@@ -1,0 +1,80 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+    }
+    dependencies {
+        classpath "net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT"
+    }
+}
+apply plugin: "net.minecraftforge.gradle.forge"
+
+ext.configFile = file "build.properties"
+configFile.withReader {
+    def prop = new Properties()
+    prop.load(it)
+    project.ext.config = new ConfigSlurper().parse prop
+}
+
+version = getVersionFromJava()
+group = "net.ilexiconn.qubble"
+archivesBaseName = "Qubble"
+sourceCompatibility = targetCompatibility = "1.8"
+
+minecraft {
+    version = config.minecraft_version + "-" + config.forge_version + "-" + config.minecraft_version
+    runDir = "minecraft"
+    mappings = "snapshot_20160401"
+}
+
+repositories {
+	mavenCentral()
+	maven {
+		name = "ilexiconn"
+		url = "http://maven.ilexiconn.net"
+	}
+}
+
+dependencies {
+    compile "net.ilexiconn:llibrary:${config.llibrary_version}-${config.minecraft_version}:dev"
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from (sourceSets.main.resources.srcDirs) {
+        include "mcmod.info"
+        expand "version":project.version, "mcversion":project.minecraft.version
+    }
+        
+    from (sourceSets.main.resources.srcDirs) {
+        exclude "mcmod.info"
+    }
+}
+
+String getVersionFromJava() {
+    String major = "0";
+    String revision = "0";
+    String patch = "0";
+    String prefix = "public static final String VERSION = \"";
+    File file = file("src/main/java/net/ilexiconn/qubble/Qubble.java");
+    file.eachLine { String s ->
+        s = s.trim();
+        if (s.startsWith(prefix)) {
+            s = s.substring(prefix.length(), s.length() - 2);
+            String[] pts = s.split("\\.");
+
+            major = pts[0];
+            revision = pts[1];
+            patch = pts[2];
+        }
+    }
+
+    return "$major.$revision.$patch";
+}
+
+idea { module { inheritOutputDirs = true } }
