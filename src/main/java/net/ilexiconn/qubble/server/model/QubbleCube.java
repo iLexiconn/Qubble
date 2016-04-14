@@ -31,6 +31,34 @@ public class QubbleCube implements INBTSerializable<NBTTagCompound> {
     private boolean textureMirrored;
     private float opacity;
 
+    public QubbleCube() {
+
+    }
+
+    public QubbleCube(String name, List<QubbleCube> children, int dimensionX, int dimensionY, int dimensionZ, float positionX, float positionY, float positionZ, float offsetX, float offsetY, float offsetZ, float rotationX, float rotationY, float rotationZ, float scaleX, float scaleY, float scaleZ, int textureX, int textureY, boolean textureMirrored, float opacity) {
+        this.name = name;
+        this.children = children;
+        this.dimensionX = dimensionX;
+        this.dimensionY = dimensionY;
+        this.dimensionZ = dimensionZ;
+        this.positionX = positionX;
+        this.positionY = positionY;
+        this.positionZ = positionZ;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+        this.offsetZ = offsetZ;
+        this.rotationX = rotationX;
+        this.rotationY = rotationY;
+        this.rotationZ = rotationZ;
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
+        this.scaleZ = scaleZ;
+        this.textureX = textureX;
+        this.textureY = textureY;
+        this.textureMirrored = textureMirrored;
+        this.opacity = opacity;
+    }
+
     @Override
     public NBTTagCompound serializeNBT() {
         NBTTagCompound compound = new NBTTagCompound();
@@ -109,5 +137,89 @@ public class QubbleCube implements INBTSerializable<NBTTagCompound> {
         this.textureY = textureTag.getInteger("y");
         this.textureMirrored = textureTag.getBoolean("mirrored");
         this.opacity = compound.getFloat("opacity");
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<QubbleCube> getChildren() {
+        return children;
+    }
+
+    public int getDimensionX() {
+        return dimensionX;
+    }
+
+    public int getDimensionY() {
+        return dimensionY;
+    }
+
+    public int getDimensionZ() {
+        return dimensionZ;
+    }
+
+    public float getPositionX() {
+        return positionX;
+    }
+
+    public float getPositionY() {
+        return positionY;
+    }
+
+    public float getPositionZ() {
+        return positionZ;
+    }
+
+    public float getOffsetX() {
+        return offsetX;
+    }
+
+    public float getOffsetY() {
+        return offsetY;
+    }
+
+    public float getOffsetZ() {
+        return offsetZ;
+    }
+
+    public float getRotationX() {
+        return rotationX;
+    }
+
+    public float getRotationY() {
+        return rotationY;
+    }
+
+    public float getRotationZ() {
+        return rotationZ;
+    }
+
+    public float getScaleX() {
+        return scaleX;
+    }
+
+    public float getScaleY() {
+        return scaleY;
+    }
+
+    public float getScaleZ() {
+        return scaleZ;
+    }
+
+    public int getTextureX() {
+        return textureX;
+    }
+
+    public int getTextureY() {
+        return textureY;
+    }
+
+    public boolean isTextureMirrored() {
+        return textureMirrored;
+    }
+
+    public float getOpacity() {
+        return opacity;
     }
 }

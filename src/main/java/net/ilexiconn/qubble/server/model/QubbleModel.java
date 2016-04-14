@@ -11,15 +11,30 @@ import java.util.List;
 public class QubbleModel implements INBTSerializable<NBTTagCompound> {
     private String name;
     private String author;
+    private int version;
     private int textureWidth;
     private int textureHeight;
     private List<QubbleCube> cubes = new ArrayList<>();
+
+    public QubbleModel() {
+
+    }
+
+    public QubbleModel(String name, String author, int version, int textureWidth, int textureHeight, List<QubbleCube> cubes) {
+        this.name = name;
+        this.author = author;
+        this.version = version;
+        this.textureWidth = textureWidth;
+        this.textureHeight = textureHeight;
+        this.cubes = cubes;
+    }
 
     @Override
     public NBTTagCompound serializeNBT() {
         NBTTagCompound compound = new NBTTagCompound();
         compound.setString("name", this.name);
         compound.setString("author", this.author);
+        compound.setInteger("version", this.version);
         NBTTagCompound textureTag = new NBTTagCompound();
         textureTag.setInteger("width", this.textureWidth);
         textureTag.setInteger("height", this.textureHeight);
@@ -36,6 +51,7 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
     public void deserializeNBT(NBTTagCompound compound) {
         this.name = compound.getString("name");
         this.author = compound.getString("author");
+        this.version = compound.getInteger("version");
         NBTTagCompound textureTag = compound.getCompoundTag("texture");
         this.textureWidth = textureTag.getInteger("width");
         this.textureHeight = textureTag.getInteger("height");
@@ -54,6 +70,10 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
 
     public String getAuthor() {
         return author;
+    }
+
+    public int getVersion() {
+        return version;
     }
 
     public int getTextureWidth() {
