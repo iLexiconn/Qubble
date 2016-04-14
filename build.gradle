@@ -15,8 +15,8 @@ apply plugin: "net.minecraftforge.gradle.forge"
 def mod_file = getModFile()
 version = getVersion("VERSION", mod_file)
 def llibrary_version = getVersion("LLIBRARY_VERSION", mod_file)
-group = "net.ilexiconn.qubble"
-archivesBaseName = "Qubble"
+group = mod_file.split("\\.").dropRight(2)
+archivesBaseName = mod_file.split("\\.").last()
 sourceCompatibility = targetCompatibility = "1.8"
 
 minecraft {
