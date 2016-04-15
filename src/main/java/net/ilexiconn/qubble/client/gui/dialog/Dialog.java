@@ -30,7 +30,7 @@ public class Dialog {
         this.posY = posY;
         this.width = width;
         this.height = height;
-        this.addComponent(new ButtonComponent("x", this.width - 11, 1, 10, 10, "Close this dialog", (gui, component) -> gui.closeDialog(Dialog.this)));
+        this.addComponent(new ButtonComponent("x", this.width - 12, 0, 12, 12, "Close this dialog", (gui, component) -> gui.closeDialog(Dialog.this)));
     }
 
     public void addComponent(IGUIComponent component) {

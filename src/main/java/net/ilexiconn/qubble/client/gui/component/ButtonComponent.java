@@ -54,6 +54,7 @@ public class ButtonComponent extends Gui implements IGUIComponent {
         if (this.tooltip != null && this.hoverChecker.checkHover(mouseX, mouseY)) {
             GuiScreen currentScreen = ClientProxy.MINECRAFT.currentScreen;
             GuiUtils.drawHoveringText(Collections.singletonList(this.tooltip), mouseX, mouseY, currentScreen.width, currentScreen.height, 300, fontRenderer);
+            GlStateManager.disableLighting();
         }
     }
 
