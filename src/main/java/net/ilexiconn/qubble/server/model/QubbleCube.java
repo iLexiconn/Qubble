@@ -35,26 +35,26 @@ public class QubbleCube implements INBTSerializable<NBTTagCompound> {
 
     }
 
-    public QubbleCube(String name, List<QubbleCube> children, int dimensionX, int dimensionY, int dimensionZ, float positionX, float positionY, float positionZ, float offsetX, float offsetY, float offsetZ, float rotationX, float rotationY, float rotationZ, float scaleX, float scaleY, float scaleZ, int textureX, int textureY, boolean textureMirrored, float opacity) {
+    public QubbleCube(String name, List<QubbleCube> children, int[] dimension, float[] position, float[] offset, float[] rotation, float[] scale, int[] texture, boolean textureMirrored, float opacity) {
         this.name = name;
         this.children = children;
-        this.dimensionX = dimensionX;
-        this.dimensionY = dimensionY;
-        this.dimensionZ = dimensionZ;
-        this.positionX = positionX;
-        this.positionY = positionY;
-        this.positionZ = positionZ;
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        this.offsetZ = offsetZ;
-        this.rotationX = rotationX;
-        this.rotationY = rotationY;
-        this.rotationZ = rotationZ;
-        this.scaleX = scaleX;
-        this.scaleY = scaleY;
-        this.scaleZ = scaleZ;
-        this.textureX = textureX;
-        this.textureY = textureY;
+        this.dimensionX = dimension[0];
+        this.dimensionY = dimension[1];
+        this.dimensionZ = dimension[2];
+        this.positionX = position[0];
+        this.positionY = position[1];
+        this.positionZ = position[2];
+        this.offsetX = offset[0];
+        this.offsetY = offset[1];
+        this.offsetZ = offset[2];
+        this.rotationX = rotation[0];
+        this.rotationY = rotation[1];
+        this.rotationZ = rotation[2];
+        this.scaleX = scale[0];
+        this.scaleY = scale[1];
+        this.scaleZ = scale[2];
+        this.textureX = texture[0];
+        this.textureY = texture[1];
         this.textureMirrored = textureMirrored;
         this.opacity = opacity;
     }

@@ -43,8 +43,10 @@ public class JavaExporter implements IModelExporter<List<String>> {
         list.add("    @Override");
         list.add("    public void render(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float rotationYaw, float rotationPitch, float scale) {");
         this.addRenderCalls(model.getCubes(), list);
+        list.add("    }");
         list.add("");
         this.addRotationAngles(list);
+        list.add("}");
         return list;
     }
 
