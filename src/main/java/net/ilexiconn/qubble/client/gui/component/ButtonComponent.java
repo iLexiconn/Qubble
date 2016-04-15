@@ -3,10 +3,12 @@ package net.ilexiconn.qubble.client.gui.component;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.init.SoundEvents;
 import net.minecraftforge.fml.client.config.GuiUtils;
 import net.minecraftforge.fml.client.config.HoverChecker;
 import net.minecraftforge.fml.relauncher.Side;
@@ -66,6 +68,7 @@ public class ButtonComponent extends Gui implements IGUIComponent {
     @Override
     public void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button) {
         if (this.isSelected(mouseX, mouseY)) {
+            ClientProxy.MINECRAFT.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
             this.actionHandler.onAction(gui, this);
         }
     }
