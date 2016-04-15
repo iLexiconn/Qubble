@@ -44,7 +44,7 @@ public class Dialog {
 
     public void render(QubbleGUI gui, int mouseX, int mouseY, float partialTicks) {
         int accentColor = Qubble.CONFIG.getAccentColor();
-        gui.drawRectangle(this.posX, this.posY, this.width, this.height, QubbleGUI.SECONDARY_COLOR);
+        gui.drawRectangle(this.posX, this.posY, this.width, this.height, QubbleGUI.getSecondaryColor());
         gui.drawOutline(this.posX, this.posY, this.width, this.height, accentColor, 1);
         gui.drawOutline(this.posX, this.posY, this.width, 12, accentColor, 1);
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;

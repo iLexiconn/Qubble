@@ -1,5 +1,6 @@
 package net.ilexiconn.qubble.client.gui;
 
+import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.component.ButtonComponent;
 import net.ilexiconn.qubble.client.gui.component.IActionHandler;
@@ -22,8 +23,11 @@ import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class QubbleGUI extends GuiScreen {
-    public static final int PRIMARY_COLOR = 0xFF3D3D3D;
-    public static final int SECONDARY_COLOR = 0xFF212121;
+    private static final int PRIMARY_COLOR_DARK = 0xFF3D3D3D;
+    private static final int SECONDARY_COLOR_DARK = 0xFF212121;
+
+    private static final int PRIMARY_COLOR_LIGHT = 0xFFDBDBDB;
+    private static final int SECONDARY_COLOR_LIGHT = 0xFFECECEC;
 
     private GuiMainMenu mainMenu;
 
@@ -92,7 +96,12 @@ public class QubbleGUI extends GuiScreen {
 
     private void drawBackground() {
         GlStateManager.disableTexture2D();
-        GlStateManager.color(0.1F, 0.1F, 0.1F, 1.0F);
+        GlStateManager.disableAlpha();
+        int color = getSecondaryColor();
+        float r = (float) (color >> 16 & 0xFF) / 255.0F;
+        float g = (float) (color >> 8 & 0xFF) / 255.0F;
+        float b = (float) (color & 0xFF) / 255.0F;
+        GlStateManager.color(r * 0.8F, g * 0.8F, b * 0.8F, 1.0F);
         this.drawTexturedModalRect(0, 0, 0, 0, this.width, this.height);
         GlStateManager.enableTexture2D();
     }
@@ -101,10 +110,10 @@ public class QubbleGUI extends GuiScreen {
         GlStateManager.disableTexture2D();
         GlStateManager.enableBlend();
         GlStateManager.disableAlpha();
-        float a = (float)(color >> 24 & 0xFF) / 255.0F;
-        float r = (float)(color >> 16 & 0xFF) / 255.0F;
-        float g = (float)(color >> 8 & 0xFF) / 255.0F;
-        float b = (float)(color & 0xFF) / 255.0F;
+        float a = (float) (color >> 24 & 0xFF) / 255.0F;
+        float r = (float) (color >> 16 & 0xFF) / 255.0F;
+        float g = (float) (color >> 8 & 0xFF) / 255.0F;
+        float b = (float) (color & 0xFF) / 255.0F;
         Tessellator tessellator = Tessellator.getInstance();
         VertexBuffer vertexBuffer = tessellator.getBuffer();
         vertexBuffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
@@ -131,5 +140,12 @@ public class QubbleGUI extends GuiScreen {
 
     public void closeDialog(Dialog dialog) {
         this.openDialogs.remove(dialog);
+    }
+
+    public static int getPrimaryColor() {
+        return Qubble.CONFIG.darkMode ? PRIMARY_COLOR_DARK : PRIMARY_COLOR_LIGHT;
+    }
+    public static int getSecondaryColor() {
+        return Qubble.CONFIG.darkMode ? SECONDARY_COLOR_DARK : SECONDARY_COLOR_LIGHT;
     }
 }

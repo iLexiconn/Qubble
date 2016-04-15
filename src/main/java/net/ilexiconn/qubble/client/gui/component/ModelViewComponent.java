@@ -8,7 +8,7 @@ public class ModelViewComponent implements IGUIComponent {
     public void render(QubbleGUI gui, int mouseX, int mouseY, float partialTicks) {
         GlStateManager.disableLighting();
         GlStateManager.disableTexture2D();
-        gui.drawOutline(0, 20, gui.width, gui.height - 20, QubbleGUI.PRIMARY_COLOR, 1);
+        gui.drawOutline(0, 20, gui.width, gui.height - 20, QubbleGUI.getPrimaryColor(), 1);
         if (gui.getCurrentModel() != null) {
             GlStateManager.pushMatrix();
             GlStateManager.disableTexture2D();

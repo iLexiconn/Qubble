@@ -6,6 +6,9 @@ public class QubbleConfig {
     @ConfigEntry(name = "Accent Color")
     public String accentColor = "0xFF212121";
 
+    @ConfigEntry(name = "Dark Mode")
+    public boolean darkMode = false;
+
     public int getAccentColor() {
         if (this.accentColor.startsWith("0x")) {
             String hex = this.accentColor.split("0x")[1];

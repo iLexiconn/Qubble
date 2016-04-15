@@ -24,8 +24,8 @@ public class ButtonComponent extends Gui implements IGUIComponent {
     private int width;
     private int height;
 
-    private int primaryColor = QubbleGUI.PRIMARY_COLOR;
-    private int secondaryColor = QubbleGUI.SECONDARY_COLOR;
+    private int primaryColor = QubbleGUI.getPrimaryColor();
+    private int secondaryColor = QubbleGUI.getSecondaryColor();
     private int accentColor = Qubble.CONFIG.getAccentColor();
 
     private HoverChecker hoverChecker;
