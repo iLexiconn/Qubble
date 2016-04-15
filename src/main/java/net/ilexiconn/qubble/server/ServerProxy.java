@@ -5,6 +5,7 @@ import net.ilexiconn.qubble.server.model.QubbleModel;
 import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
 import net.ilexiconn.qubble.server.model.exporter.JavaExporter;
 import net.ilexiconn.qubble.server.model.exporter.JavaScriptExporter;
+import net.ilexiconn.qubble.server.model.exporter.ScalaExporter;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.ilexiconn.qubble.server.model.importer.JavaScriptImporter;
 import net.ilexiconn.qubble.server.model.importer.TabulaImporter;
@@ -22,11 +23,13 @@ public class ServerProxy {
 
         IModelImporter<TabulaModelContainer> tabulaImporter = new TabulaImporter();
         IModelExporter<List<String>> javaExporter = new JavaExporter();
+        IModelExporter<List<String>> scalaExporter = new ScalaExporter();
         IModelExporter<List<String>> jsExporter = new JavaScriptExporter();
         IModelImporter<List<String>> jsImporter = new JavaScriptImporter();
 
         try {
             QubbleModel model = tabulaImporter.getModel(tabulaImporter.read(new File(".", "test.tbl")));
+            scalaExporter.save(scalaExporter.export(model, "net.ilexiconn.test", "TestModel"), new File(".", "test.scala"));
             CompressedStreamTools.writeCompressed(model.serializeNBT(), new FileOutputStream(new File("tabula.qbl")));
             jsExporter.save(jsExporter.export(model), new File(".", "test.js"));
             model = jsImporter.getModel(jsImporter.read(new File(".", "test.js")));
