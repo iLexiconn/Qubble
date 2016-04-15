@@ -4,5 +4,17 @@ import net.ilexiconn.llibrary.server.config.ConfigEntry;
 
 public class QubbleConfig {
     @ConfigEntry(name = "Accent Color")
-    public int accentColor = 0xFF212121;
+    public String accentColor = "0xFF212121";
+
+    public int getAccentColor() {
+        if (this.accentColor.startsWith("0x")) {
+            String hex = this.accentColor.split("0x")[1];
+            while (hex.length() < 8) {
+                hex = "F" + hex;
+            }
+            return (int) Long.parseLong(hex, 16);
+        } else {
+            return Integer.parseInt(this.accentColor);
+        }
+    }
 }

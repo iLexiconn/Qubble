@@ -46,12 +46,11 @@ public class ButtonComponent extends Gui implements IGUIComponent {
     public void render(QubbleGUI gui, int mouseX, int mouseY, float partialTicks) {
         boolean selected = this.isSelected(mouseX, mouseY);
         GlStateManager.disableTexture2D();
-        this.drawGradientRect(this.posX + 1, this.posY + 1, this.width - 1, this.height - 1, selected ? QubbleGUI.PRIMARY_COLOR : QubbleGUI.PRIMARY_COLOR, selected ? QubbleGUI.SECONDARY_COLOR : QubbleGUI.PRIMARY_COLOR);
-        this.drawOutline(this.posX, this.posY, this.width, this.height, Qubble.CONFIG.accentColor, 1);
+        this.drawGradientRect(this.posX + 1, this.posY + 1, this.posX + this.width - 1, this.posY + this.height - 1, selected ? QubbleGUI.PRIMARY_COLOR : QubbleGUI.PRIMARY_COLOR, selected ? QubbleGUI.SECONDARY_COLOR : QubbleGUI.PRIMARY_COLOR);
+        gui.drawOutline(this.posX, this.posY, this.width, this.height, Qubble.CONFIG.getAccentColor(), 1);
         GlStateManager.enableTexture2D();
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
         fontRenderer.drawString(this.text, this.posX + (this.width / 2) - (fontRenderer.getStringWidth(this.text) / 2), this.posY + (this.height / 2) - (fontRenderer.FONT_HEIGHT / 2), 0xFFFFFF);
-
         if (this.tooltip != null && this.hoverChecker.checkHover(mouseX, mouseY)) {
             GuiScreen currentScreen = ClientProxy.MINECRAFT.currentScreen;
             GuiUtils.drawHoveringText(Collections.singletonList(this.tooltip), mouseX, mouseY, currentScreen.width, currentScreen.height, 300, fontRenderer);
@@ -61,7 +60,7 @@ public class ButtonComponent extends Gui implements IGUIComponent {
     @Override
     public void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button) {
         if (this.isSelected(mouseX, mouseY)) {
-            this.actionHandler.onAction(this);
+            this.actionHandler.onAction(gui, this);
         }
     }
 
