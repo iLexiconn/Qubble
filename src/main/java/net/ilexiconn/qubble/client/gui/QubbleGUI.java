@@ -29,7 +29,7 @@ public class QubbleGUI extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
-        this.components.add(new ButtonComponent("x", 0, 0, 20, 20, "Close Qubble and return to the main menu", (component) -> ClientProxy.MINECRAFT.displayGuiScreen(this.mainMenu)));
+        this.components.add(new ButtonComponent("x", 0, 0, 20, 20, "Close Qubble and return to the main menu", component -> ClientProxy.MINECRAFT.displayGuiScreen(this.mainMenu)));
     }
 
     @Override

@@ -25,13 +25,13 @@ public class ButtonComponent extends Gui implements IGUIComponent {
     private int height;
 
     private HoverChecker hoverChecker;
-    private IActionHandler actionHandler;
+    private IActionHandler<ButtonComponent> actionHandler;
 
-    public ButtonComponent(String text, int posX, int posY, int width, int height, IActionHandler action) {
+    public ButtonComponent(String text, int posX, int posY, int width, int height, IActionHandler<ButtonComponent> action) {
         this(text, posX, posY, width, height, null, action);
     }
 
-    public ButtonComponent(String text, int posX, int posY, int width, int height, String tooltip, IActionHandler action) {
+    public ButtonComponent(String text, int posX, int posY, int width, int height, String tooltip, IActionHandler<ButtonComponent> action) {
         this.text = text;
         this.posX = posX;
         this.posY = posY;
@@ -61,7 +61,7 @@ public class ButtonComponent extends Gui implements IGUIComponent {
     @Override
     public void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button) {
         if (this.isSelected(mouseX, mouseY)) {
-            this.actionHandler.onAction();
+            this.actionHandler.onAction(this);
         }
     }
 
