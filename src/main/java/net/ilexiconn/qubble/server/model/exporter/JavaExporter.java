@@ -1,6 +1,5 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
-import com.google.common.base.CaseFormat;
 import net.ilexiconn.qubble.server.model.QubbleCube;
 import net.ilexiconn.qubble.server.model.QubbleModel;
 
@@ -68,10 +67,10 @@ public class JavaExporter implements IModelExporter<List<String>> {
         for (QubbleCube cube : cubes) {
             String field = this.getFieldName(cube);
             list.add("        this." + field + " = new ModelRenderer(this, " + cube.getTextureX() + ", " + cube.getTextureY() + ");");
-            list.add("        this." + field + ".setRotationPoint(" + cube.getPositionX() + ", " + cube.getPositionY() + ", " + cube.getPositionZ() + ");");
-            list.add("        this." + field + ".addBox(" + cube.getOffsetX() + "F, " + cube.getOffsetY() + "F, " + cube.getOffsetZ() + ");");
+            list.add("        this." + field + ".setRotationPoint(" + cube.getPositionX() + "F, " + cube.getPositionY() + "F, " + cube.getPositionZ() + "F);");
+            list.add("        this." + field + ".addBox(" + cube.getOffsetX() + "F, " + cube.getOffsetY() + "F, " + cube.getOffsetZ() + "F);");
             if (cube.getRotationX() != 0.0F || cube.getRotationY() != 0.0F || cube.getRotationZ() != 0.0F) {
-                list.add("        this.setRotationAngles(this." + field + ", " + Math.toRadians(cube.getRotationX()) + ", " + Math.toRadians(cube.getRotationY()) + ", " + Math.toRadians(cube.getRotationZ()) + ");");
+                list.add("        this.setRotationAngles(this." + field + ", " + Math.toRadians(cube.getRotationX()) + "F, " + Math.toRadians(cube.getRotationY()) + "F, " + Math.toRadians(cube.getRotationZ()) + "F);");
             }
             if (parent != null) {
                 list.add("        this." + this.getFieldName(parent) + ".addChild(this." + field + ");");
@@ -89,7 +88,7 @@ public class JavaExporter implements IModelExporter<List<String>> {
                 list.add("        GlStateManager.pushMatrix();");
                 list.add("        GlStateManager.translate(this." + field + ".offsetX, this." + field + ".offsetY, this." + field + ".offsetZ);");
                 list.add("        GlStateManager.translate(this." + field + ".rotationPointX * scale, this." + field + ".rotationPointY * scale, this." + field + ".rotationPointZ * scale);");
-                list.add("        GlStateManager.scale(" + cube.getScaleX() + "D, " + cube.getScaleY() + "D, " + cube.getScaleZ() + "D);");
+                list.add("        GlStateManager.scale(" + cube.getScaleX() + "F, " + cube.getScaleY() + "F, " + cube.getScaleZ() + "F);");
                 list.add("        GlStateManager.translate(-this." + field + ".offsetX, -this." + field + ".offsetY, -this." + field + ".offsetZ);");
                 list.add("        GlStateManager.translate(-this." + field + ".rotationPointX * scale, -this." + field + ".rotationPointY * scale, -this." + field + ".rotationPointZ * scale);");
             }
@@ -117,6 +116,6 @@ public class JavaExporter implements IModelExporter<List<String>> {
     }
 
     public String getFieldName(QubbleCube cube) {
-        return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, cube.getName().replaceAll("[^A-Za-z0-9_$]", ""));
+        return cube.getName().replaceAll("[^A-Za-z0-9_$]", "");
     }
 }

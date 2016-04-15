@@ -42,7 +42,6 @@ public class TabulaImporter implements IModelImporter<TabulaModelContainer> {
     public List<QubbleCube> addChildren(QubbleCube parent, List<TabulaCubeContainer> cubes) {
         List<QubbleCube> list = new ArrayList<>();
         for (TabulaCubeContainer cube : cubes) {
-            System.out.println("Found cube " + cube.getName() + "." + (parent != null ? " Parent: " + parent.getName() : ""));
             QubbleCube qubble = new QubbleCube(cube.getName(), new ArrayList<>(), cube.getDimensions(), doubleToFloat(cube.getPosition()), doubleToFloat(cube.getOffset()), doubleToFloat(cube.getRotation()), doubleToFloat(cube.getScale()), cube.getTextureOffset(), cube.isTextureMirrorEnabled(), (float) cube.getOpacity());
             if (parent == null) {
                 list.add(qubble);
@@ -55,7 +54,6 @@ public class TabulaImporter implements IModelImporter<TabulaModelContainer> {
     }
 
     public List<QubbleCube> addChildrenFromGroup(QubbleCube parent, TabulaCubeGroupContainer cubeGroup) {
-        System.out.println("Found group " + cubeGroup.getName() + "." + (parent != null ? " Parent: " + parent.getName() : ""));
         List<QubbleCube> list = this.addChildren(parent, cubeGroup.getCubes());
         for (TabulaCubeGroupContainer group : cubeGroup.getCubeGroups()) {
             list.addAll(this.addChildrenFromGroup(parent, group));
