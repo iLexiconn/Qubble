@@ -43,6 +43,9 @@ public class QubbleGUI extends GuiScreen {
         this.openDialogs.clear();
         this.components.add(new ButtonComponent("x", 0, 0, 20, 20, "Close Qubble and return to the main menu", (gui, component) -> ClientProxy.MINECRAFT.displayGuiScreen(QubbleGUI.this.mainMenu)));
         this.components.add(new ModelViewComponent());
+        Dialog dialog = new Dialog("Test Dialogue", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
+        dialog.addComponent(new ButtonComponent("Test", 100, 100, 40, 20, (gui, component) -> System.out.println("Test button")));
+        this.openDialogs.add(dialog);
     }
 
     @Override
@@ -89,7 +92,7 @@ public class QubbleGUI extends GuiScreen {
 
     private void drawBackground() {
         GlStateManager.disableTexture2D();
-        GlStateManager.color(0.05F, 0.05F, 0.05F, 1.0F);
+        GlStateManager.color(0.1F, 0.1F, 0.1F, 1.0F);
         this.drawTexturedModalRect(0, 0, 0, 0, this.width, this.height);
         GlStateManager.enableTexture2D();
     }

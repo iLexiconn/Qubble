@@ -24,6 +24,10 @@ public class ButtonComponent extends Gui implements IGUIComponent {
     private int width;
     private int height;
 
+    private int primaryColor = QubbleGUI.PRIMARY_COLOR;
+    private int secondaryColor = QubbleGUI.SECONDARY_COLOR;
+    private int accentColor = Qubble.CONFIG.getAccentColor();
+
     private HoverChecker hoverChecker;
     private IActionHandler<ButtonComponent> actionHandler;
 
@@ -46,11 +50,11 @@ public class ButtonComponent extends Gui implements IGUIComponent {
     public void render(QubbleGUI gui, int mouseX, int mouseY, float partialTicks) {
         boolean selected = this.isSelected(mouseX, mouseY);
         GlStateManager.disableTexture2D();
-        this.drawGradientRect(this.posX + 1, this.posY + 1, this.posX + this.width - 1, this.posY + this.height - 1, selected ? QubbleGUI.PRIMARY_COLOR : QubbleGUI.PRIMARY_COLOR, selected ? QubbleGUI.SECONDARY_COLOR : QubbleGUI.PRIMARY_COLOR);
-        gui.drawOutline(this.posX, this.posY, this.width, this.height, Qubble.CONFIG.getAccentColor(), 1);
+        this.drawGradientRect(this.posX + 1, this.posY + 1, this.posX + this.width - 1, this.posY + this.height - 1, selected ? primaryColor : primaryColor, selected ? secondaryColor : primaryColor);
+        gui.drawOutline(this.posX, this.posY, this.width, this.height, this.accentColor, 1);
         GlStateManager.enableTexture2D();
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
-        fontRenderer.drawString(this.text, this.posX + (this.width / 2) - (fontRenderer.getStringWidth(this.text) / 2), this.posY + (this.height / 2) - (fontRenderer.FONT_HEIGHT / 2), 0xFFFFFF);
+        fontRenderer.drawString(this.text, this.posX + (this.width / 2) - (fontRenderer.getStringWidth(this.text) / 2) + 0.625F, this.posY + (this.height / 2) - (fontRenderer.FONT_HEIGHT / 2) - 0.625F, 0xFFFFFF, false);
         if (this.tooltip != null && this.hoverChecker.checkHover(mouseX, mouseY)) {
             GuiScreen currentScreen = ClientProxy.MINECRAFT.currentScreen;
             GuiUtils.drawHoveringText(Collections.singletonList(this.tooltip), mouseX, mouseY, currentScreen.width, currentScreen.height, 300, fontRenderer);
@@ -72,5 +76,11 @@ public class ButtonComponent extends Gui implements IGUIComponent {
 
     protected boolean isSelected(int mouseX, int mouseY) {
         return mouseX > this.posX && mouseY > this.posY && mouseX < this.posX + this.width && mouseY < this.posY + this.height;
+    }
+
+    public void setColorScheme(int primaryColor, int secondaryColor, int accentColor) {
+        this.primaryColor = primaryColor;
+        this.secondaryColor = secondaryColor;
+        this.accentColor = accentColor;
     }
 }

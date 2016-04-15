@@ -1,9 +1,12 @@
 package net.ilexiconn.qubble.client.gui.dialog;
 
+import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.component.ButtonComponent;
 import net.ilexiconn.qubble.client.gui.component.IGUIComponent;
+import net.ilexiconn.qubble.server.ServerProxy;
+import net.ilexiconn.qubble.server.config.QubbleConfig;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 
@@ -30,7 +33,9 @@ public class Dialog {
         this.posY = posY;
         this.width = width;
         this.height = height;
-        this.addComponent(new ButtonComponent("x", this.width - 12, 0, 12, 12, "Close this dialog", (gui, component) -> gui.closeDialog(Dialog.this)));
+        ButtonComponent closeWindowComponent = new ButtonComponent("x", this.width - 12, 0, 12, 12, "Close this dialog", (gui, component) -> gui.closeDialog(Dialog.this));
+        closeWindowComponent.setColorScheme(0xFFFF2020, 0xFF7F0000, 0xFFFF2020);
+        this.addComponent(closeWindowComponent);
     }
 
     public void addComponent(IGUIComponent component) {
@@ -38,9 +43,10 @@ public class Dialog {
     }
 
     public void render(QubbleGUI gui, int mouseX, int mouseY, float partialTicks) {
+        int accentColor = Qubble.CONFIG.getAccentColor();
         gui.drawRectangle(this.posX, this.posY, this.width, this.height, QubbleGUI.SECONDARY_COLOR);
-        gui.drawOutline(this.posX, this.posY, this.width, this.height, QubbleGUI.PRIMARY_COLOR, 1);
-        gui.drawOutline(this.posX, this.posY, this.width, 12, QubbleGUI.PRIMARY_COLOR, 1);
+        gui.drawOutline(this.posX, this.posY, this.width, this.height, accentColor, 1);
+        gui.drawOutline(this.posX, this.posY, this.width, 12, accentColor, 1);
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
         fontRenderer.drawString(this.name, this.posX + 2, this.posY + 2, 0xFFFFFF);
         mouseX -= this.posX;
