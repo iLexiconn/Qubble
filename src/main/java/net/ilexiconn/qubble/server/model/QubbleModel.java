@@ -87,4 +87,24 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
     public List<QubbleCube> getCubes() {
         return cubes;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public void setTextureWidth(int textureWidth) {
+        this.textureWidth = textureWidth;
+    }
+
+    public void setTextureHeight(int textureHeight) {
+        this.textureHeight = textureHeight;
+    }
 }
