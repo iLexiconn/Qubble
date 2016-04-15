@@ -19,6 +19,7 @@ public class JavaScriptExporter implements IModelExporter<List<String>> {
     @Override
     public List<String> export(QubbleModel model, String... arguments) {
         List<String> list = new ArrayList<>();
+        list.add("//" + model.getName() + " by " + model.getAuthor());
         list.add("function addEntityRenderType(renderer) {");
         list.add("    var model = renderer.getModel();");
         list.add("    var body = model.getPart(\"body\").clear();");
@@ -52,7 +53,7 @@ public class JavaScriptExporter implements IModelExporter<List<String>> {
             String bodyPart = this.getBodyPart(name);
             list.add("    //" + name);
             list.add("    " + bodyPart + ".setTextureOffset(" + cube.getTextureX() + ", " + cube.getTextureY() + ");");
-            list.add("    " + bodyPart + ".addBox(" + (cube.getPositionX() + cube.getOffsetX()) + ", " + (cube.getPositionY() + cube.getOffsetY()) + ", " + (cube.getPositionZ() + cube.getOffsetZ()) + ");");
+            list.add("    " + bodyPart + ".addBox(" + (cube.getPositionX() + cube.getOffsetX()) + ", " + (cube.getPositionY() + cube.getOffsetY()) + ", " + (cube.getPositionZ() + cube.getOffsetZ()) + ", " + cube.getDimensionX() + ", " + cube.getDimensionY() + ", " + cube.getDimensionZ() + ");");
             this.addCubeDeclarations(cube.getChildren(), list);
         }
     }
