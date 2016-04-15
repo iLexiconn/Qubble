@@ -18,33 +18,32 @@ public class JavaScriptImporter implements IModelImporter<List<String>> {
         int textureOffsetX = 0;
         int textureOffsetY = 0;
         String name = "Unknown";
+        String author = "Unknown";
+        String cube = "Unknown";
         for (String line : model) {
-            if (line.contains("setTextureSize") && textureWidth == 64 && textureHeight == 32) {
+            if (line.startsWith("//") && line.contains("by")) {
+                String[] array = line.substring(2, line.length()).split(" by ");
+                name = array[0];
+                author = array[1];
+            } else if (line.contains("setTextureSize") && textureWidth == 64 && textureHeight == 32) {
                 String[] values = line.substring(line.indexOf("(") + 1, line.length() - 2).split(",");
                 textureWidth = Integer.parseInt(values[0].trim());
                 textureHeight = Integer.parseInt(values[1].trim());
             } else if (line.contains("//")) {
-                name = line.substring(line.indexOf("//") + 1, line.length());
+                cube = line.substring(line.indexOf("//") + 1, line.length());
             } else if (line.contains("setTextureOffset")) {
                 String[] values = line.substring(line.indexOf("(") + 1, line.length() - 2).split(",");
                 textureOffsetX = Integer.parseInt(values[0].trim());
                 textureOffsetY = Integer.parseInt(values[1].trim());
             } else if (line.contains("addBox")) {
                 String[] values = line.substring(line.indexOf("(") + 1, line.length() - 2).split(",");
-                int[] dimension = {Integer.parseInt(values[3].trim()),Integer.parseInt(values[4].trim()), Integer.parseInt(values[5].trim())};
+                int[] dimension = {Integer.parseInt(values[3].trim()), Integer.parseInt(values[4].trim()), Integer.parseInt(values[5].trim())};
                 float[] position = {Float.parseFloat(values[0].trim()), Float.parseFloat(values[1].trim()), Float.parseFloat(values[2].trim())};
-                cubes.add(new QubbleCube(name, new ArrayList<>(), dimension, position, new float[] {0.0F, 0.0F, 0.0F}, new float[] {0.0F, 0.0F, 0.0F}, new float[] {0.0F, 0.0F, 0.0F}, new int[] {textureOffsetX, textureOffsetY}, false, 100.0F));
+                cubes.add(new QubbleCube(cube, new ArrayList<>(), dimension, position, new float[]{0.0F, 0.0F, 0.0F}, new float[]{0.0F, 0.0F, 0.0F}, new float[]{0.0F, 0.0F, 0.0F}, new int[]{textureOffsetX, textureOffsetY}, false, 100.0F));
                 textureOffsetX = 0;
                 textureOffsetY = 0;
-                name = "Unknown";
+                cube = "Unknown";
             }
-        }
-        String author = "Unknown";
-        String comment = model.get(0);
-        if (comment.startsWith("//") && comment.contains("by")) {
-            String[] array = comment.substring(2, comment.length()).split(" by ");
-            name = array[0];
-            author = array[1];
         }
         return new QubbleModel(name, author, 1, textureWidth, textureHeight, cubes);
     }

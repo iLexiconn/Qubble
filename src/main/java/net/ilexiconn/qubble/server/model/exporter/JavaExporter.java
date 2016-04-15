@@ -28,6 +28,9 @@ public class JavaExporter implements IModelExporter<List<String>> {
         list.add("import net.minecraftforge.fml.relauncher.SideOnly;");
         list.add("import org.lwjgl.opengl.GL11;");
         list.add("");
+        list.add("/**");
+        list.add(" * " + model.getName() + " by " + model.getAuthor());
+        list.add(" */");
         list.add("@SideOnly(Side.CLIENT)");
         list.add("public class " + arguments[1] + " extends ModelBase {");
         this.addCubeFields(model.getCubes(), list);
