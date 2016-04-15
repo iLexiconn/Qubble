@@ -1,5 +1,6 @@
 package net.ilexiconn.qubble.client.gui;
 
+import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.component.ButtonComponent;
 import net.ilexiconn.qubble.client.gui.component.IGuiComponent;
 import net.minecraft.client.gui.GuiMainMenu;
@@ -10,23 +11,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiQubbleEditor extends GuiScreen {
-    public static final int PRIMARY_COLOR = 0x3D3D3D;
-    public static final int SECONDARY_COLOR = 0x212121;
-    public static final int TERTIARY_COLOR = 0x10101;
+public class QubbleGUI extends GuiScreen {
+    public static final int PRIMARY_COLOR = 0xFF3D3D3D;
+    public static final int SECONDARY_COLOR = 0xFF212121;
 
-    private GuiMainMenu menu;
+    private GuiMainMenu mainMenu;
 
     private List<IGuiComponent> components = new ArrayList<>();
 
-    public GuiQubbleEditor(GuiMainMenu menu) {
-        this.menu = menu;
+    public QubbleGUI(GuiMainMenu mainMenu) {
+        this.mainMenu = mainMenu;
     }
 
     @Override
     public void initGui() {
         super.initGui();
-        this.components.add(new ButtonComponent(10, 10, 100, 20, "Test", () -> System.out.println("Test Button")));
+        this.components.add(new ButtonComponent(0, 0, 20, 20, "x", () -> ClientProxy.MINECRAFT.displayGuiScreen(this.mainMenu)));
     }
 
     @Override

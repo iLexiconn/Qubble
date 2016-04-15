@@ -1,31 +1,40 @@
 package net.ilexiconn.qubble.client.gui.component;
 
-import net.ilexiconn.qubble.client.gui.GuiQubbleEditor;
+import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 public interface IGuiComponent {
-    void render(GuiQubbleEditor gui, int mouseX, int mouseY, float partialTicks);
+    void render(QubbleGUI gui, int mouseX, int mouseY, float partialTicks);
 
-    void mouseClicked(GuiQubbleEditor gui, int mouseX, int mouseY, int button);
+    void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button);
 
-    void mouseDragged(GuiQubbleEditor gui, int mouseX, int mouseY, int button, long timeSinceClick);
+    void mouseDragged(QubbleGUI gui, int mouseX, int mouseY, int button, long timeSinceClick);
 
-    static void drawRectangle(int x, int y, int width, int height, int color) {
-        GlStateManager.color(((color & 0xFF0000) >> 16) / 255.0F, ((color & 0xFF00) >> 8) / 255.0F, (color & 0xFF) / 255.0F);
+    default void drawRectangle(int x, int y, int width, int height, int color) {
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        float a = (float)(color >> 24 & 255) / 255.0F;
+        float r = (float)(color >> 16 & 255) / 255.0F;
+        float g = (float)(color >> 8 & 255) / 255.0F;
+        float b = (float)(color & 255) / 255.0F;
         Tessellator tessellator = Tessellator.getInstance();
         VertexBuffer vertexBuffer = tessellator.getBuffer();
-        vertexBuffer.begin(7, DefaultVertexFormats.POSITION);
-        vertexBuffer.pos(x, y + height, 0.0).endVertex();
-        vertexBuffer.pos(x + width, y + height, 0.0).endVertex();
-        vertexBuffer.pos(x + width, y, 0.0).endVertex();
-        vertexBuffer.pos(x, y, 0.0).endVertex();
+        vertexBuffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        vertexBuffer.pos(x, y + height, 0.0).color(r, g, b, a).endVertex();
+        vertexBuffer.pos(x + width, y + height, 0.0).color(r, g, b, a).endVertex();
+        vertexBuffer.pos(x + width, y, 0.0).color(r, g, b, a).endVertex();
+        vertexBuffer.pos(x, y, 0.0).color(r, g, b, a).endVertex();
         tessellator.draw();
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
     }
 
-    static void drawOutline(int x, int y, int width, int height, int color, int outlineSize) {
+    default void drawOutline(int x, int y, int width, int height, int color, int outlineSize) {
         drawRectangle(x, y, width - outlineSize, outlineSize, color);
         drawRectangle(x + width - outlineSize, y, outlineSize, height - outlineSize, color);
         drawRectangle(x, y + height - outlineSize, width, outlineSize, color);

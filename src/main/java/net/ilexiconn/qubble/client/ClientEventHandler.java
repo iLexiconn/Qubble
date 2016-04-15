@@ -1,8 +1,6 @@
 package net.ilexiconn.qubble.client;
 
-import net.ilexiconn.llibrary.client.*;
-import net.ilexiconn.llibrary.client.gui.ModUpdateGUI;
-import net.ilexiconn.qubble.client.gui.GuiQubbleEditor;
+import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
@@ -64,8 +62,7 @@ public enum ClientEventHandler {
     @SubscribeEvent
     public void onButtonPressPre(GuiScreenEvent.ActionPerformedEvent.Pre event) {
         if (event.getGui() instanceof GuiMainMenu && event.getButton().id == ClientProxy.QUBBLE_BUTTON_ID) {
-            ClientProxy.MINECRAFT.displayGuiScreen(new GuiQubbleEditor((GuiMainMenu) event.getGui()));
-            event.setCanceled(true);
+            ClientProxy.MINECRAFT.displayGuiScreen(new QubbleGUI((GuiMainMenu) event.getGui()));
         }
     }
 }
