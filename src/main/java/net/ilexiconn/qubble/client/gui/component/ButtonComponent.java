@@ -7,7 +7,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 
-public class ButtonComponent extends Gui implements IComponent {
+public class ButtonComponent extends Gui implements IGUIComponent {
     private int x;
     private int y;
 
