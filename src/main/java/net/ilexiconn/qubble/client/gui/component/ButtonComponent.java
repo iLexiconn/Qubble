@@ -27,6 +27,7 @@ public class ButtonComponent extends Gui implements IGUIComponent {
     private int primaryColor = QubbleGUI.getPrimaryColor();
     private int secondaryColor = QubbleGUI.getSecondaryColor();
     private int accentColor = Qubble.CONFIG.getAccentColor();
+    private int textColor = QubbleGUI.getTextColor();
 
     private HoverChecker hoverChecker;
     private IActionHandler<ButtonComponent> actionHandler;
@@ -54,7 +55,7 @@ public class ButtonComponent extends Gui implements IGUIComponent {
         gui.drawOutline(this.posX, this.posY, this.width, this.height, this.accentColor, 1);
         GlStateManager.enableTexture2D();
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
-        fontRenderer.drawString(this.text, this.posX + (this.width / 2) - (fontRenderer.getStringWidth(this.text) / 2) + 0.625F, this.posY + (this.height / 2) - (fontRenderer.FONT_HEIGHT / 2) - 0.625F, 0xFFFFFF, false);
+        fontRenderer.drawString(this.text, this.posX + (this.width / 2) - (fontRenderer.getStringWidth(this.text) / 2) + 0.625F, this.posY + (this.height / 2) - (fontRenderer.FONT_HEIGHT / 2) - 0.625F, this.textColor, false);
         if (this.tooltip != null && this.hoverChecker.checkHover(mouseX, mouseY)) {
             GuiScreen currentScreen = ClientProxy.MINECRAFT.currentScreen;
             GuiUtils.drawHoveringText(Collections.singletonList(this.tooltip), mouseX, mouseY, currentScreen.width, currentScreen.height, 300, fontRenderer);
@@ -78,9 +79,10 @@ public class ButtonComponent extends Gui implements IGUIComponent {
         return mouseX > this.posX && mouseY > this.posY && mouseX < this.posX + this.width && mouseY < this.posY + this.height;
     }
 
-    public void setColorScheme(int primaryColor, int secondaryColor, int accentColor) {
+    public void setColorScheme(int primaryColor, int secondaryColor, int accentColor, int textColor) {
         this.primaryColor = primaryColor;
         this.secondaryColor = secondaryColor;
         this.accentColor = accentColor;
+        this.textColor = textColor;
     }
 }

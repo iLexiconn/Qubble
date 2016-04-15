@@ -6,8 +6,6 @@ import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.component.ButtonComponent;
 import net.ilexiconn.qubble.client.gui.component.IGUIComponent;
-import net.ilexiconn.qubble.server.ServerProxy;
-import net.ilexiconn.qubble.server.config.QubbleConfig;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 
@@ -41,7 +39,7 @@ public class Dialog {
         this.width = width;
         this.height = height;
         ButtonComponent closeWindowComponent = new ButtonComponent("x", this.width - 12, 0, 12, 12, "Close this dialog", (gui, component) -> gui.closeDialog(Dialog.this));
-        closeWindowComponent.setColorScheme(0xFFFF2020, 0xFF7F0000, 0xFFFF2020);
+        closeWindowComponent.setColorScheme(0xFFFF2020, 0xFF7F0000, 0xFFFF2020, 0xFFFFFFFF);
         this.addComponent(closeWindowComponent);
     }
 
@@ -57,7 +55,7 @@ public class Dialog {
         gui.drawOutline(drawX, drawY, this.width, this.height, accentColor, 1);
         gui.drawOutline(drawX, drawY, this.width, 12, accentColor, 1);
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
-        fontRenderer.drawString(this.name, (float) drawX + 2.0F, (float) drawY + 2.0F, 0xFFFFFF, false);
+        fontRenderer.drawString(this.name, (float) drawX + 2.0F, (float) drawY + 2.0F, QubbleGUI.getTextColor(), false);
         mouseX -= this.posX;
         mouseY -= this.posY;
         GlStateManager.pushMatrix();

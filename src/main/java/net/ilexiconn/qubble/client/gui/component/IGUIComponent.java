@@ -1,10 +1,6 @@
 package net.ilexiconn.qubble.client.gui.component;
 
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 

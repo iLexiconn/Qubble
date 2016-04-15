@@ -3,7 +3,6 @@ package net.ilexiconn.qubble.client.gui;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.component.ButtonComponent;
-import net.ilexiconn.qubble.client.gui.component.IActionHandler;
 import net.ilexiconn.qubble.client.gui.component.IGUIComponent;
 import net.ilexiconn.qubble.client.gui.component.ModelViewComponent;
 import net.ilexiconn.qubble.client.gui.dialog.Dialog;
@@ -25,9 +24,11 @@ import java.util.List;
 public class QubbleGUI extends GuiScreen {
     private static final int PRIMARY_COLOR_DARK = 0xFF3D3D3D;
     private static final int SECONDARY_COLOR_DARK = 0xFF212121;
+    private static final int TEXT_COLOR_DARK = 0xFFFFFFFF;
 
-    private static final int PRIMARY_COLOR_LIGHT = 0xFFDBDBDB;
-    private static final int SECONDARY_COLOR_LIGHT = 0xFFECECEC;
+    private static final int PRIMARY_COLOR_LIGHT = 0xFFDDDDDD;
+    private static final int SECONDARY_COLOR_LIGHT = 0xFFE8E8E8;
+    private static final int TEXT_COLOR_LIGHT = 0xFF3D3D3D;
 
     private GuiMainMenu mainMenu;
 
@@ -145,7 +146,12 @@ public class QubbleGUI extends GuiScreen {
     public static int getPrimaryColor() {
         return Qubble.CONFIG.darkMode ? PRIMARY_COLOR_DARK : PRIMARY_COLOR_LIGHT;
     }
+
     public static int getSecondaryColor() {
         return Qubble.CONFIG.darkMode ? SECONDARY_COLOR_DARK : SECONDARY_COLOR_LIGHT;
+    }
+
+    public static int getTextColor() {
+        return Qubble.CONFIG.darkMode ? TEXT_COLOR_DARK : TEXT_COLOR_LIGHT;
     }
 }
