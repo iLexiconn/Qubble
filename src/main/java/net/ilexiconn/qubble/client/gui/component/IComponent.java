@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
-public interface IGuiComponent {
+public interface IComponent {
     void render(QubbleGUI gui, int mouseX, int mouseY, float partialTicks);
 
     void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button);

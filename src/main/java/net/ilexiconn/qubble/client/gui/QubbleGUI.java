@@ -2,7 +2,7 @@ package net.ilexiconn.qubble.client.gui;
 
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.component.ButtonComponent;
-import net.ilexiconn.qubble.client.gui.component.IGuiComponent;
+import net.ilexiconn.qubble.client.gui.component.IComponent;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -17,7 +17,7 @@ public class QubbleGUI extends GuiScreen {
 
     private GuiMainMenu mainMenu;
 
-    private List<IGuiComponent> components = new ArrayList<>();
+    private List<IComponent> components = new ArrayList<>();
 
     public QubbleGUI(GuiMainMenu mainMenu) {
         this.mainMenu = mainMenu;
@@ -33,7 +33,7 @@ public class QubbleGUI extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
-        for (IGuiComponent component : this.components) {
+        for (IComponent component : this.components) {
             component.render(this, mouseX, mouseY, partialTicks);
         }
     }
@@ -41,7 +41,7 @@ public class QubbleGUI extends GuiScreen {
     @Override
     public void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
         super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
-        for (IGuiComponent component : this.components) {
+        for (IComponent component : this.components) {
             component.mouseDragged(this, mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
         }
     }
@@ -49,7 +49,7 @@ public class QubbleGUI extends GuiScreen {
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) throws IOException {
         super.mouseClicked(mouseX, mouseY, button);
-        for (IGuiComponent component : this.components) {
+        for (IComponent component : this.components) {
             component.mouseClicked(this, mouseX, mouseY, button);
         }
     }
