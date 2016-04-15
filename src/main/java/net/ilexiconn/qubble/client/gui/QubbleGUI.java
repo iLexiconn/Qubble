@@ -106,7 +106,7 @@ public class QubbleGUI extends GuiScreen {
         GlStateManager.enableTexture2D();
     }
 
-    public void drawRectangle(int x, int y, int width, int height, int color) {
+    public void drawRectangle(double x, double y, double width, double height, int color) {
         GlStateManager.disableTexture2D();
         GlStateManager.enableBlend();
         GlStateManager.disableAlpha();
@@ -127,7 +127,7 @@ public class QubbleGUI extends GuiScreen {
         GlStateManager.enableTexture2D();
     }
 
-    public void drawOutline(int x, int y, int width, int height, int color, int outlineSize) {
+    public void drawOutline(double x, double y, double width, double height, int color, int outlineSize) {
         drawRectangle(x, y, width - outlineSize, outlineSize, color);
         drawRectangle(x + width - outlineSize, y, outlineSize, height - outlineSize, color);
         drawRectangle(x, y + height - outlineSize, width, outlineSize, color);

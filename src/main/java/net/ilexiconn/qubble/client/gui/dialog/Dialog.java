@@ -1,5 +1,6 @@
 package net.ilexiconn.qubble.client.gui.dialog;
 
+import net.ilexiconn.llibrary.client.util.ClientUtils;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
@@ -18,6 +19,10 @@ public class Dialog {
 
     private int posX;
     private int posY;
+
+    private int prevPosX;
+    private int prevPosY;
+
     private int width;
     private int height;
 
@@ -31,6 +36,8 @@ public class Dialog {
         this.name = name;
         this.posX = posX;
         this.posY = posY;
+        this.prevPosX = posX;
+        this.prevPosY = posY;
         this.width = width;
         this.height = height;
         ButtonComponent closeWindowComponent = new ButtonComponent("x", this.width - 12, 0, 12, 12, "Close this dialog", (gui, component) -> gui.closeDialog(Dialog.this));
@@ -43,20 +50,24 @@ public class Dialog {
     }
 
     public void render(QubbleGUI gui, int mouseX, int mouseY, float partialTicks) {
+        double drawX = ClientUtils.interpolate(this.prevPosX, this.posX, partialTicks);
+        double drawY = ClientUtils.interpolate(this.prevPosY, this.posY, partialTicks);
         int accentColor = Qubble.CONFIG.getAccentColor();
-        gui.drawRectangle(this.posX, this.posY, this.width, this.height, QubbleGUI.getSecondaryColor());
-        gui.drawOutline(this.posX, this.posY, this.width, this.height, accentColor, 1);
-        gui.drawOutline(this.posX, this.posY, this.width, 12, accentColor, 1);
+        gui.drawRectangle(drawX, drawY, this.width, this.height, QubbleGUI.getSecondaryColor());
+        gui.drawOutline(drawX, drawY, this.width, this.height, accentColor, 1);
+        gui.drawOutline(drawX, drawY, this.width, 12, accentColor, 1);
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
-        fontRenderer.drawString(this.name, this.posX + 2, this.posY + 2, 0xFFFFFF);
+        fontRenderer.drawString(this.name, (float) drawX + 2.0F, (float) drawY + 2.0F, 0xFFFFFF, false);
         mouseX -= this.posX;
         mouseY -= this.posY;
         GlStateManager.pushMatrix();
-        GlStateManager.translate(this.posX, this.posY, 0.0);
+        GlStateManager.translate(drawX, drawY, 0.0);
         for (IGUIComponent component : this.components) {
             component.render(gui, mouseX, mouseY, partialTicks);
         }
         GlStateManager.popMatrix();
+        this.prevPosX = this.posX;
+        this.prevPosY = this.posY;
     }
 
     public void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button) {
