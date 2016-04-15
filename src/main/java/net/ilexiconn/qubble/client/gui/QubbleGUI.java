@@ -6,11 +6,14 @@ import net.ilexiconn.qubble.client.gui.component.IGUIComponent;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@SideOnly(Side.CLIENT)
 public class QubbleGUI extends GuiScreen {
     public static final int PRIMARY_COLOR = 0xFF3D3D3D;
     public static final int SECONDARY_COLOR = 0xFF212121;
@@ -26,7 +29,7 @@ public class QubbleGUI extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
-        this.components.add(new ButtonComponent(0, 0, 20, 20, "x", () -> ClientProxy.MINECRAFT.displayGuiScreen(this.mainMenu)));
+        this.components.add(new ButtonComponent("x", 0, 0, 20, 20, "Close Qubble and return to the main menu", () -> ClientProxy.MINECRAFT.displayGuiScreen(this.mainMenu)));
     }
 
     @Override

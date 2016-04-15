@@ -12,6 +12,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -26,10 +27,10 @@ public class ServerProxy {
 
         try {
             QubbleModel model = tabulaImporter.getModel(tabulaImporter.read(new File(".", "test.tbl")));
-            CompressedStreamTools.write(model.serializeNBT(), new File("tabula.qbl"));
+            CompressedStreamTools.writeCompressed(model.serializeNBT(), new FileOutputStream(new File("tabula.qbl")));
             jsExporter.save(jsExporter.export(model), new File(".", "test.js"));
             model = jsImporter.getModel(jsImporter.read(new File(".", "test.js")));
-            CompressedStreamTools.write(model.serializeNBT(), new File("javascript.qbl"));
+            CompressedStreamTools.writeCompressed(model.serializeNBT(), new FileOutputStream(new File("javascript.qbl")));
             javaExporter.save(javaExporter.export(model, "net.ilexiconn.test", "TestModel"), new File(".", "test.java"));
         } catch (IOException e) {
             e.printStackTrace();
