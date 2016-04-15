@@ -5,6 +5,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 @FunctionalInterface
-public interface IActionHandler {
-    void onAction();
+public interface IActionHandler<T extends IGUIComponent> {
+    void onAction(T component);
 }
