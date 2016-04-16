@@ -50,7 +50,7 @@ public class ButtonComponent extends Gui implements IGUIComponent {
     }
 
     @Override
-    public void render(QubbleGUI gui, int mouseX, int mouseY, float partialTicks) {
+    public void render(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
         boolean selected = this.isSelected(mouseX, mouseY);
         GlStateManager.disableTexture2D();
         this.drawGradientRect(this.posX + 1, this.posY + 1, this.posX + this.width - 1, this.posY + this.height - 1, selected ? primaryColor : primaryColor, selected ? secondaryColor : primaryColor);
@@ -75,6 +75,11 @@ public class ButtonComponent extends Gui implements IGUIComponent {
 
     @Override
     public void mouseDragged(QubbleGUI gui, int mouseX, int mouseY, int button, long timeSinceClick) {
+
+    }
+
+    @Override
+    public void mouseReleased(QubbleGUI gui, int mouseX, int mouseY, int button) {
 
     }
 

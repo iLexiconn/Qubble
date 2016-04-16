@@ -20,8 +20,16 @@ public class ClientProxy extends ServerProxy {
     @Override
     public void onPreInit() {
         super.onPreInit();
-
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.INSTANCE);
+        if (!QUBBLE_MODEL_DIRECTORY.exists()) {
+            QUBBLE_MODEL_DIRECTORY.mkdirs();
+        }
+        if (!QUBBLE_TEXTURE_DIRECTORY.exists()) {
+            QUBBLE_TEXTURE_DIRECTORY.mkdirs();
+        }
+        if (!QUBBLE_EXPORT_DIRECTORY.exists()) {
+            QUBBLE_EXPORT_DIRECTORY.mkdirs();
+        }
     }
 
     @Override

@@ -61,7 +61,7 @@ public class Dialog {
         GlStateManager.pushMatrix();
         GlStateManager.translate(drawX, drawY, 0.0);
         for (IGUIComponent component : this.components) {
-            component.render(gui, mouseX, mouseY, partialTicks);
+            component.render(gui, mouseX, mouseY, drawX, drawY, partialTicks);
         }
         GlStateManager.popMatrix();
         this.prevPosX = this.posX;
@@ -95,5 +95,10 @@ public class Dialog {
 
     public void mouseReleased(QubbleGUI gui, int mouseX, int mouseY, int button) {
         this.isDragging = false;
+        mouseX -= this.posX;
+        mouseY -= this.posY;
+        for (IGUIComponent component : this.components) {
+            component.mouseReleased(gui, mouseX, mouseY, button);
+        }
     }
 }
