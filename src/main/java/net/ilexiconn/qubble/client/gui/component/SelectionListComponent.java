@@ -56,7 +56,6 @@ public class SelectionListComponent extends Gui implements IGUIComponent {
         int scaleFactor = resolution.getScaleFactor();
         GL11.glScissor((int) ((this.posX + offsetX) * scaleFactor), (int) ((gui.height - (this.posY + this.height + offsetY - 1)) * scaleFactor), this.width * scaleFactor, (this.height - 2) * scaleFactor);
         for (String entry : this.entries) {
-//            if (posY + 13 < this.height && posY >= 0) {
                 int entryX = this.posX + 1;
                 int entryY = this.posY + y + 1;
                 int entryWidth = this.width - 16;
@@ -65,7 +64,6 @@ public class SelectionListComponent extends Gui implements IGUIComponent {
                 this.drawGradientRect(entryX, entryY, entryX + entryWidth, entryY + entryHeight, selected ? primaryColor : primaryColor, selected ? secondaryColor : primaryColor);
                 gui.drawOutline(entryX, entryY, entryWidth, entryHeight, Qubble.CONFIG.getAccentColor(), 1);
                 fontRenderer.drawString(entry, entryX + 2, entryY + 2, 0xFFFFFF);
-//            }
             y += 13;
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
@@ -76,6 +74,11 @@ public class SelectionListComponent extends Gui implements IGUIComponent {
             gui.drawRectangle(scrollX, scrollY, 6, height, this.scrolling ? primaryColor : secondaryColor);
             gui.drawOutline(scrollX, scrollY, 6, height, Qubble.CONFIG.getAccentColor(), 1);
         }
+    }
+
+    @Override
+    public void renderAfter(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
+
     }
 
     @Override

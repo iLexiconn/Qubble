@@ -18,6 +18,11 @@ public class ModelViewComponent implements IGUIComponent {
     }
 
     @Override
+    public void renderAfter(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
+
+    }
+
+    @Override
     public void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button) {
 
     }

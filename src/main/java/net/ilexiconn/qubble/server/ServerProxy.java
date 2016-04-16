@@ -5,7 +5,9 @@ import net.ilexiconn.qubble.server.model.QubbleModel;
 import net.ilexiconn.qubble.server.model.exporter.*;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.ilexiconn.qubble.server.model.importer.TabulaImporter;
+import net.ilexiconn.qubble.server.model.importer.TechneImporter;
 import net.ilexiconn.qubble.server.model.obj.OBJModel;
+import net.ilexiconn.qubble.server.model.techne.TechneModel;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -19,6 +21,8 @@ public class ServerProxy {
         MinecraftForge.EVENT_BUS.register(ServerEventHandler.INSTANCE);
 
         IModelImporter<TabulaModelContainer> tabulaImporter = new TabulaImporter();
+        IModelImporter<TechneModel> techneImporter = new TechneImporter();
+
         IModelExporter<List<String>> javaExporter = new JavaExporter();
         IModelExporter<List<String>> scalaExporter = new ScalaExporter();
         IModelExporter<List<String>> jsExporter = new JavaScriptExporter();
@@ -30,9 +34,21 @@ public class ServerProxy {
             javaExporter.save(javaExporter.export(model, "net.ilexiconn.test", "TabulaModel"), new File(".", "TabulaModel.java"));
             scalaExporter.save(scalaExporter.export(model, "net.ilexiconn.test", "TabulaModel"), new File(".", "TabulaModel.scala"));
             jsExporter.save(jsExporter.export(model), new File(".", "TabulaModel.js"));
-            objExporter.save(objExporter.export(model), new File(".", "TabulaModel.obj"));
+            objExporter.save(objExporter.export(model.unparent()), new File(".", "TabulaModel.obj"));
             kotlinExporter.save(kotlinExporter.export(model, "net.ilexiconn.test", "TabulaModel"), new File(".", "TabulaModel.kt"));
             CompressedStreamTools.writeCompressed(model.serializeNBT(), new FileOutputStream(new File("TabulaModel.qbl")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            QubbleModel model = techneImporter.getModel(techneImporter.read(new File(".", "TechneModel.tcn")));
+            javaExporter.save(javaExporter.export(model, "net.ilexiconn.test", "TechneModel"), new File(".", "TechneModel.java"));
+            scalaExporter.save(scalaExporter.export(model, "net.ilexiconn.test", "TechneModel"), new File(".", "TechneModel.scala"));
+            jsExporter.save(jsExporter.export(model), new File(".", "TechneModel.js"));
+            objExporter.save(objExporter.export(model), new File(".", "TechneModel.obj"));
+            kotlinExporter.save(kotlinExporter.export(model, "net.ilexiconn.test", "TechneModel"), new File(".", "TechneModel.kt"));
+            CompressedStreamTools.writeCompressed(model.serializeNBT(), new FileOutputStream(new File("TechneModel.qbl")));
         } catch (IOException e) {
             e.printStackTrace();
         }

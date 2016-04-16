@@ -8,6 +8,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public interface IGUIComponent {
     void render(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks);
 
+    void renderAfter(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks);
+
     void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button);
 
     void mouseDragged(QubbleGUI gui, int mouseX, int mouseY, int button, long timeSinceClick);

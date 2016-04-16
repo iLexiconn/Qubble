@@ -1,5 +1,6 @@
 package net.ilexiconn.qubble.client.gui;
 
+import com.google.common.collect.Lists;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.component.*;
@@ -51,6 +52,7 @@ public class QubbleGUI extends GuiScreen {
         this.openDialogs.clear();
         this.components.add(new ButtonComponent("x", 0, 0, 20, 20, "Close Qubble and return to the main menu", (gui, component) -> ClientProxy.MINECRAFT.displayGuiScreen(QubbleGUI.this.mainMenu)));
         this.components.add(new ButtonComponent("o", 21, 0, 20, 20, "Open a model", (gui, component) -> QubbleGUI.this.openModelSelectionDialog()));
+        this.components.add(new ButtonComponent("i", 42, 0, 20, 20, "Import a model", (gui, component) -> {}));
         this.components.add(new ModelViewComponent());
         this.modelTree = new ModelTreeComponent();
         this.components.add(this.modelTree);
@@ -66,8 +68,18 @@ public class QubbleGUI extends GuiScreen {
         for (IGUIComponent component : new ArrayList<>(this.components)) {
             component.render(this, mouseX, mouseY, 0, 0, partialTicks);
         }
+        boolean flag = false;
         for (Dialog dialog : new ArrayList<>(this.openDialogs)) {
             dialog.render(this, mouseX, mouseY, partialTicks);
+            if (mouseX < dialog.posX || mouseX > dialog.posX + dialog.width || mouseY < dialog.posY || mouseY > dialog.posY + dialog.height) {
+                flag = true;
+            }
+        }
+        if (flag) {
+            return;
+        }
+        for (IGUIComponent component : new ArrayList<>(this.components)) {
+            component.renderAfter(this, mouseX, mouseY, 0, 0, partialTicks);
         }
     }
 
@@ -85,11 +97,15 @@ public class QubbleGUI extends GuiScreen {
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) throws IOException {
         super.mouseClicked(mouseX, mouseY, button);
+        for (Dialog dialog : new ArrayList<>(Lists.reverse(this.openDialogs))) {
+            if (dialog.mouseClicked(this, mouseX, mouseY, button)) {
+                this.openDialogs.remove(dialog);
+                this.openDialogs.add(dialog);
+                return;
+            }
+        }
         for (IGUIComponent component : new ArrayList<>(this.components)) {
             component.mouseClicked(this, mouseX, mouseY, button);
-        }
-        for (Dialog dialog : new ArrayList<>(this.openDialogs)) {
-            dialog.mouseClicked(this, mouseX, mouseY, button);
         }
     }
 

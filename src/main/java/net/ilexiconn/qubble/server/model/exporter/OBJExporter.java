@@ -1,6 +1,5 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
-import com.google.common.collect.Lists;
 import net.ilexiconn.qubble.server.model.QubbleCube;
 import net.ilexiconn.qubble.server.model.QubbleModel;
 import net.ilexiconn.qubble.server.model.obj.*;
@@ -9,8 +8,6 @@ import org.lwjgl.util.vector.Vector3f;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class OBJExporter implements IModelExporter<OBJModel> {
@@ -22,12 +19,7 @@ public class OBJExporter implements IModelExporter<OBJModel> {
     @Override
     public OBJModel export(QubbleModel model, String... arguments) {
         OBJModel obj = new OBJModel();
-        List<QubbleCube> cubes = new ArrayList<>();
-        for (QubbleCube cube : model.getCubes()) {
-            cubes.add(cube);
-            this.addChildCubes(cube.getChildren(), Lists.newArrayList(cube), cubes);
-        }
-        obj.shapes.addAll(cubes.stream().map(cube -> this.convertBoxToShape(obj, model, cube, 0.0625F)).collect(Collectors.toList()));
+        obj.shapes.addAll(model.getCubes().stream().map(cube -> this.convertBoxToShape(obj, model, cube, 0.0625F)).collect(Collectors.toList()));
         return obj;
     }
 
@@ -36,14 +28,6 @@ public class OBJExporter implements IModelExporter<OBJModel> {
         PrintWriter writer = new PrintWriter(file, "UTF-8");
         model.shapes.forEach(shape -> shape.toStringList().forEach(writer::println));
         writer.close();
-    }
-
-    public void addChildCubes(List<QubbleCube> cubes, List<QubbleCube> parents, List<QubbleCube> list) {
-        for (QubbleCube cube : cubes) {
-            list.add(new QubbleCube(cube.getName(), cube.getChildren(), this.getDimension(cube), this.getPosition(cube, parents), this.getOffset(cube, parents), this.getRotation(cube, parents), this.getScale(cube, parents), this.getTexture(cube), cube.isTextureMirrored(), cube.getOpacity()));
-            parents.add(cube);
-            this.addChildCubes(cube.getChildren(), parents, list);
-        }
     }
 
     public Shape convertBoxToShape(OBJModel obj, QubbleModel model, QubbleCube cube, float scale) {
@@ -84,61 +68,4 @@ public class OBJExporter implements IModelExporter<OBJModel> {
             return new TextureCoords((cube.getTextureX() + baseU + mirrorOffset) / qubble.getTextureWidth(), 1.0F - (cube.getTextureY() + baseV) / qubble.getTextureHeight());
         }
     }
-
-    public int[] getDimension(QubbleCube cube) {
-        return new int[] {cube.getDimensionX(), cube.getDimensionY(), cube.getDimensionZ()};
-    }
-
-    public float[] getPosition(QubbleCube cube, List<QubbleCube> parents) {
-        float positionX = cube.getOffsetX();
-        float positionY = cube.getOffsetY();
-        float positionZ = cube.getOffsetZ();
-        for (QubbleCube parent : parents) {
-            positionX += parent.getPositionX();
-            positionY += cube.getPositionY();
-            positionZ += cube.getPositionZ();
-        }
-        return new float[] {positionX, positionY, positionZ};
-    }
-
-    public float[] getOffset(QubbleCube cube, List<QubbleCube> parents) {
-        float offsetX = cube.getOffsetX();
-        float offsetY = cube.getOffsetY();
-        float offsetZ = cube.getOffsetZ();
-        for (QubbleCube parent : parents) {
-            offsetX += parent.getOffsetX();
-            offsetY += cube.getOffsetY();
-            offsetZ += cube.getOffsetZ();
-        }
-        return new float[] {offsetX, offsetY, offsetZ};
-    }
-
-    public float[] getRotation(QubbleCube cube, List<QubbleCube> parents) {
-        float rotationX = cube.getRotationX();
-        float rotationY = cube.getRotationY();
-        float rotationZ = cube.getRotationZ();
-        for (QubbleCube parent : parents) {
-            rotationX += parent.getRotationX();
-            rotationY += cube.getRotationY();
-            rotationZ += cube.getRotationZ();
-        }
-        return new float[] {rotationX, rotationY, rotationZ};
-    }
-
-    public float[] getScale(QubbleCube cube, List<QubbleCube> parents) {
-        float scaleX = cube.getScaleX();
-        float scaleY = cube.getScaleY();
-        float scaleZ = cube.getScaleZ();
-        for (QubbleCube parent : parents) {
-            scaleX += parent.getScaleX();
-            scaleY += cube.getScaleY();
-            scaleZ += cube.getScaleZ();
-        }
-        return new float[] {scaleX, scaleY, scaleZ};
-    }
-
-    public int[] getTexture(QubbleCube cube) {
-        return new int[] {cube.getTextureX(), cube.getTextureY()};
-    }
 }
-

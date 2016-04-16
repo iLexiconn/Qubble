@@ -15,14 +15,14 @@ import java.util.List;
 public class Dialog {
     private String name;
 
-    private int posX;
-    private int posY;
+    public int posX;
+    public int posY;
 
     private int prevPosX;
     private int prevPosY;
 
-    private int width;
-    private int height;
+    public int width;
+    public int height;
 
     private int dragOffsetX;
     private int dragOffsetY;
@@ -68,8 +68,11 @@ public class Dialog {
         this.prevPosY = this.posY;
     }
 
-    public void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button) {
-        if (button == 0 && mouseX > this.posX && mouseX < this.posX + this.width && mouseY > this.posY && mouseY < this.posY + 12) {
+    public boolean mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button) {
+        if (button != 0 || mouseX < this.posX || mouseX > this.posX + this.width || mouseY < this.posY || mouseY > this.posY + this.height) {
+            return false;
+        }
+        if (mouseY < this.posY + 12) {
             this.dragOffsetX = mouseX - this.posX;
             this.dragOffsetY = mouseY - this.posY;
             this.isDragging = true;
@@ -79,6 +82,7 @@ public class Dialog {
         for (IGUIComponent component : this.components) {
             component.mouseClicked(gui, mouseX, mouseY, button);
         }
+        return true;
     }
 
     public void mouseDragged(QubbleGUI gui, int mouseX, int mouseY, int button, long timeSinceClick) {

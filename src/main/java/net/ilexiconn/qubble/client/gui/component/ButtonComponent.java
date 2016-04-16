@@ -58,9 +58,13 @@ public class ButtonComponent extends Gui implements IGUIComponent {
         GlStateManager.enableTexture2D();
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
         fontRenderer.drawString(this.text, this.posX + (this.width / 2) - (fontRenderer.getStringWidth(this.text) / 2) + 0.625F, this.posY + (this.height / 2) - (fontRenderer.FONT_HEIGHT / 2) - 0.625F, this.textColor, false);
+    }
+
+    @Override
+    public void renderAfter(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
         if (this.tooltip != null && this.hoverChecker.checkHover(mouseX, mouseY)) {
             GuiScreen currentScreen = ClientProxy.MINECRAFT.currentScreen;
-            GuiUtils.drawHoveringText(Collections.singletonList(this.tooltip), mouseX, mouseY, currentScreen.width, currentScreen.height, 300, fontRenderer);
+            GuiUtils.drawHoveringText(Collections.singletonList(this.tooltip), mouseX, mouseY, currentScreen.width, currentScreen.height, 300, ClientProxy.MINECRAFT.fontRendererObj);
             GlStateManager.disableLighting();
         }
     }

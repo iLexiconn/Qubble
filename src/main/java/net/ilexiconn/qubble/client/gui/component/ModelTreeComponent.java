@@ -28,6 +28,11 @@ public class ModelTreeComponent extends Gui implements IGUIComponent {
         }
     }
 
+    @Override
+    public void renderAfter(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
+
+    }
+
     private void drawCubeEntry(QubbleGUI gui, QubbleCube cube, int xOffset) {
         xOffset++;
         for (QubbleCube child : cube.getChildren()) {
