@@ -5,6 +5,8 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 
+import javax.vecmath.Matrix4d;
+import javax.vecmath.Vector3d;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,73 +66,6 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
         }
     }
 
-    public QubbleModel unparent() {
-        List<QubbleCube> unparentedCubes = new ArrayList<>();
-        for (QubbleCube cube : this.cubes) {
-            unparentedCubes.add(cube);
-            this.addChildCubes(cube.getChildren(), cube, unparentedCubes);
-        }
-        this.cubes.clear();
-        this.cubes.addAll(unparentedCubes);
-        return this;
-    }
-
-    private void addChildCubes(List<QubbleCube> cubes, QubbleCube parent, List<QubbleCube> list) {
-        for (QubbleCube cube : cubes) {
-            QubbleCube newCube = new QubbleCube(cube.getName(), cube.getChildren(), this.getDimension(cube), this.getPosition(cube, parent), this.getOffset(cube, parent), this.getRotation(cube, parent), this.getScale(cube, parent), this.getTexture(cube), cube.isTextureMirrored(), cube.getOpacity());
-            list.add(newCube);
-            this.addChildCubes(cube.getChildren(), newCube, list);
-        }
-    }
-
-    private int[] getDimension(QubbleCube cube) {
-        return new int[]{cube.getDimensionX(), cube.getDimensionY(), cube.getDimensionZ()};
-    }
-
-    private float[] getPosition(QubbleCube cube, QubbleCube parent) {
-        float positionX = cube.getOffsetX();
-        float positionY = cube.getOffsetY();
-        float positionZ = cube.getOffsetZ();
-        positionX += parent.getPositionX();
-        positionY += cube.getPositionY();
-        positionZ += cube.getPositionZ();
-        return new float[]{positionX, positionY, positionZ};
-    }
-
-    private float[] getOffset(QubbleCube cube, QubbleCube parent) {
-        float offsetX = cube.getOffsetX();
-        float offsetY = cube.getOffsetY();
-        float offsetZ = cube.getOffsetZ();
-        offsetX += parent.getOffsetX();
-        offsetY += cube.getOffsetY();
-        offsetZ += cube.getOffsetZ();
-        return new float[]{offsetX, offsetY, offsetZ};
-    }
-
-    private float[] getRotation(QubbleCube cube, QubbleCube parent) {
-        float rotationX = cube.getRotationX();
-        float rotationY = cube.getRotationY();
-        float rotationZ = cube.getRotationZ();
-        rotationX += parent.getRotationX();
-        rotationY += cube.getRotationY();
-        rotationZ += cube.getRotationZ();
-        return new float[]{rotationX, rotationY, rotationZ};
-    }
-
-    private float[] getScale(QubbleCube cube, QubbleCube parent) {
-        float scaleX = cube.getScaleX();
-        float scaleY = cube.getScaleY();
-        float scaleZ = cube.getScaleZ();
-        scaleX += parent.getScaleX();
-        scaleY += cube.getScaleY();
-        scaleZ += cube.getScaleZ();
-        return new float[]{scaleX, scaleY, scaleZ};
-    }
-
-    private int[] getTexture(QubbleCube cube) {
-        return new int[]{cube.getTextureX(), cube.getTextureY()};
-    }
-
     public String getName() {
         return name;
     }
@@ -170,5 +105,69 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
     public void setTexture(int width, int height) {
         this.textureWidth = width;
         this.textureHeight = height;
+    }
+
+    public QubbleModel unparent() {
+        List<QubbleCube> unparentedCubes = new ArrayList<>();
+        for (QubbleCube cube : this.cubes) {
+            List<QubbleCube> parentCubes = new ArrayList<>();
+            parentCubes.add(cube);
+            unparentedCubes.add(cube);
+            this.unparentCubes(new ArrayList<>(cube.getChildren()), unparentedCubes, parentCubes);
+        }
+        this.cubes.clear();
+        this.cubes.addAll(unparentedCubes);
+        return this;
+    }
+
+    private void unparentCubes(List<QubbleCube> cubes, List<QubbleCube> childCubes, List<QubbleCube> parentCubes) {
+        for (QubbleCube cube : cubes) {
+            List<QubbleCube> newParentCubes = new ArrayList<>(parentCubes);
+            newParentCubes.add(cube);
+            float[][] transformation = this.getParentTransformation(newParentCubes);
+            cube = new QubbleCube(cube.getName(), new ArrayList<>(cube.getChildren()), new int[]{cube.getDimensionX(), cube.getDimensionY(), cube.getDimensionZ()}, transformation[0], new float[]{cube.getOffsetX(), cube.getOffsetY(), cube.getOffsetZ()}, transformation[1], new float[]{cube.getScaleX(), cube.getScaleY(), cube.getScaleZ()}, new int[]{cube.getTextureX(), cube.getTextureY()}, cube.isTextureMirrored(), cube.getOpacity());
+            childCubes.add(cube);
+            this.unparentCubes(cube.getChildren(), childCubes, new ArrayList<>(newParentCubes));
+        }
+    }
+
+    private float[][] getParentTransformation(List<QubbleCube> parentCubes) {
+        Matrix4d matrix = new Matrix4d();
+        matrix.setIdentity();
+        Matrix4d transform = new Matrix4d();
+        for (int i = 0; i < parentCubes.size(); i++) {
+            QubbleCube current = parentCubes.get(i);
+            transform.setIdentity();
+            transform.setTranslation(new Vector3d(current.getPositionX(), current.getPositionY(), current.getPositionZ()));
+            matrix.mul(transform);
+            transform.rotZ(current.getRotationZ() / 180 * Math.PI);
+            matrix.mul(transform);
+            transform.rotY(current.getRotationY() / 180 * Math.PI);
+            matrix.mul(transform);
+            transform.rotX(current.getRotationX() / 180 * Math.PI);
+            matrix.mul(transform);
+        }
+        double sinRotationAngleY, cosRotationAngleY, sinRotationAngleX, cosRotationAngleX, sinRotationAngleZ, cosRotationAngleZ;
+        sinRotationAngleY = -matrix.m20;
+        cosRotationAngleY = Math.sqrt(1 - sinRotationAngleY * sinRotationAngleY);
+        if (Math.abs(cosRotationAngleY) > 0.0001) {
+            sinRotationAngleX = matrix.m21 / cosRotationAngleY;
+            cosRotationAngleX = matrix.m22 / cosRotationAngleY;
+            sinRotationAngleZ = matrix.m10 / cosRotationAngleY;
+            cosRotationAngleZ = matrix.m00 / cosRotationAngleY;
+        } else {
+            sinRotationAngleX = -matrix.m12;
+            cosRotationAngleX = matrix.m11;
+            sinRotationAngleZ = 0;
+            cosRotationAngleZ = 1;
+        }
+        float rotationAngleX = (float) (epsilon((float) Math.atan2(sinRotationAngleX, cosRotationAngleX)) / Math.PI * 180);
+        float rotationAngleY = (float) (epsilon((float) Math.atan2(sinRotationAngleY, cosRotationAngleY)) / Math.PI * 180);
+        float rotationAngleZ = (float) (epsilon((float) Math.atan2(sinRotationAngleZ, cosRotationAngleZ)) / Math.PI * 180);
+        return new float[][] { { epsilon((float) matrix.m03), epsilon((float) matrix.m13), epsilon((float) matrix.m23) }, { rotationAngleX, rotationAngleY, rotationAngleZ } };
+    }
+
+    private float epsilon(float x) {
+        return x < 0 ? x > -0.0001F ? 0 : x : x < 0.0001F ? 0 : x;
     }
 }

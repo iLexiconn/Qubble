@@ -99,8 +99,9 @@ public class QubbleGUI extends GuiScreen {
         super.mouseClicked(mouseX, mouseY, button);
         for (Dialog dialog : new ArrayList<>(Lists.reverse(this.openDialogs))) {
             if (dialog.mouseClicked(this, mouseX, mouseY, button)) {
-                this.openDialogs.remove(dialog);
-                this.openDialogs.add(dialog);
+                if (this.openDialogs.remove(dialog)) {
+                    this.openDialogs.add(dialog);
+                }
                 return;
             }
         }
