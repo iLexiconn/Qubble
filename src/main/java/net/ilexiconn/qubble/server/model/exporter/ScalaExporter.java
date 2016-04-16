@@ -46,7 +46,7 @@ public class ScalaExporter implements IModelExporter<List<String>> {
     }
 
     @Override
-    public void save(List<String> model, File file, Object... arguments) throws IOException {
+    public void save(List<String> model, File file) throws IOException {
         PrintWriter writer = new PrintWriter(file, "UTF-8");
         model.forEach(writer::println);
         writer.close();
@@ -57,7 +57,10 @@ public class ScalaExporter implements IModelExporter<List<String>> {
             String field = this.getFieldName(cube);
             list.add("  val " + field + " = new ModelRenderer(this, " + cube.getTextureX() + ", " + cube.getTextureY() + ")");
             list.add("  this." + field + ".setRotationPoint(" + cube.getPositionX() + "F, " + cube.getPositionY() + "F, " + cube.getPositionZ() + "F)");
-            list.add("  this." + field + ".addBox(" + cube.getOffsetX() + "F, " + cube.getOffsetY() + "F, " + cube.getOffsetZ() + "F, " + cube.getDimensionX() + ", " + cube.getDimensionY() + ", " + cube.getDimensionZ() + ");");
+            list.add("  this." + field + ".addBox(" + cube.getOffsetX() + "F, " + cube.getOffsetY() + "F, " + cube.getOffsetZ() + "F, " + cube.getDimensionX() + ", " + cube.getDimensionY() + ", " + cube.getDimensionZ() + ")");
+            if (cube.isTextureMirrored()) {
+                list.add("  this." + field + ".mirror = true");
+            }
             if (cube.getRotationX() != 0.0F || cube.getRotationY() != 0.0F || cube.getRotationZ() != 0.0F) {
                 list.add("  this.setRotationAngles(this." + field + ", " + Math.toRadians(cube.getRotationX()) + "F, " + Math.toRadians(cube.getRotationY()) + "F, " + Math.toRadians(cube.getRotationZ()) + "F)");
             }
@@ -74,24 +77,24 @@ public class ScalaExporter implements IModelExporter<List<String>> {
             boolean scale = cube.getRotationX() != 0.0F || cube.getRotationY() != 0.0F || cube.getRotationZ() != 0.0F;
             boolean blend = cube.getOpacity() != 100.0F;
             if (scale) {
-                list.add("    GlStateManager.pushMatrix();");
-                list.add("    GlStateManager.translate(this." + field + ".offsetX, this." + field + ".offsetY, this." + field + ".offsetZ);");
-                list.add("    GlStateManager.translate(this." + field + ".rotationPointX * scale, this." + field + ".rotationPointY * scale, this." + field + ".rotationPointZ * scale);");
-                list.add("    GlStateManager.scale(" + cube.getScaleX() + "F, " + cube.getScaleY() + "F, " + cube.getScaleZ() + "F);");
-                list.add("    GlStateManager.translate(-this." + field + ".offsetX, -this." + field + ".offsetY, -this." + field + ".offsetZ);");
-                list.add("    GlStateManager.translate(-this." + field + ".rotationPointX * scale, -this." + field + ".rotationPointY * scale, -this." + field + ".rotationPointZ * scale);");
+                list.add("    GlStateManager.pushMatrix()");
+                list.add("    GlStateManager.translate(this." + field + ".offsetX, this." + field + ".offsetY, this." + field + ".offsetZ)");
+                list.add("    GlStateManager.translate(this." + field + ".rotationPointX * scale, this." + field + ".rotationPointY * scale, this." + field + ".rotationPointZ * scale)");
+                list.add("    GlStateManager.scale(" + cube.getScaleX() + "F, " + cube.getScaleY() + "F, " + cube.getScaleZ() + "F)");
+                list.add("    GlStateManager.translate(-this." + field + ".offsetX, -this." + field + ".offsetY, -this." + field + ".offsetZ)");
+                list.add("    GlStateManager.translate(-this." + field + ".rotationPointX * scale, -this." + field + ".rotationPointY * scale, -this." + field + ".rotationPointZ * scale)");
             }
             if (blend) {
-                list.add("    GlStateManager.enableBlend();");
-                list.add("    GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);");
-                list.add("    GlStateManager.color(1.0F, 1.0F, 1.0F, " + (cube.getOpacity() / 100.0F) + "F);");
+                list.add("    GlStateManager.enableBlend()");
+                list.add("    GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)");
+                list.add("    GlStateManager.color(1.0F, 1.0F, 1.0F, " + (cube.getOpacity() / 100.0F) + "F)");
             }
-            list.add("    this." + field + ".render(scale);");
+            list.add("    this." + field + ".render(scale)");
             if (blend) {
-                list.add("    GlStateManager.disableBlend();");
+                list.add("    GlStateManager.disableBlend()");
             }
             if (scale) {
-                list.add("    GlStateManager.popMatrix();");
+                list.add("    GlStateManager.popMatrix()");
             }
         }
     }

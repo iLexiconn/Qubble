@@ -2,13 +2,10 @@ package net.ilexiconn.qubble.server;
 
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaModelContainer;
 import net.ilexiconn.qubble.server.model.QubbleModel;
-import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
-import net.ilexiconn.qubble.server.model.exporter.JavaExporter;
-import net.ilexiconn.qubble.server.model.exporter.JavaScriptExporter;
-import net.ilexiconn.qubble.server.model.exporter.ScalaExporter;
+import net.ilexiconn.qubble.server.model.exporter.*;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
-import net.ilexiconn.qubble.server.model.importer.JavaScriptImporter;
 import net.ilexiconn.qubble.server.model.importer.TabulaImporter;
+import net.ilexiconn.qubble.server.model.obj.OBJModel;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -25,16 +22,17 @@ public class ServerProxy {
         IModelExporter<List<String>> javaExporter = new JavaExporter();
         IModelExporter<List<String>> scalaExporter = new ScalaExporter();
         IModelExporter<List<String>> jsExporter = new JavaScriptExporter();
-        IModelImporter<List<String>> jsImporter = new JavaScriptImporter();
+        IModelExporter<OBJModel> objExporter = new OBJExporter();
+        IModelExporter<List<String>> kotlinExporter = new KotlinExporter();
 
         try {
-            QubbleModel model = tabulaImporter.getModel(tabulaImporter.read(new File(".", "test.tbl")));
-            scalaExporter.save(scalaExporter.export(model, "net.ilexiconn.test", "TestModel"), new File(".", "test.scala"));
-            CompressedStreamTools.writeCompressed(model.serializeNBT(), new FileOutputStream(new File("tabula.qbl")));
-            jsExporter.save(jsExporter.export(model), new File(".", "test.js"));
-            model = jsImporter.getModel(jsImporter.read(new File(".", "test.js")));
-            CompressedStreamTools.writeCompressed(model.serializeNBT(), new FileOutputStream(new File("javascript.qbl")));
-            javaExporter.save(javaExporter.export(model, "net.ilexiconn.test", "TestModel"), new File(".", "test.java"));
+            QubbleModel model = tabulaImporter.getModel(tabulaImporter.read(new File(".", "TabulaModel.tbl")));
+            javaExporter.save(javaExporter.export(model, "net.ilexiconn.test", "TabulaModel"), new File(".", "TabulaModel.java"));
+            scalaExporter.save(scalaExporter.export(model, "net.ilexiconn.test", "TabulaModel"), new File(".", "TabulaModel.scala"));
+            jsExporter.save(jsExporter.export(model), new File(".", "TabulaModel.js"));
+            objExporter.save(objExporter.export(model), new File(".", "TabulaModel.obj"));
+            kotlinExporter.save(kotlinExporter.export(model, "net.ilexiconn.test", "TabulaModel"), new File(".", "TabulaModel.kt"));
+            CompressedStreamTools.writeCompressed(model.serializeNBT(), new FileOutputStream(new File("TabulaModel.qbl")));
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,4 +1,4 @@
-package net.ilexiconn.qubble.server.model.tabula;
+package net.ilexiconn.qubble.server.model.techne;
 
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;

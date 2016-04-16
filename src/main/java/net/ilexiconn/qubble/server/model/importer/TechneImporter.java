@@ -2,8 +2,8 @@ package net.ilexiconn.qubble.server.model.importer;
 
 import net.ilexiconn.qubble.server.model.QubbleCube;
 import net.ilexiconn.qubble.server.model.QubbleModel;
-import net.ilexiconn.qubble.server.model.tabula.TechneCube;
-import net.ilexiconn.qubble.server.model.tabula.TechneModel;
+import net.ilexiconn.qubble.server.model.techne.TechneCube;
+import net.ilexiconn.qubble.server.model.techne.TechneModel;
 
 import java.io.File;
 import java.io.IOException;

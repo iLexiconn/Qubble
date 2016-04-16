@@ -36,12 +36,12 @@ public class JavaScriptExporter implements IModelExporter<List<String>> {
         list.add("    leftLeg.setTextureSize(" + model.getTextureWidth() + ", " + model.getTextureHeight() + ");");
         list.add("");
         this.addCubeDeclarations(model.getCubes(), list);
-        list.add(")");
+        list.add("}");
         return list;
     }
 
     @Override
-    public void save(List<String> model, File file, Object... arguments) throws IOException {
+    public void save(List<String> model, File file) throws IOException {
         PrintWriter writer = new PrintWriter(file, "UTF-8");
         model.forEach(writer::println);
         writer.close();
