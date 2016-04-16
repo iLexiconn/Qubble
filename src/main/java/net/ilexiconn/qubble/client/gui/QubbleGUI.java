@@ -56,9 +56,6 @@ public class QubbleGUI extends GuiScreen {
         this.components.add(new ModelViewComponent());
         this.modelTree = new ModelTreeComponent();
         this.components.add(this.modelTree);
-        Dialog dialog = new Dialog("Test Dialogue", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
-        dialog.addComponent(new ButtonComponent("Test", 100, 100, 40, 20, (gui, component) -> System.out.println("Test button")));
-        this.openDialogs.add(dialog);
     }
 
     @Override
