@@ -36,7 +36,7 @@ public class JavaScriptExporter implements IModelExporter<List<String>> {
         list.add("    leftLeg.setTextureSize(" + model.getTextureWidth() + ", " + model.getTextureHeight() + ");");
         list.add("");
         this.addCubeDeclarations(model.getCubes(), list);
-        list.add(")");
+        list.add("}");
         return list;
     }
 

@@ -1,4 +1,4 @@
-package net.ilexiconn.qubble.server.model.tabula;
+package net.ilexiconn.qubble.server.model.techne;
 
 public class TechneCube {
     private String name;
