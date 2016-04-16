@@ -28,7 +28,7 @@ public class ModelTreeComponent extends Gui implements IGUIComponent {
         GlStateManager.disableLighting();
         GlStateManager.disableTexture2D();
 
-        int height = gui.height - 21;
+        int height = gui.height - 22;
 
         gui.drawRectangle(0, 21, this.width, height, QubbleGUI.getSecondaryColor());
 

@@ -40,7 +40,7 @@ public class JavaScriptImporter implements IModelImporter<List<String>> {
                 textureWidth = Integer.parseInt(values[0].trim());
                 textureHeight = Integer.parseInt(values[1].trim());
             } else if (line.contains("//")) {
-                cube = line.substring(line.indexOf("//") + 1, line.length());
+                cube = line.substring(line.indexOf("//") + 2, line.length());
             } else if (line.contains("setTextureOffset")) {
                 String[] values = line.substring(line.indexOf("(") + 1, line.length() - 2).split(",");
                 textureOffsetX = Integer.parseInt(values[0].trim());
