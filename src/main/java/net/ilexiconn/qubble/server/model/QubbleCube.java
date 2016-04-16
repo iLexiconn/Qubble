@@ -227,72 +227,39 @@ public class QubbleCube implements INBTSerializable<NBTTagCompound> {
         this.name = name;
     }
 
-    public void setDimensionX(int dimensionX) {
-        this.dimensionX = dimensionX;
+    public void setTexture(int x, int y) {
+        this.textureX = x;
+        this.textureY = y;
     }
 
-    public void setDimensionY(int dimensionY) {
-        this.dimensionY = dimensionY;
+    public void setPosition(float x, float y, float z) {
+        this.positionX = x;
+        this.positionY = y;
+        this.positionZ = z;
     }
 
-    public void setDimensionZ(int dimensionZ) {
-        this.dimensionZ = dimensionZ;
+    public void setOffset(float x, float y, float z) {
+        this.offsetX = x;
+        this.offsetY = y;
+        this.offsetZ = z;
     }
 
-    public void setPositionX(float positionX) {
-        this.positionX = positionX;
+    public void setDimensions(int x, int y, int z) {
+        this.dimensionX = x;
+        this.dimensionY = y;
+        this.dimensionZ = z;
     }
 
-    public void setPositionY(float positionY) {
-        this.positionY = positionY;
+    public void setRotation(float x, float y, float z) {
+        this.rotationX = x;
+        this.rotationY = y;
+        this.rotationZ = z;
     }
 
-    public void setPositionZ(float positionZ) {
-        this.positionZ = positionZ;
-    }
-
-    public void setOffsetX(float offsetX) {
-        this.offsetX = offsetX;
-    }
-
-    public void setOffsetY(float offsetY) {
-        this.offsetY = offsetY;
-    }
-
-    public void setOffsetZ(float offsetZ) {
-        this.offsetZ = offsetZ;
-    }
-
-    public void setRotationX(float rotationX) {
-        this.rotationX = rotationX;
-    }
-
-    public void setRotationY(float rotationY) {
-        this.rotationY = rotationY;
-    }
-
-    public void setRotationZ(float rotationZ) {
-        this.rotationZ = rotationZ;
-    }
-
-    public void setScaleX(float scaleX) {
-        this.scaleX = scaleX;
-    }
-
-    public void setScaleY(float scaleY) {
-        this.scaleY = scaleY;
-    }
-
-    public void setScaleZ(float scaleZ) {
-        this.scaleZ = scaleZ;
-    }
-
-    public void setTextureX(int textureX) {
-        this.textureX = textureX;
-    }
-
-    public void setTextureY(int textureY) {
-        this.textureY = textureY;
+    public void setScale(float x, float y, float z) {
+        this.scaleX = x;
+        this.scaleY = y;
+        this.scaleZ = z;
     }
 
     public void setTextureMirrored(boolean textureMirrored) {
