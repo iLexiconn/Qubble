@@ -151,16 +151,15 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
         Matrix4d matrix = new Matrix4d();
         matrix.setIdentity();
         Matrix4d transform = new Matrix4d();
-        for (int i = 0; i < parentCubes.size(); i++) {
-            QubbleCube current = parentCubes.get(i);
+        for (QubbleCube cube : parentCubes) {
             transform.setIdentity();
-            transform.setTranslation(new Vector3d(current.getPositionX(), current.getPositionY(), current.getPositionZ()));
+            transform.setTranslation(new Vector3d(cube.getPositionX(), cube.getPositionY(), cube.getPositionZ()));
             matrix.mul(transform);
-            transform.rotZ(current.getRotationZ() / 180 * Math.PI);
+            transform.rotZ(cube.getRotationZ() / 180 * Math.PI);
             matrix.mul(transform);
-            transform.rotY(current.getRotationY() / 180 * Math.PI);
+            transform.rotY(cube.getRotationY() / 180 * Math.PI);
             matrix.mul(transform);
-            transform.rotX(current.getRotationX() / 180 * Math.PI);
+            transform.rotX(cube.getRotationX() / 180 * Math.PI);
             matrix.mul(transform);
         }
         double sinRotationAngleY, cosRotationAngleY, sinRotationAngleX, cosRotationAngleX, sinRotationAngleZ, cosRotationAngleZ;

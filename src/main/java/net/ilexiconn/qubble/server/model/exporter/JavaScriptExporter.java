@@ -24,6 +24,7 @@ public class JavaScriptExporter implements IModelExporter<List<String>> {
     @Override
     public List<String> export(QubbleModel model, String... arguments) {
         List<String> list = new ArrayList<>();
+        model = model.unparent();
         list.add("//" + model.getName() + " by " + model.getAuthor());
         list.add("function addEntityRenderType(renderer) {");
         list.add("    var model = renderer.getModel();");
@@ -59,7 +60,6 @@ public class JavaScriptExporter implements IModelExporter<List<String>> {
             list.add("    //" + name);
             list.add("    " + bodyPart + ".setTextureOffset(" + cube.getTextureX() + ", " + cube.getTextureY() + ");");
             list.add("    " + bodyPart + ".addBox(" + (cube.getPositionX() + cube.getOffsetX()) + ", " + (cube.getPositionY() + cube.getOffsetY()) + ", " + (cube.getPositionZ() + cube.getOffsetZ()) + ", " + cube.getDimensionX() + ", " + cube.getDimensionY() + ", " + cube.getDimensionZ() + ");");
-            this.addCubeDeclarations(cube.getChildren(), list);
         }
     }
 
