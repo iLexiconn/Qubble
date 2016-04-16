@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
-import net.ilexiconn.qubble.server.model.QubbleCube;
-import net.ilexiconn.qubble.server.model.QubbleModel;
+import net.ilexiconn.qubble.server.model.qubble.QubbleCube;
+import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.Locale;
 
 public class JavaScriptExporter implements IModelExporter<List<String>> {
+    @Override
+    public String getName() {
+        return "JavaScript";
+    }
+
     @Override
     public String getExtension() {
         return "js";

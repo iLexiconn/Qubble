@@ -2,8 +2,8 @@ package net.ilexiconn.qubble.client.gui.component;
 
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
-import net.ilexiconn.qubble.server.model.QubbleCube;
-import net.ilexiconn.qubble.server.model.QubbleModel;
+import net.ilexiconn.qubble.server.model.qubble.QubbleCube;
+import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 

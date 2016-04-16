@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
-import net.ilexiconn.qubble.server.model.QubbleCube;
-import net.ilexiconn.qubble.server.model.QubbleModel;
+import net.ilexiconn.qubble.server.model.qubble.QubbleCube;
+import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ScalaExporter implements IModelExporter<List<String>> {
+    @Override
+    public String getName() {
+        return "Scala";
+    }
+
     @Override
     public String getExtension() {
         return "scala";

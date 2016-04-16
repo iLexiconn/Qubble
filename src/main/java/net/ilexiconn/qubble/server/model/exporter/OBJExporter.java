@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
-import net.ilexiconn.qubble.server.model.QubbleCube;
-import net.ilexiconn.qubble.server.model.QubbleModel;
+import net.ilexiconn.qubble.server.model.qubble.QubbleCube;
+import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.server.model.obj.*;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -11,6 +11,11 @@ import java.io.PrintWriter;
 import java.util.stream.Collectors;
 
 public class OBJExporter implements IModelExporter<OBJModel> {
+    @Override
+    public String getName() {
+        return "OBJ";
+    }
+
     @Override
     public String getExtension() {
         return "obj";

@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.server.model.importer;
 
-import net.ilexiconn.qubble.server.model.QubbleCube;
-import net.ilexiconn.qubble.server.model.QubbleModel;
+import net.ilexiconn.qubble.server.model.qubble.QubbleCube;
+import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -10,6 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JavaScriptImporter implements IModelImporter<List<String>> {
+    @Override
+    public String getName() {
+        return "JavaScript";
+    }
+
+    @Override
+    public String getExtension() {
+        return "js";
+    }
+
     @Override
     public QubbleModel getModel(List<String> model) {
         List<QubbleCube> cubes = new ArrayList<>();

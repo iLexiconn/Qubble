@@ -4,8 +4,8 @@ import net.ilexiconn.llibrary.client.model.tabula.TabulaModelHandler;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaCubeContainer;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaCubeGroupContainer;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaModelContainer;
-import net.ilexiconn.qubble.server.model.QubbleCube;
-import net.ilexiconn.qubble.server.model.QubbleModel;
+import net.ilexiconn.qubble.server.model.qubble.QubbleCube;
+import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +16,16 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class TabulaImporter implements IModelImporter<TabulaModelContainer> {
+    @Override
+    public String getName() {
+        return "Tabula";
+    }
+
+    @Override
+    public String getExtension() {
+        return "tbl";
+    }
+
     @Override
     public QubbleModel getModel(TabulaModelContainer model) {
         List<QubbleCube> cubes = new ArrayList<>();

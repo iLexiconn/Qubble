@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.server;
 
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaModelContainer;
-import net.ilexiconn.qubble.server.model.QubbleModel;
+import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.server.model.exporter.*;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.ilexiconn.qubble.server.model.importer.TabulaImporter;

@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.server.model.importer;
 
-import net.ilexiconn.qubble.server.model.QubbleCube;
-import net.ilexiconn.qubble.server.model.QubbleModel;
+import net.ilexiconn.qubble.server.model.qubble.QubbleCube;
+import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.server.model.techne.TechneCube;
 import net.ilexiconn.qubble.server.model.techne.TechneModel;
 
@@ -9,6 +9,16 @@ import java.io.File;
 import java.io.IOException;
 
 public class TechneImporter implements IModelImporter<TechneModel> {
+    @Override
+    public String getName() {
+        return "Techne";
+    }
+
+    @Override
+    public String getExtension() {
+        return "tcn";
+    }
+
     @Override
     public QubbleModel getModel(TechneModel model) {
         QubbleModel qubble = new QubbleModel();

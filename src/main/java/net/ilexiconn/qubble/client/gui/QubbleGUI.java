@@ -5,7 +5,9 @@ import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.component.*;
 import net.ilexiconn.qubble.client.gui.dialog.Dialog;
-import net.ilexiconn.qubble.server.model.QubbleModel;
+import net.ilexiconn.qubble.server.model.ModelHandler;
+import net.ilexiconn.qubble.server.model.importer.IModelImporter;
+import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -51,8 +53,8 @@ public class QubbleGUI extends GuiScreen {
         this.components.clear();
         this.openDialogs.clear();
         this.components.add(new ButtonComponent("x", 0, 0, 20, 20, "Close Qubble and return to the main menu", (gui, component) -> ClientProxy.MINECRAFT.displayGuiScreen(QubbleGUI.this.mainMenu)));
-        this.components.add(new ButtonComponent("o", 21, 0, 20, 20, "Open a model", (gui, component) -> QubbleGUI.this.openModelSelectionDialog()));
-        this.components.add(new ButtonComponent("i", 42, 0, 20, 20, "Import a model", (gui, component) -> {}));
+        this.components.add(new ButtonComponent("o", 21, 0, 20, 20, "Open a model", (gui, component) -> QubbleGUI.this.openModelSelectionDialog(null)));
+        this.components.add(new ButtonComponent("i", 42, 0, 20, 20, "Import a model", (gui, component) -> QubbleGUI.this.openModelImportDialog()));
         this.components.add(new ModelViewComponent());
         this.modelTree = new ModelTreeComponent();
         this.components.add(this.modelTree);
@@ -166,13 +168,18 @@ public class QubbleGUI extends GuiScreen {
         this.openDialogs.remove(dialog);
     }
 
-    private void openModelSelectionDialog() {
-        Dialog dialog = new Dialog("Open Model", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
-        List<String> models = this.getModels();
+    private void openModelSelectionDialog(IModelImporter modelImporter) {
+        Dialog dialog = new Dialog("Open " + (modelImporter == null ? "" : modelImporter.getName()) + " " + "Model", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
+        List<String> models = this.getModels(modelImporter);
         dialog.addComponent(new SelectionListComponent(1, 12, 198, 187, models, (gui, component) -> {
             try {
-                QubbleModel model = new QubbleModel();
-                model.deserializeNBT(CompressedStreamTools.readCompressed(new FileInputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, component.getSelected() + ".qbl"))));
+                QubbleModel model;
+                if (modelImporter == null) {
+                    model = new QubbleModel();
+                    model.deserializeNBT(CompressedStreamTools.readCompressed(new FileInputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, component.getSelected() + ".qbl"))));
+                } else {
+                    model = modelImporter.getModel(modelImporter.read(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, component.getSelected() + "." + modelImporter.getExtension())));
+                }
                 gui.currentModel = model;
                 gui.closeDialog(dialog);
             } catch (IOException e) {
@@ -182,11 +189,29 @@ public class QubbleGUI extends GuiScreen {
         this.openDialogs.add(dialog);
     }
 
-    private List<String> getModels() {
+    private void openModelImportDialog() {
+        Dialog dialog = new Dialog("Import Model", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
+        List<String> types = new ArrayList<>();
+        ModelHandler.INSTANCE.getImporters().forEach(modelImporter -> types.add(modelImporter.getName()));
+        dialog.addComponent(new SelectionListComponent(1, 12, 198, 187, types, (gui, component) -> {
+            IModelImporter<?> importer = ModelHandler.INSTANCE.getImporter(component.getSelected());
+            if (importer != null) {
+                this.openModelSelectionDialog(importer);
+                gui.closeDialog(dialog);
+            }
+        }));
+        this.openDialogs.add(dialog);
+    }
+
+    private List<String> getModels(IModelImporter<?> modelImporter) {
+        String extension = ".qbl";
+        if (modelImporter != null) {
+            extension = "." + modelImporter.getExtension();
+        }
         List<String> models = new ArrayList<>();
         for (File modelFile : ClientProxy.QUBBLE_MODEL_DIRECTORY.listFiles()) {
-            if (modelFile.isFile() && modelFile.getName().endsWith(".qbl")) {
-                models.add(modelFile.getName().split(".qbl")[0]);
+            if (modelFile.isFile() && modelFile.getName().endsWith(extension)) {
+                models.add(modelFile.getName().split(extension)[0]);
             }
         }
         return models;

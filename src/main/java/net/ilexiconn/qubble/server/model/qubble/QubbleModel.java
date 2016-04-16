@@ -1,4 +1,4 @@
-package net.ilexiconn.qubble.server.model;
+package net.ilexiconn.qubble.server.model.qubble;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
