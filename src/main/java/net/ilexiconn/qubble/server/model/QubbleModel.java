@@ -17,6 +17,7 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
     private int textureWidth;
     private int textureHeight;
     private List<QubbleCube> cubes = new ArrayList<>();
+    private List<QubbleAnimation> animations = new ArrayList<>();
 
     public QubbleModel() {
 
@@ -46,6 +47,11 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
             cubesTag.appendTag(cube.serializeNBT());
         }
         compound.setTag("cubes", cubesTag);
+        NBTTagList animationsTag = new NBTTagList();
+        for (QubbleAnimation animation : this.animations) {
+            cubesTag.appendTag(animation.serializeNBT());
+        }
+        compound.setTag("animations", animationsTag);
         return compound;
     }
 
@@ -58,11 +64,17 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
         this.textureWidth = textureTag.getInteger("width");
         this.textureHeight = textureTag.getInteger("height");
         this.cubes = new ArrayList<>();
-        NBTTagList cubesList = compound.getTagList("cubes", Constants.NBT.TAG_COMPOUND);
-        for (int i = 0; i < cubesList.tagCount(); i++) {
+        NBTTagList cubesTag = compound.getTagList("cubes", Constants.NBT.TAG_COMPOUND);
+        for (int i = 0; i < cubesTag.tagCount(); i++) {
             QubbleCube cube = new QubbleCube();
-            cube.deserializeNBT(cubesList.getCompoundTagAt(i));
+            cube.deserializeNBT(cubesTag.getCompoundTagAt(i));
             this.cubes.add(cube);
+        }
+        NBTTagList animationsTag = compound.getTagList("animations", Constants.NBT.TAG_COMPOUND);
+        for (int i = 0; i < animationsTag.tagCount(); i++) {
+            QubbleAnimation animation = new QubbleAnimation();
+            animation.deserializeNBT(cubesTag.getCompoundTagAt(i));
+            this.animations.add(animation);
         }
     }
 
@@ -88,6 +100,10 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
 
     public List<QubbleCube> getCubes() {
         return cubes;
+    }
+
+    public List<QubbleAnimation> getAnimations() {
+        return animations;
     }
 
     public void setName(String name) {
