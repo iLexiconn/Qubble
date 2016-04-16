@@ -32,7 +32,7 @@ public class OBJExporter implements IModelExporter<OBJModel> {
     }
 
     @Override
-    public void save(OBJModel model, File file, Object... arguments) throws IOException {
+    public void save(OBJModel model, File file) throws IOException {
         PrintWriter writer = new PrintWriter(file, "UTF-8");
         model.shapes.forEach(shape -> shape.toStringList().forEach(writer::println));
         writer.close();

@@ -23,6 +23,7 @@ public class ServerProxy {
         IModelExporter<List<String>> scalaExporter = new ScalaExporter();
         IModelExporter<List<String>> jsExporter = new JavaScriptExporter();
         IModelExporter<OBJModel> objExporter = new OBJExporter();
+        IModelExporter<List<String>> kotlinExporter = new KotlinExporter();
 
         try {
             QubbleModel model = tabulaImporter.getModel(tabulaImporter.read(new File(".", "TabulaModel.tbl")));
@@ -30,6 +31,7 @@ public class ServerProxy {
             scalaExporter.save(scalaExporter.export(model, "net.ilexiconn.test", "TabulaModel"), new File(".", "TabulaModel.scala"));
             jsExporter.save(jsExporter.export(model), new File(".", "TabulaModel.js"));
             objExporter.save(objExporter.export(model), new File(".", "TabulaModel.obj"));
+            kotlinExporter.save(kotlinExporter.export(model, "net.ilexiconn.test", "TabulaModel"), new File(".", "TabulaModel.kt"));
             CompressedStreamTools.writeCompressed(model.serializeNBT(), new FileOutputStream(new File("TabulaModel.qbl")));
         } catch (IOException e) {
             e.printStackTrace();

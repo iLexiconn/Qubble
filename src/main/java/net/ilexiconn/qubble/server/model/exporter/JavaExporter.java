@@ -53,7 +53,7 @@ public class JavaExporter implements IModelExporter<List<String>> {
     }
 
     @Override
-    public void save(List<String> model, File file, Object... arguments) throws IOException {
+    public void save(List<String> model, File file) throws IOException {
         PrintWriter writer = new PrintWriter(file, "UTF-8");
         model.forEach(writer::println);
         writer.close();
@@ -72,6 +72,9 @@ public class JavaExporter implements IModelExporter<List<String>> {
             list.add("        this." + field + " = new ModelRenderer(this, " + cube.getTextureX() + ", " + cube.getTextureY() + ");");
             list.add("        this." + field + ".setRotationPoint(" + cube.getPositionX() + "F, " + cube.getPositionY() + "F, " + cube.getPositionZ() + "F);");
             list.add("        this." + field + ".addBox(" + cube.getOffsetX() + "F, " + cube.getOffsetY() + "F, " + cube.getOffsetZ() + "F, " + cube.getDimensionX() + ", " + cube.getDimensionY() + ", " + cube.getDimensionZ() + ");");
+            if (cube.isTextureMirrored()) {
+                list.add("        this." + field + ".mirror = true;");
+            }
             if (cube.getRotationX() != 0.0F || cube.getRotationY() != 0.0F || cube.getRotationZ() != 0.0F) {
                 list.add("        this.setRotationAngles(this." + field + ", " + Math.toRadians(cube.getRotationX()) + "F, " + Math.toRadians(cube.getRotationY()) + "F, " + Math.toRadians(cube.getRotationZ()) + "F);");
             }

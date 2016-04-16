@@ -10,5 +10,5 @@ public interface IModelExporter<T> {
 
     T export(QubbleModel model, String... arguments);
 
-    void save(T model, File file, Object... arguments) throws IOException;
+    void save(T model, File file) throws IOException;
 }
