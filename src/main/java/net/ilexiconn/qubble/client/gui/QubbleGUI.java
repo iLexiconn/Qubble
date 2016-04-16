@@ -169,7 +169,7 @@ public class QubbleGUI extends GuiScreen {
     }
 
     private void openModelSelectionDialog(IModelImporter modelImporter) {
-        Dialog dialog = new Dialog("Open " + (modelImporter == null ? "" : modelImporter.getName()) + " " + "Model", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
+        Dialog dialog = new Dialog(modelImporter == null ? "Open model" : "Import " + modelImporter.getName() + " model", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
         List<String> models = this.getModels(modelImporter);
         dialog.addComponent(new SelectionListComponent(1, 12, 198, 187, models, (gui, component) -> {
             try {
@@ -190,7 +190,7 @@ public class QubbleGUI extends GuiScreen {
     }
 
     private void openModelImportDialog() {
-        Dialog dialog = new Dialog("Import Model", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
+        Dialog dialog = new Dialog("Import model", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
         List<String> types = new ArrayList<>();
         ModelHandler.INSTANCE.getImporters().forEach(modelImporter -> types.add(modelImporter.getName()));
         dialog.addComponent(new SelectionListComponent(1, 12, 198, 187, types, (gui, component) -> {
