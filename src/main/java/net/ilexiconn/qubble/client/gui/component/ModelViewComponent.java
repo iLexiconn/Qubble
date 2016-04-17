@@ -1,5 +1,6 @@
 package net.ilexiconn.qubble.client.gui.component;
 
+import net.ilexiconn.llibrary.client.util.ClientUtils;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.model.QubbleModelBase;
@@ -16,6 +17,12 @@ public class ModelViewComponent implements IGUIComponent {
 
     private float rotationYaw = 225.0F;
     private float rotationPitch = -15.0F;
+
+    private float prevRotationYaw;
+    private float prevRotationPitch;
+
+    private float prevCameraOffsetX;
+    private float prevCameraOffsetY;
 
     private float zoom = 1.0F;
 
@@ -52,7 +59,7 @@ public class ModelViewComponent implements IGUIComponent {
             float b = (float) (color & 0xFF) / 255.0F;
             GlStateManager.clearColor(r * 0.8F, g * 0.8F, b * 0.8F, 1.0F);
             GlStateManager.clear(GL11.GL_COLOR_BUFFER_BIT);
-            this.setupCamera(10.0F);
+            this.setupCamera(10.0F, partialTicks);
             RenderHelper.enableStandardItemLighting();
             if (this.currentModelContainer != gui.getCurrentModel()) {
                 this.currentModel = new QubbleModelBase(gui.getCurrentModel());
@@ -73,17 +80,21 @@ public class ModelViewComponent implements IGUIComponent {
         GlStateManager.loadIdentity();
         this.prevMouseX = mouseX;
         this.prevMouseY = mouseY;
+        this.prevCameraOffsetX = this.cameraOffsetX;
+        this.prevCameraOffsetY = this.cameraOffsetY;
+        this.prevRotationYaw = this.rotationYaw;
+        this.prevRotationPitch = this.rotationPitch;
     }
 
-    private void setupCamera(float scale) {
+    private void setupCamera(float scale, float partialTicks) {
         GlStateManager.disableTexture2D();
         GlStateManager.scale(scale, scale, scale);
         GlStateManager.translate(0.0F, -2.0F, -10.0F);
         GlStateManager.scale(this.zoom, this.zoom, this.zoom);
         GlStateManager.scale(1.0F, -1.0F, 1.0F);
-        GlStateManager.translate(this.cameraOffsetX, this.cameraOffsetY, 0.0F);
-        GlStateManager.rotate(this.rotationPitch, 1.0F, 0.0F, 0.0F);
-        GlStateManager.rotate(this.rotationYaw, 0.0F, 1.0F, 0.0F);
+        GlStateManager.translate(ClientUtils.interpolate(this.prevCameraOffsetX, this.cameraOffsetX, partialTicks), ClientUtils.interpolate(this.prevCameraOffsetY, this.cameraOffsetY, partialTicks), 0.0F);
+        GlStateManager.rotate(ClientUtils.interpolate(this.prevRotationPitch, this.rotationPitch, partialTicks), 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(ClientUtils.interpolate(this.prevRotationYaw, this.rotationYaw, partialTicks), 0.0F, 1.0F, 0.0F);
     }
 
     @Override
