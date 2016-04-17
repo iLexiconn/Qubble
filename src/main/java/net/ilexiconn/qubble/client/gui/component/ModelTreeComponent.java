@@ -48,7 +48,7 @@ public class ModelTreeComponent extends Gui implements IGUIComponent {
 
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
-        gui.drawOutline(0, 21, this.width, height, Qubble.CONFIG.getAccentColor(), 1);
+        gui.drawOutline(0, 21, this.width, height + 1, Qubble.CONFIG.getAccentColor(), 1);
 
         float maxDisplayEntries = height / 13;
         float maxScroll = Math.max(0, this.partY - maxDisplayEntries);

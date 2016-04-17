@@ -26,8 +26,6 @@ public class ModelViewComponent implements IGUIComponent {
     private float prevCameraOffsetY;
 
     private float zoom = 1.0F;
-    private float prevZoom;
-
     private float zoomVelocity;
 
     private QubbleModel currentModelContainer;
@@ -89,14 +87,14 @@ public class ModelViewComponent implements IGUIComponent {
         this.prevCameraOffsetY = this.cameraOffsetY;
         this.prevRotationYaw = this.rotationYaw;
         this.prevRotationPitch = this.rotationPitch;
-        this.prevZoom = this.zoom;
-        this.zoomVelocity += Mouse.getDWheel() * 0.0005F;
+        int scroll = Mouse.getDWheel();
+        this.zoomVelocity += (scroll / 120.0F) * 0.05F;
         this.zoom += this.zoomVelocity;
-        this.zoomVelocity *= 0.8F;
-        if (this.zoom < 0.6F) {
-            this.zoom = 0.6F;
-        } else if (this.zoom > 5.0F) {
-            this.zoom = 5.0F;
+        this.zoomVelocity *= 0.6F;
+        if (this.zoom < 0.5F) {
+            this.zoom = 0.5F;
+        } else if (this.zoom > 10.0F) {
+            this.zoom = 10.0F;
         }
     }
 
@@ -104,8 +102,7 @@ public class ModelViewComponent implements IGUIComponent {
         GlStateManager.disableTexture2D();
         GlStateManager.scale(scale, scale, scale);
         GlStateManager.translate(0.0F, -2.0F, -10.0F);
-        float zoom = QubbleGUI.interpolate(this.prevZoom, this.zoom, partialTicks);
-        GlStateManager.scale(zoom, zoom, zoom);
+        GlStateManager.scale(this.zoom, this.zoom, this.zoom);
         GlStateManager.scale(1.0F, -1.0F, 1.0F);
         GlStateManager.translate(QubbleGUI.interpolate(this.prevCameraOffsetX, this.cameraOffsetX, partialTicks), QubbleGUI.interpolate(this.prevCameraOffsetY, this.cameraOffsetY, partialTicks), 0.0F);
         GlStateManager.rotate(QubbleGUI.interpolate(this.prevRotationPitch, this.rotationPitch, partialTicks), 1.0F, 0.0F, 0.0F);
