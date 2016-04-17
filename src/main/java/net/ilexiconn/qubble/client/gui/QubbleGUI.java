@@ -156,7 +156,7 @@ public class QubbleGUI extends GuiScreen {
     }
 
     private float getPreciseMouseY(ScaledResolution scaledResolution) {
-        return this.height - Mouse.getY() * this.height / this.mc.displayHeight - 1;
+        return this.height - (float) Mouse.getY() * this.height / (float) this.mc.displayHeight - 1.0F;
     }
 
     private void drawBackground() {

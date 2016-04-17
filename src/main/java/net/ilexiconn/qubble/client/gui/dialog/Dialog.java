@@ -16,11 +16,11 @@ import java.util.List;
 public class Dialog {
     private String name;
 
-    public int posX;
-    public int posY;
+    public float posX;
+    public float posY;
 
-    private int prevPosX;
-    private int prevPosY;
+    private float prevPosX;
+    private float prevPosY;
 
     public int width;
     public int height;
@@ -56,7 +56,7 @@ public class Dialog {
         int accentColor = Qubble.CONFIG.getAccentColor();
         GlStateManager.pushMatrix();
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        GL11.glScissor((int) (drawX * scaleFactor), (int) ((gui.height - (drawY + this.height)) * scaleFactor), this.width * scaleFactor, this.height * scaleFactor);
+        GL11.glScissor((int) (drawX * scaleFactor), (int) ((gui.height - (drawY + this.height)) * scaleFactor) + 1, this.width * scaleFactor, this.height * scaleFactor);
         gui.drawRectangle(drawX, drawY, this.width, this.height, QubbleGUI.getSecondaryColor());
         gui.drawOutline(drawX, drawY, this.width, this.height, accentColor, 1);
         gui.drawOutline(drawX, drawY, this.width, 12, accentColor, 1);
@@ -93,8 +93,8 @@ public class Dialog {
 
     public void mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
         if (this.isDragging) {
-            this.posX = (int) Math.min(Math.max(mouseX - this.dragOffsetX, 0), gui.width - this.width);
-            this.posY = (int) Math.min(Math.max(mouseY - this.dragOffsetY, 0), gui.height - this.height);
+            this.posX = Math.min(Math.max(mouseX - this.dragOffsetX, 0), gui.width - this.width);
+            this.posY = Math.min(Math.max(mouseY - this.dragOffsetY, 0), gui.height - this.height);
         }
         mouseX -= this.posX;
         mouseY -= this.posY;
