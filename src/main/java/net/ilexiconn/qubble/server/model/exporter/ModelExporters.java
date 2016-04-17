@@ -5,7 +5,8 @@ public enum ModelExporters {
     JAVASCRIPT(new JavaScriptExporter()),
     KOTLIN(new KotlinExporter()),
     OBJ(new OBJExporter()),
-    SCALA(new ScalaExporter());
+    SCALA(new ScalaExporter()),
+    TABULA(new TabulaExporter());
 
     public static final ModelExporters[] VALUES = values();
     private IModelExporter<?> modelExporter;
