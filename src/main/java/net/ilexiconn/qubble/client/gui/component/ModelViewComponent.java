@@ -5,7 +5,8 @@ import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.model.QubbleModelBase;
 import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
@@ -111,7 +112,9 @@ public class ModelViewComponent implements IGUIComponent {
         float yMovement = mouseY - this.prevMouseY;
         if (button == 0) {
             this.rotationYaw += xMovement;
-            this.rotationPitch -= yMovement;
+            if ((this.rotationPitch > -90.0F || yMovement < 0.0F) && (this.rotationPitch < 90.0F || yMovement > 0.0F)) {
+                this.rotationPitch -= yMovement;
+            }
         } else if (button == 1) {
             this.cameraOffsetX = this.cameraOffsetX + xMovement * 0.016F;
             this.cameraOffsetY = this.cameraOffsetY + yMovement * 0.016F;
