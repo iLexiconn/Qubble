@@ -27,8 +27,8 @@ public class Dialog {
     public int width;
     public int height;
 
-    private int dragOffsetX;
-    private int dragOffsetY;
+    private float dragOffsetX;
+    private float dragOffsetY;
     private boolean isDragging;
 
     private List<IGUIComponent> components = new ArrayList<>();
@@ -50,7 +50,7 @@ public class Dialog {
         this.components.add(component);
     }
 
-    public void render(QubbleGUI gui, int mouseX, int mouseY, float partialTicks) {
+    public void render(QubbleGUI gui, float mouseX, float mouseY, float partialTicks) {
         double drawX = ClientUtils.interpolate(this.prevPosX, this.posX, partialTicks);
         double drawY = ClientUtils.interpolate(this.prevPosY, this.posY, partialTicks);
         ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
@@ -76,7 +76,7 @@ public class Dialog {
         this.prevPosY = this.posY;
     }
 
-    public boolean mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button) {
+    public boolean mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
         if (button != 0 || mouseX < this.posX || mouseX > this.posX + this.width || mouseY < this.posY || mouseY > this.posY + this.height) {
             return false;
         }
@@ -93,10 +93,10 @@ public class Dialog {
         return true;
     }
 
-    public void mouseDragged(QubbleGUI gui, int mouseX, int mouseY, int button, long timeSinceClick) {
+    public void mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
         if (this.isDragging) {
-            this.posX = Math.min(Math.max(mouseX - this.dragOffsetX, 0), gui.width - this.width);
-            this.posY = Math.min(Math.max(mouseY - this.dragOffsetY, 0), gui.height - this.height);
+            this.posX = (int) Math.min(Math.max(mouseX - this.dragOffsetX, 0), gui.width - this.width);
+            this.posY = (int) Math.min(Math.max(mouseY - this.dragOffsetY, 0), gui.height - this.height);
         }
         mouseX -= this.posX;
         mouseY -= this.posY;
@@ -105,7 +105,7 @@ public class Dialog {
         }
     }
 
-    public void mouseReleased(QubbleGUI gui, int mouseX, int mouseY, int button) {
+    public void mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
         this.isDragging = false;
         mouseX -= this.posX;
         mouseY -= this.posY;

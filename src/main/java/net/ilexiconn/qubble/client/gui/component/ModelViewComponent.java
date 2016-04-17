@@ -29,11 +29,11 @@ public class ModelViewComponent implements IGUIComponent {
     private QubbleModel currentModelContainer;
     private QubbleModelBase currentModel;
 
-    private int prevMouseX;
-    private int prevMouseY;
+    private float prevMouseX;
+    private float prevMouseY;
 
     @Override
-    public void render(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
+    public void render(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
         GlStateManager.disableLighting();
         GlStateManager.disableTexture2D();
         gui.drawOutline(0, 20, gui.width, gui.height - 20, QubbleGUI.getPrimaryColor(), 1);
@@ -98,18 +98,18 @@ public class ModelViewComponent implements IGUIComponent {
     }
 
     @Override
-    public void renderAfter(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
+    public void renderAfter(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
 
     }
 
     @Override
-    public void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button) {
+    public void mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
     }
 
     @Override
-    public void mouseDragged(QubbleGUI gui, int mouseX, int mouseY, int button, long timeSinceClick) {
-        int xMovement = mouseX - this.prevMouseX;
-        int yMovement = mouseY - this.prevMouseY;
+    public void mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
+        float xMovement = mouseX - this.prevMouseX;
+        float yMovement = mouseY - this.prevMouseY;
         if (button == 0) {
             this.rotationYaw += xMovement;
             this.rotationPitch -= yMovement;
@@ -120,7 +120,7 @@ public class ModelViewComponent implements IGUIComponent {
     }
 
     @Override
-    public void mouseReleased(QubbleGUI gui, int mouseX, int mouseY, int button) {
+    public void mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
 
     }
 

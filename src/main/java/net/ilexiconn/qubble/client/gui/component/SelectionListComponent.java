@@ -44,7 +44,7 @@ public class SelectionListComponent extends Gui implements IGUIComponent {
     }
 
     @Override
-    public void render(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
+    public void render(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
         int primaryColor = QubbleGUI.getPrimaryColor();
         int secondaryColor = QubbleGUI.getSecondaryColor();
         gui.drawRectangle(this.posX, this.posY, this.width, this.height, primaryColor);
@@ -77,12 +77,12 @@ public class SelectionListComponent extends Gui implements IGUIComponent {
     }
 
     @Override
-    public void renderAfter(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
+    public void renderAfter(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
 
     }
 
     @Override
-    public void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button) {
+    public void mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
         int y = (int) (-this.scroll * this.scrollPerEntry * 13);
         for (String entry : this.entries) {
             if (y + 13 < this.height && y >= 0) {
@@ -104,20 +104,20 @@ public class SelectionListComponent extends Gui implements IGUIComponent {
             int height = (int) ((this.height - 2) / ((float) this.entries.size() / (float) this.maxDisplayEntries));
             if (mouseX >= scrollX && mouseX < scrollX + 6 && mouseY >= scrollY && mouseY < scrollY + height) {
                 this.scrolling = true;
-                this.scrollYOffset = mouseY - scrollY;
+                this.scrollYOffset = (int) (mouseY - scrollY);
             }
         }
     }
 
     @Override
-    public void mouseDragged(QubbleGUI gui, int mouseX, int mouseY, int button, long timeSinceClick) {
+    public void mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
         if (this.scrolling) {
             this.scroll = (int) Math.max(0, Math.min(this.maxScroll / this.scrollPerEntry, mouseY - this.posY - 2 - this.scrollYOffset));
         }
     }
 
     @Override
-    public void mouseReleased(QubbleGUI gui, int mouseX, int mouseY, int button) {
+    public void mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
         this.scrolling = false;
     }
 
@@ -126,7 +126,7 @@ public class SelectionListComponent extends Gui implements IGUIComponent {
 
     }
 
-    private boolean isSelected(int entryX, int entryY, int entryWidth, int entryHeight, int mouseX, int mouseY) {
+    private boolean isSelected(int entryX, int entryY, int entryWidth, int entryHeight, float mouseX, float mouseY) {
         return mouseX > entryX && mouseX < entryX + entryWidth && mouseY > entryY && mouseY < entryY + entryHeight;
     }
 

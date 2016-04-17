@@ -24,7 +24,7 @@ public class ModelTreeComponent extends Gui implements IGUIComponent {
     }
 
     @Override
-    public void render(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
+    public void render(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
         GlStateManager.disableLighting();
         GlStateManager.disableTexture2D();
 
@@ -63,7 +63,7 @@ public class ModelTreeComponent extends Gui implements IGUIComponent {
     }
 
     @Override
-    public void renderAfter(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
+    public void renderAfter(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
 
     }
 
@@ -80,7 +80,7 @@ public class ModelTreeComponent extends Gui implements IGUIComponent {
     }
 
     @Override
-    public void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button) {
+    public void mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
         if (mouseX > this.width - 4 && mouseX < this.width + 4 && mouseY > 21) {
             this.rescaling = true;
         }
@@ -93,15 +93,15 @@ public class ModelTreeComponent extends Gui implements IGUIComponent {
             int scrollerHeight = (int) ((height - 21) / ((float) this.partY / maxDisplayEntries));
             if (mouseX >= scrollX && mouseX < scrollX + 6 && mouseY >= scrollY && mouseY < scrollY + scrollerHeight) {
                 this.scrolling = true;
-                this.scrollYOffset = mouseY - scrollY;
+                this.scrollYOffset = (int) (mouseY - scrollY);
             }
         }
     }
 
     @Override
-    public void mouseDragged(QubbleGUI gui, int mouseX, int mouseY, int button, long timeSinceClick) {
+    public void mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
         if (this.rescaling) {
-            this.width = Math.max(50, Math.min(300, mouseX));
+            this.width = (int) Math.max(50, Math.min(300, mouseX));
         }
         if (this.scrolling) {
             int height = gui.height - 21;
@@ -113,7 +113,7 @@ public class ModelTreeComponent extends Gui implements IGUIComponent {
     }
 
     @Override
-    public void mouseReleased(QubbleGUI gui, int mouseX, int mouseY, int button) {
+    public void mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
         this.rescaling = false;
         this.scrolling = false;
     }

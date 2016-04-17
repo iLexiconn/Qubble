@@ -25,7 +25,7 @@ public class TextBoxComponent extends Gui implements IGUIComponent {
     }
 
     @Override
-    public void render(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
+    public void render(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
         int primaryColor = QubbleGUI.getPrimaryColor();
         int secondaryColor = QubbleGUI.getSecondaryColor();
         GlStateManager.disableTexture2D();
@@ -43,20 +43,20 @@ public class TextBoxComponent extends Gui implements IGUIComponent {
     }
 
     @Override
-    public void renderAfter(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
+    public void renderAfter(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
     }
 
     @Override
-    public void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button) {
+    public void mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
         this.selected = this.isMouseSelecting(mouseX, mouseY);
     }
 
     @Override
-    public void mouseDragged(QubbleGUI gui, int mouseX, int mouseY, int button, long timeSinceClick) {
+    public void mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
     }
 
     @Override
-    public void mouseReleased(QubbleGUI gui, int mouseX, int mouseY, int button) {
+    public void mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
     }
 
     @Override
@@ -76,7 +76,7 @@ public class TextBoxComponent extends Gui implements IGUIComponent {
         }
     }
 
-    private boolean isMouseSelecting(int mouseX, int mouseY) {
+    private boolean isMouseSelecting(float mouseX, float mouseY) {
         return mouseX >= this.posX && mouseX < this.posX + this.width && mouseY >= this.posY && mouseY < this.posY + this.height;
     }
 

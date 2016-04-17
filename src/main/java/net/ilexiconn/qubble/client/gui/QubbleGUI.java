@@ -11,6 +11,7 @@ import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
@@ -18,6 +19,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Mouse;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -70,12 +72,15 @@ public class QubbleGUI extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
+        ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
+        float preciseMouseX = this.getPreciseMouseX(scaledResolution);
+        float preciseMouseY = this.getPreciseMouseY(scaledResolution);
         for (IGUIComponent component : new ArrayList<>(this.components)) {
-            component.render(this, mouseX, mouseY, 0, 0, partialTicks);
+            component.render(this, preciseMouseX, preciseMouseY, 0, 0, partialTicks);
         }
         boolean flag = false;
         for (Dialog dialog : new ArrayList<>(this.openDialogs)) {
-            dialog.render(this, mouseX, mouseY, partialTicks);
+            dialog.render(this, preciseMouseX, preciseMouseY, partialTicks);
             if (mouseX < dialog.posX || mouseX > dialog.posX + dialog.width || mouseY < dialog.posY || mouseY > dialog.posY + dialog.height) {
                 flag = true;
             }
@@ -84,26 +89,32 @@ public class QubbleGUI extends GuiScreen {
             return;
         }
         for (IGUIComponent component : new ArrayList<>(this.components)) {
-            component.renderAfter(this, mouseX, mouseY, 0, 0, partialTicks);
+            component.renderAfter(this, preciseMouseX, preciseMouseY, 0, 0, partialTicks);
         }
     }
 
     @Override
     public void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
         super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+        ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
+        float preciseMouseX = this.getPreciseMouseX(scaledResolution);
+        float preciseMouseY = this.getPreciseMouseY(scaledResolution);
         for (IGUIComponent component : new ArrayList<>(this.components)) {
-            component.mouseDragged(this, mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+            component.mouseDragged(this, preciseMouseX, preciseMouseY, clickedMouseButton, timeSinceLastClick);
         }
         for (Dialog dialog : new ArrayList<>(this.openDialogs)) {
-            dialog.mouseDragged(this, mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+            dialog.mouseDragged(this, preciseMouseX, preciseMouseY, clickedMouseButton, timeSinceLastClick);
         }
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) throws IOException {
         super.mouseClicked(mouseX, mouseY, button);
+        ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
+        float preciseMouseX = this.getPreciseMouseX(scaledResolution);
+        float preciseMouseY = this.getPreciseMouseY(scaledResolution);
         for (Dialog dialog : new ArrayList<>(Lists.reverse(this.openDialogs))) {
-            if (dialog.mouseClicked(this, mouseX, mouseY, button)) {
+            if (dialog.mouseClicked(this, preciseMouseX, preciseMouseY, button)) {
                 if (this.openDialogs.remove(dialog)) {
                     this.openDialogs.add(dialog);
                 }
@@ -111,18 +122,21 @@ public class QubbleGUI extends GuiScreen {
             }
         }
         for (IGUIComponent component : new ArrayList<>(this.components)) {
-            component.mouseClicked(this, mouseX, mouseY, button);
+            component.mouseClicked(this, preciseMouseX, preciseMouseY, button);
         }
     }
 
     @Override
     public void mouseReleased(int mouseX, int mouseY, int button) {
         super.mouseReleased(mouseX, mouseY, button);
+        ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
+        float preciseMouseX = this.getPreciseMouseX(scaledResolution);
+        float preciseMouseY = this.getPreciseMouseY(scaledResolution);
         for (IGUIComponent component : new ArrayList<>(this.components)) {
-            component.mouseReleased(this, mouseX, mouseY, button);
+            component.mouseReleased(this, preciseMouseX, preciseMouseY, button);
         }
         for (Dialog dialog : new ArrayList<>(this.openDialogs)) {
-            dialog.mouseReleased(this, mouseX, mouseY, button);
+            dialog.mouseReleased(this, preciseMouseX, preciseMouseY, button);
         }
     }
 
@@ -135,6 +149,14 @@ public class QubbleGUI extends GuiScreen {
         for (Dialog dialog : new ArrayList<>(this.openDialogs)) {
             dialog.keyPressed(this, character, keyCode);
         }
+    }
+
+    private float getPreciseMouseX(ScaledResolution scaledResolution) {
+        return (float) Mouse.getX() / scaledResolution.getScaleFactor();
+    }
+
+    private float getPreciseMouseY(ScaledResolution scaledResolution) {
+        return this.height - Mouse.getY() * this.height / this.mc.displayHeight - 1;
     }
 
     private void drawBackground() {

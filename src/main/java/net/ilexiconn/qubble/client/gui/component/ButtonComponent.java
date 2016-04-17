@@ -50,7 +50,7 @@ public class ButtonComponent extends Gui implements IGUIComponent {
     }
 
     @Override
-    public void render(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
+    public void render(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
         boolean selected = this.isSelected(mouseX, mouseY);
         GlStateManager.disableTexture2D();
         this.drawGradientRect(this.posX + 1, this.posY + 1, this.posX + this.width - 1, this.posY + this.height - 1, this.primaryColor, selected ? this.secondaryColor : this.primaryColor);
@@ -61,16 +61,16 @@ public class ButtonComponent extends Gui implements IGUIComponent {
     }
 
     @Override
-    public void renderAfter(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
-        if (this.tooltip != null && this.hoverChecker.checkHover(mouseX, mouseY)) {
+    public void renderAfter(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
+        if (this.tooltip != null && this.hoverChecker.checkHover((int) mouseX, (int) mouseY)) {
             GuiScreen currentScreen = ClientProxy.MINECRAFT.currentScreen;
-            GuiUtils.drawHoveringText(Collections.singletonList(this.tooltip), mouseX, mouseY, currentScreen.width, currentScreen.height, 300, ClientProxy.MINECRAFT.fontRendererObj);
+            GuiUtils.drawHoveringText(Collections.singletonList(this.tooltip), (int) mouseX, (int) mouseY, currentScreen.width, currentScreen.height, 300, ClientProxy.MINECRAFT.fontRendererObj);
             GlStateManager.disableLighting();
         }
     }
 
     @Override
-    public void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button) {
+    public void mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
         if (this.isSelected(mouseX, mouseY)) {
             ClientProxy.MINECRAFT.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
             this.actionHandler.onAction(gui, this);
@@ -78,12 +78,12 @@ public class ButtonComponent extends Gui implements IGUIComponent {
     }
 
     @Override
-    public void mouseDragged(QubbleGUI gui, int mouseX, int mouseY, int button, long timeSinceClick) {
+    public void mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
 
     }
 
     @Override
-    public void mouseReleased(QubbleGUI gui, int mouseX, int mouseY, int button) {
+    public void mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
 
     }
 
@@ -92,8 +92,8 @@ public class ButtonComponent extends Gui implements IGUIComponent {
 
     }
 
-    protected boolean isSelected(int mouseX, int mouseY) {
-        return mouseX > this.posX && mouseY > this.posY && mouseX < this.posX + this.width && mouseY < this.posY + this.height;
+    protected boolean isSelected(float mouseX, float mouseY) {
+        return mouseX >= this.posX && mouseY >= this.posY && mouseX < this.posX + this.width && mouseY < this.posY + this.height;
     }
 
     public void setColorScheme(int primaryColor, int secondaryColor, int accentColor, int textColor) {

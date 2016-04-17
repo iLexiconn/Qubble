@@ -6,15 +6,15 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public interface IGUIComponent {
-    void render(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks);
+    void render(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks);
 
-    void renderAfter(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks);
+    void renderAfter(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks);
 
-    void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button);
+    void mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button);
 
-    void mouseDragged(QubbleGUI gui, int mouseX, int mouseY, int button, long timeSinceClick);
+    void mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick);
 
-    void mouseReleased(QubbleGUI gui, int mouseX, int mouseY, int button);
+    void mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button);
 
     void keyPressed(QubbleGUI gui, char character, int key);
 }
