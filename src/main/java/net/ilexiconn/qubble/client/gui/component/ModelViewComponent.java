@@ -7,7 +7,6 @@ import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
@@ -100,12 +99,12 @@ public class ModelViewComponent implements IGUIComponent {
     public void mouseDragged(QubbleGUI gui, int mouseX, int mouseY, int button, long timeSinceClick) {
         int xMovement = mouseX - this.prevMouseX;
         int yMovement = mouseY - this.prevMouseY;
-        if (button == 1) {
+        if (button == 0) {
             this.rotationYaw += xMovement;
             this.rotationPitch -= yMovement;
-        } else if (button == 2) {
-            this.cameraOffsetX = MathHelper.clamp_float(this.cameraOffsetX + xMovement * 0.0125F, -2.0F, 2.0F);
-            this.cameraOffsetY = MathHelper.clamp_float(this.cameraOffsetY + yMovement * 0.0125F, -2.0F, 2.0F);
+        } else if (button == 1) {
+            this.cameraOffsetX = this.cameraOffsetX + xMovement * 0.016F;
+            this.cameraOffsetY = this.cameraOffsetY + yMovement * 0.016F;
         }
     }
 
