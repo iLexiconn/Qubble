@@ -1,5 +1,6 @@
 package net.ilexiconn.qubble.server;
 
+import com.google.gson.Gson;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaModelContainer;
 import net.ilexiconn.qubble.server.model.exporter.*;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
@@ -14,6 +15,7 @@ import net.minecraftforge.common.MinecraftForge;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
 public class ServerProxy {
@@ -31,6 +33,9 @@ public class ServerProxy {
 
         try {
             QubbleModel model = tabulaImporter.getModel("TabulaModel", tabulaImporter.read(new File(".", "TabulaModel.tbl")));
+            PrintWriter writer = new PrintWriter(new File(".", "TabulaModel.json"));
+            writer.print(new Gson().toJson(model.copy().unparent()));
+            writer.close();
             javaExporter.save(javaExporter.export(model.copy(), "net.ilexiconn.test", "TabulaModel"), new File(".", "TabulaModel.java"));
             scalaExporter.save(scalaExporter.export(model.copy(), "net.ilexiconn.test", "TabulaModel"), new File(".", "TabulaModel.scala"));
             jsExporter.save(jsExporter.export(model.copy()), new File(".", "TabulaModel.js"));
@@ -41,7 +46,7 @@ public class ServerProxy {
             e.printStackTrace();
         }
 
-        try {
+        /*try {
             QubbleModel model = techneImporter.getModel("TechneModel", techneImporter.read(new File(".", "TechneModel.tcn")));
             javaExporter.save(javaExporter.export(model.copy(), "net.ilexiconn.test", "TechneModel"), new File(".", "TechneModel.java"));
             scalaExporter.save(scalaExporter.export(model.copy(), "net.ilexiconn.test", "TechneModel"), new File(".", "TechneModel.scala"));
@@ -51,7 +56,7 @@ public class ServerProxy {
             CompressedStreamTools.writeCompressed(model.copy().serializeNBT(), new FileOutputStream(new File("TechneModel.qbl")));
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     public void onInit() {

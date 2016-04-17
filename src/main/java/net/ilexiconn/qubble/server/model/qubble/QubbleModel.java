@@ -151,9 +151,10 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
             List<QubbleCube> newParentCubes = new ArrayList<>(parentCubes);
             newParentCubes.add(cube);
             float[][] transformation = this.getParentTransformation(newParentCubes);
-            cube = new QubbleCube(cube.getName(), new ArrayList<>(cube.getChildren()), new int[]{cube.getDimensionX(), cube.getDimensionY(), cube.getDimensionZ()}, transformation[0], new float[]{cube.getOffsetX(), cube.getOffsetY(), cube.getOffsetZ()}, transformation[1], new float[]{cube.getScaleX(), cube.getScaleY(), cube.getScaleZ()}, new int[]{cube.getTextureX(), cube.getTextureY()}, cube.isTextureMirrored(), cube.getOpacity());
+            List<QubbleCube> children = new ArrayList<>(cube.getChildren());
+            cube = new QubbleCube(cube.getName(), new ArrayList<>(), new int[]{cube.getDimensionX(), cube.getDimensionY(), cube.getDimensionZ()}, transformation[0], new float[]{cube.getOffsetX(), cube.getOffsetY(), cube.getOffsetZ()}, transformation[1], new float[]{cube.getScaleX(), cube.getScaleY(), cube.getScaleZ()}, new int[]{cube.getTextureX(), cube.getTextureY()}, cube.isTextureMirrored(), cube.getOpacity());
             childCubes.add(cube);
-            this.unparentCubes(cube.getChildren(), childCubes, new ArrayList<>(newParentCubes));
+            this.unparentCubes(children, childCubes, new ArrayList<>(newParentCubes));
         }
     }
 
