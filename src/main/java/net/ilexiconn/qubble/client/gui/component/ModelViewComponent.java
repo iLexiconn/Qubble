@@ -7,6 +7,7 @@ import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
@@ -71,6 +72,8 @@ public class ModelViewComponent implements IGUIComponent {
         GlStateManager.ortho(0.0, scaledResolution.getScaledWidth_double(), scaledResolution.getScaledHeight_double(), 0.0, -5000.0D, 5000.0D);
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
         GlStateManager.loadIdentity();
+        this.prevMouseX = mouseX;
+        this.prevMouseY = mouseY;
     }
 
     private void setupCamera(float scale) {
@@ -91,20 +94,18 @@ public class ModelViewComponent implements IGUIComponent {
 
     @Override
     public void mouseClicked(QubbleGUI gui, int mouseX, int mouseY, int button) {
-        if (button == 1) {
-            this.prevMouseX = mouseX;
-            this.prevMouseY = mouseY;
-        }
     }
 
     @Override
     public void mouseDragged(QubbleGUI gui, int mouseX, int mouseY, int button, long timeSinceClick) {
+        int xMovement = mouseX - this.prevMouseX;
+        int yMovement = mouseY - this.prevMouseY;
         if (button == 1) {
-            this.rotationYaw += mouseX - this.prevMouseX;
-            this.rotationPitch -= mouseY - this.prevMouseY;
-
-            this.prevMouseX = mouseX;
-            this.prevMouseY = mouseY;
+            this.rotationYaw += xMovement;
+            this.rotationPitch -= yMovement;
+        } else if (button == 2) {
+            this.cameraOffsetX = MathHelper.clamp_float(this.cameraOffsetX + xMovement * 0.0125F, -2.0F, 2.0F);
+            this.cameraOffsetY = MathHelper.clamp_float(this.cameraOffsetY + yMovement * 0.0125F, -2.0F, 2.0F);
         }
     }
 
