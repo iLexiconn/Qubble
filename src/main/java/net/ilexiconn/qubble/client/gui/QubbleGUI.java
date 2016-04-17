@@ -1,10 +1,10 @@
 package net.ilexiconn.qubble.client.gui;
 
-import com.google.common.collect.Lists;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.component.*;
 import net.ilexiconn.qubble.client.gui.dialog.Dialog;
+import net.ilexiconn.qubble.client.gui.dialog.DialogHandler;
 import net.ilexiconn.qubble.server.model.ModelHandler;
 import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
@@ -39,10 +39,6 @@ public class QubbleGUI extends GuiScreen {
 
     private GuiMainMenu mainMenu;
 
-    private List<Dialog> openDialogs = new ArrayList<>();
-
-    private ModelTreeComponent modelTree;
-
     private QubbleModel currentModel;
 
     public QubbleGUI(GuiMainMenu mainMenu) {
@@ -53,7 +49,7 @@ public class QubbleGUI extends GuiScreen {
     public void initGui() {
         super.initGui();
         ComponentHandler.INSTANCE.clearGUI(this);
-        this.openDialogs.clear();
+        DialogHandler.INSTANCE.clearGUI(this);
         ComponentHandler.INSTANCE.addComponent(this, new ButtonComponent("x", 0, 0, 20, 20, "Close Qubble and return to the main menu", (gui, component) -> ClientProxy.MINECRAFT.displayGuiScreen(QubbleGUI.this.mainMenu)));
         ComponentHandler.INSTANCE.addComponent(this, new ButtonComponent("o", 21, 0, 20, 20, "Open a model", (gui, component) -> QubbleGUI.this.openModelSelectionDialog(null)));
         ComponentHandler.INSTANCE.addComponent(this, new ButtonComponent("i", 42, 0, 20, 20, "Import a model", (gui, component) -> QubbleGUI.this.openModelImportDialog()));
@@ -63,7 +59,7 @@ public class QubbleGUI extends GuiScreen {
             }
         }));
         ComponentHandler.INSTANCE.addComponent(this, new ModelViewComponent());
-        ComponentHandler.INSTANCE.addComponent(this, this.modelTree = new ModelTreeComponent());
+        ComponentHandler.INSTANCE.addComponent(this, new ModelTreeComponent());
     }
 
     @Override
@@ -73,18 +69,10 @@ public class QubbleGUI extends GuiScreen {
         ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
         float preciseMouseX = this.getPreciseMouseX(scaledResolution);
         float preciseMouseY = this.getPreciseMouseY(scaledResolution);
-        ComponentHandler.INSTANCE.render(this, mouseX, mouseY, partialTicks);
-        boolean flag = false;
-        for (Dialog dialog : new ArrayList<>(this.openDialogs)) {
-            dialog.render(this, preciseMouseX, preciseMouseY, partialTicks);
-            if (mouseX < dialog.posX || mouseX > dialog.posX + dialog.width || mouseY < dialog.posY || mouseY > dialog.posY + dialog.height) {
-                flag = true;
-            }
+        ComponentHandler.INSTANCE.render(this, preciseMouseX, preciseMouseY, partialTicks);
+        if (!DialogHandler.INSTANCE.render(this, preciseMouseX, preciseMouseY, partialTicks)) {
+            ComponentHandler.INSTANCE.renderAfter(this, preciseMouseX, preciseMouseY, partialTicks);
         }
-        if (flag) {
-            return;
-        }
-        ComponentHandler.INSTANCE.renderAfter(this, mouseX, mouseY, partialTicks);
     }
 
     @Override
@@ -93,12 +81,9 @@ public class QubbleGUI extends GuiScreen {
         ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
         float preciseMouseX = this.getPreciseMouseX(scaledResolution);
         float preciseMouseY = this.getPreciseMouseY(scaledResolution);
-        for (Dialog dialog : new ArrayList<>(this.openDialogs)) {
-            if (dialog.mouseDragged(this, preciseMouseX, preciseMouseY, clickedMouseButton, timeSinceLastClick)) {
-                return;
-            }
+        if (!DialogHandler.INSTANCE.mouseDragged(this, preciseMouseX, preciseMouseY, clickedMouseButton, timeSinceLastClick)) {
+            ComponentHandler.INSTANCE.mouseDragged(this, preciseMouseX, preciseMouseY, clickedMouseButton, timeSinceLastClick);
         }
-        ComponentHandler.INSTANCE.mouseDragged(this, preciseMouseX, preciseMouseY, clickedMouseButton, timeSinceLastClick);
     }
 
     @Override
@@ -107,15 +92,9 @@ public class QubbleGUI extends GuiScreen {
         ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
         float preciseMouseX = this.getPreciseMouseX(scaledResolution);
         float preciseMouseY = this.getPreciseMouseY(scaledResolution);
-        for (Dialog dialog : new ArrayList<>(Lists.reverse(this.openDialogs))) {
-            if (dialog.mouseClicked(this, preciseMouseX, preciseMouseY, button)) {
-                if (this.openDialogs.remove(dialog)) {
-                    this.openDialogs.add(dialog);
-                }
-                return;
-            }
+        if (!DialogHandler.INSTANCE.mouseClicked(this, preciseMouseX, preciseMouseY, button)) {
+            ComponentHandler.INSTANCE.mouseClicked(this, preciseMouseX, preciseMouseY, button);
         }
-        ComponentHandler.INSTANCE.mouseClicked(this, preciseMouseX, preciseMouseY, button);
     }
 
     @Override
@@ -124,23 +103,17 @@ public class QubbleGUI extends GuiScreen {
         ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
         float preciseMouseX = this.getPreciseMouseX(scaledResolution);
         float preciseMouseY = this.getPreciseMouseY(scaledResolution);
-        for (Dialog dialog : new ArrayList<>(this.openDialogs)) {
-            if (dialog.mouseReleased(this, preciseMouseX, preciseMouseY, button)) {
-                return;
-            }
+        if (!DialogHandler.INSTANCE.mouseReleased(this, preciseMouseX, preciseMouseY, button)) {
+            ComponentHandler.INSTANCE.mouseReleased(this, preciseMouseX, preciseMouseY, button);
         }
-        ComponentHandler.INSTANCE.mouseReleased(this, preciseMouseX, preciseMouseY, button);
     }
 
     @Override
     public void keyTyped(char character, int keyCode) throws IOException {
         super.keyTyped(character, keyCode);
-        for (Dialog dialog : new ArrayList<>(this.openDialogs)) {
-            if (dialog.keyPressed(this, character, keyCode)) {
-                return;
-            }
+        if (!DialogHandler.INSTANCE.keyPressed(this, character, keyCode)) {
+            ComponentHandler.INSTANCE.keyPressed(this, character, keyCode);
         }
-        ComponentHandler.INSTANCE.keyPressed(this, character, keyCode);
     }
 
     private float getPreciseMouseX(ScaledResolution scaledResolution) {
@@ -195,12 +168,8 @@ public class QubbleGUI extends GuiScreen {
         return this.currentModel;
     }
 
-    public void closeDialog(Dialog dialog) {
-        this.openDialogs.remove(dialog);
-    }
-
     private void openModelSelectionDialog(IModelImporter modelImporter) {
-        Dialog dialog = new Dialog(modelImporter == null ? "Open model" : "Import " + modelImporter.getName() + " model", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
+        Dialog<QubbleGUI> dialog = new Dialog(this, modelImporter == null ? "Open model" : "Import " + modelImporter.getName() + " model", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
         List<String> models = this.getModels(modelImporter);
         dialog.addComponent(new SelectionListComponent(1, 12, 198, 187, models, (gui, component) -> {
             try {
@@ -212,40 +181,40 @@ public class QubbleGUI extends GuiScreen {
                     model = modelImporter.getModel(component.getSelected(), modelImporter.read(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, component.getSelected() + "." + modelImporter.getExtension())));
                 }
                 currentModel = model;
-                closeDialog(dialog);
+                DialogHandler.INSTANCE.closeDialog(this, dialog);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }));
-        this.openDialogs.add(dialog);
+        DialogHandler.INSTANCE.openDialog(this, dialog);
     }
 
     private void openModelImportDialog() {
-        Dialog dialog = new Dialog("Import model", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
+        Dialog<QubbleGUI> dialog = new Dialog(this, "Import model", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
         List<String> types = new ArrayList<>();
         ModelHandler.INSTANCE.getImporters().forEach(modelImporter -> types.add(modelImporter.getName()));
         dialog.addComponent(new SelectionListComponent(1, 12, 198, 187, types, (gui, component) -> {
             IModelImporter<?> importer = ModelHandler.INSTANCE.getImporter(component.getSelected());
             if (importer != null) {
                 this.openModelSelectionDialog(importer);
-                closeDialog(dialog);
+                DialogHandler.INSTANCE.closeDialog(this, dialog);
             }
         }));
-        this.openDialogs.add(dialog);
+        DialogHandler.INSTANCE.openDialog(this, dialog);
     }
 
     private void openModelExportSelectDialog() {
-        Dialog dialog = new Dialog("Export model", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
+        Dialog<QubbleGUI> dialog = new Dialog(this, "Export model", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
         List<String> types = new ArrayList<>();
         ModelHandler.INSTANCE.getExporters().forEach(modelExporter -> types.add(modelExporter.getName()));
         dialog.addComponent(new SelectionListComponent(1, 12, 198, 187, types, ((gui, component) -> {
             IModelExporter<?> exporter = ModelHandler.INSTANCE.getExporter(component.getSelected());
             if (exporter != null) {
                 this.openModelExportDialog(exporter);
-                closeDialog(dialog);
+                DialogHandler.INSTANCE.closeDialog(this, dialog);
             }
         })));
-        this.openDialogs.add(dialog);
+        DialogHandler.INSTANCE.openDialog(this, dialog);
     }
 
     private <T> void openModelExportDialog(IModelExporter<T> modelExporter) {
@@ -256,7 +225,7 @@ public class QubbleGUI extends GuiScreen {
         boolean compact = argumentNames.length == 0;
         int dialogWidth = compact ? 200 : 400;
         int dialogHeight = compact ? 60 : 200;
-        Dialog dialog = new Dialog("Export " + this.currentModel.getName() + " to " + modelExporter.getName(), this.width / 2 - (dialogWidth / 2), this.height / 2 - (dialogHeight / 2), dialogWidth, dialogHeight);
+        Dialog<QubbleGUI> dialog = new Dialog(this, "Export " + this.currentModel.getName() + " to " + modelExporter.getName(), this.width / 2 - (dialogWidth / 2), this.height / 2 - (dialogHeight / 2), dialogWidth, dialogHeight);
         for (int argumentIndex = 0; argumentIndex < argumentNames.length; argumentIndex++) {
             dialog.addComponent(new TextComponent(argumentNames[argumentIndex], 200, argumentY, getTextColor()));
             TextBoxComponent textBox = new TextBoxComponent(defaultArguments[argumentIndex], 40, argumentY + 10, 320, 20);
@@ -275,9 +244,9 @@ public class QubbleGUI extends GuiScreen {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            QubbleGUI.this.closeDialog(dialog);
+            DialogHandler.INSTANCE.closeDialog(this, dialog);
         }));
-        this.openDialogs.add(dialog);
+        DialogHandler.INSTANCE.openDialog(this, dialog);
     }
 
     private List<String> getModels(IModelImporter<?> modelImporter) {

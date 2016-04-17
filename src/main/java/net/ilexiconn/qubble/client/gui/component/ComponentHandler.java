@@ -11,9 +11,9 @@ import java.util.WeakHashMap;
 public enum ComponentHandler {
     INSTANCE;
 
-    private Map<GuiScreen, List<IComponent>> componentMap = new WeakHashMap<>();
+    private Map<GuiScreen, List<IComponent<?>>> componentMap = new WeakHashMap<>();
 
-    public void clearGUI(GuiScreen gui) {
+    public <T extends GuiScreen> void clearGUI(T gui) {
         if (this.componentMap.containsKey(gui)) {
             this.componentMap.get(gui).clear();
         }
@@ -23,7 +23,7 @@ public enum ComponentHandler {
         if (this.componentMap.containsKey(gui)) {
             this.componentMap.get(gui).add(component);
         } else {
-            List<IComponent> componentList = new ArrayList<>();
+            List<IComponent<?>> componentList = new ArrayList<>();
             componentList.add(component);
             this.componentMap.put(gui, componentList);
         }

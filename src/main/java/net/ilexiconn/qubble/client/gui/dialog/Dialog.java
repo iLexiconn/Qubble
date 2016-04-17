@@ -6,6 +6,7 @@ import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.component.ButtonComponent;
 import net.ilexiconn.qubble.client.gui.component.IComponent;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
@@ -13,7 +14,8 @@ import org.lwjgl.opengl.GL11;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Dialog {
+public class Dialog<T extends GuiScreen> {
+    private T gui;
     private String name;
 
     public float posX;
@@ -29,9 +31,10 @@ public class Dialog {
     private float dragOffsetY;
     private boolean isDragging;
 
-    private List<IComponent<QubbleGUI>> components = new ArrayList<>();
+    private List<IComponent<T>> components = new ArrayList<>();
 
-    public Dialog(String name, int posX, int posY, int width, int height) {
+    public Dialog(T gui, String name, int posX, int posY, int width, int height) {
+        this.gui = gui;
         this.name = name;
         this.posX = posX;
         this.posY = posY;
@@ -39,16 +42,16 @@ public class Dialog {
         this.prevPosY = posY;
         this.width = width;
         this.height = height;
-        ButtonComponent closeWindowComponent = new ButtonComponent("x", this.width - 12, 0, 12, 12, "Close this dialog", (gui, component) -> ((QubbleGUI) gui).closeDialog(Dialog.this));
+        ButtonComponent closeWindowComponent = new ButtonComponent("x", this.width - 12, 0, 12, 12, "Close this dialog", (g, c) -> DialogHandler.INSTANCE.closeDialog(gui, Dialog.this));
         closeWindowComponent.setColorScheme(0xFFFF2020, 0xFF7F0000, 0xFFFF2020, 0xFFFFFFFF);
         this.addComponent(closeWindowComponent);
     }
 
-    public void addComponent(IComponent component) {
-        this.components.add(component);
+    public void addComponent(IComponent<?> component) {
+        this.components.add((IComponent<T>) component);
     }
 
-    public void render(QubbleGUI gui, float mouseX, float mouseY, float partialTicks) {
+    public void render(float mouseX, float mouseY, float partialTicks) {
         double drawX = QubbleGUI.interpolate(this.prevPosX, this.posX, partialTicks);
         double drawY = QubbleGUI.interpolate(this.prevPosY, this.posY, partialTicks);
         ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
@@ -65,7 +68,7 @@ public class Dialog {
         mouseX -= this.posX;
         mouseY -= this.posY;
         GlStateManager.translate(drawX, drawY, 0.0);
-        for (IComponent<QubbleGUI> component : this.components) {
+        for (IComponent<T> component : this.components) {
             component.render(gui, mouseX, mouseY, drawX, drawY, partialTicks);
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
@@ -74,7 +77,7 @@ public class Dialog {
         this.prevPosY = this.posY;
     }
 
-    public boolean mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseClicked(float mouseX, float mouseY, int button) {
         if (button != 0 || mouseX < this.posX || mouseX > this.posX + this.width || mouseY < this.posY || mouseY > this.posY + this.height) {
             return false;
         }
@@ -85,7 +88,7 @@ public class Dialog {
         }
         mouseX -= this.posX;
         mouseY -= this.posY;
-        for (IComponent<QubbleGUI> component : this.components) {
+        for (IComponent<T> component : this.components) {
             if (component.mouseClicked(gui, mouseX, mouseY, button)) {
                 return true;
             }
@@ -93,7 +96,7 @@ public class Dialog {
         return true;
     }
 
-    public boolean mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
+    public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
         if (this.isDragging) {
             this.posX = Math.min(Math.max(mouseX - this.dragOffsetX, 0), gui.width - this.width);
             this.posY = Math.min(Math.max(mouseY - this.dragOffsetY, 0), gui.height - this.height);
@@ -101,7 +104,7 @@ public class Dialog {
         }
         mouseX -= this.posX;
         mouseY -= this.posY;
-        for (IComponent<QubbleGUI> component : this.components) {
+        for (IComponent<T> component : this.components) {
             if (component.mouseDragged(gui, mouseX, mouseY, button, timeSinceClick)) {
                 return true;
             }
@@ -109,11 +112,11 @@ public class Dialog {
         return false;
     }
 
-    public boolean mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseReleased(float mouseX, float mouseY, int button) {
         this.isDragging = false;
         mouseX -= this.posX;
         mouseY -= this.posY;
-        for (IComponent<QubbleGUI> component : this.components) {
+        for (IComponent<T> component : this.components) {
             if (component.mouseReleased(gui, mouseX, mouseY, button)) {
                 return true;
             }
@@ -121,8 +124,8 @@ public class Dialog {
         return false;
     }
 
-    public boolean keyPressed(QubbleGUI gui, char character, int keyCode) {
-        for (IComponent<QubbleGUI> component : new ArrayList<>(this.components)) {
+    public boolean keyPressed(char character, int keyCode) {
+        for (IComponent<T> component : this.components) {
             if (component.keyPressed(gui, character, keyCode)) {
                 return true;
             }
