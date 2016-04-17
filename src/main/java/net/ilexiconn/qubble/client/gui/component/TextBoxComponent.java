@@ -5,10 +5,11 @@ import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.input.Keyboard;
 
-public class TextBoxComponent extends Gui implements IComponent<QubbleGUI> {
+public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
     private String text;
     private int posX;
     private int posY;
@@ -25,12 +26,12 @@ public class TextBoxComponent extends Gui implements IComponent<QubbleGUI> {
     }
 
     @Override
-    public void render(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
+    public void render(GuiScreen gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
         int primaryColor = QubbleGUI.getPrimaryColor();
         int secondaryColor = QubbleGUI.getSecondaryColor();
         GlStateManager.disableTexture2D();
         this.drawGradientRect(this.posX + 1, this.posY + 1, this.posX + this.width - 1, this.posY + this.height - 1, primaryColor, selected ? secondaryColor : primaryColor);
-        gui.drawOutline(this.posX, this.posY, this.width, this.height, Qubble.CONFIG.getAccentColor(), 1);
+        QubbleGUI.drawOutline(this.posX, this.posY, this.width, this.height, Qubble.CONFIG.getAccentColor(), 1);
         GlStateManager.enableTexture2D();
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
         int x = this.posX + (this.width / 2);
@@ -38,32 +39,32 @@ public class TextBoxComponent extends Gui implements IComponent<QubbleGUI> {
         int centerWidth = fontRenderer.getStringWidth(this.text) / 2;
         fontRenderer.drawString(this.text, x - (centerWidth) + 0.625F, y - 0.625F, QubbleGUI.getTextColor(), false);
         if (this.selected && System.currentTimeMillis() % 1000 > 500) {
-            gui.drawRectangle(x + centerWidth + 1, y - 0.625, 1, fontRenderer.FONT_HEIGHT, QubbleGUI.getTextColor());
+            QubbleGUI.drawRectangle(x + centerWidth + 1, y - 0.625, 1, fontRenderer.FONT_HEIGHT, QubbleGUI.getTextColor());
         }
     }
 
     @Override
-    public void renderAfter(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
+    public void renderAfter(GuiScreen gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
     }
 
     @Override
-    public boolean mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseClicked(GuiScreen gui, float mouseX, float mouseY, int button) {
         this.selected = this.isMouseSelecting(mouseX, mouseY);
         return this.selected;
     }
 
     @Override
-    public boolean mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
+    public boolean mouseDragged(GuiScreen gui, float mouseX, float mouseY, int button, long timeSinceClick) {
         return false;
     }
 
     @Override
-    public boolean mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseReleased(GuiScreen gui, float mouseX, float mouseY, int button) {
         return false;
     }
 
     @Override
-    public boolean keyPressed(QubbleGUI gui, char character, int key) {
+    public boolean keyPressed(GuiScreen gui, char character, int key) {
         if (this.selected) {
             if (key == Keyboard.KEY_BACK) {
                 if (this.text.length() > 0) {

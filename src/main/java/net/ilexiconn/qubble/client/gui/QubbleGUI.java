@@ -211,8 +211,8 @@ public class QubbleGUI extends GuiScreen {
                 } else {
                     model = modelImporter.getModel(component.getSelected(), modelImporter.read(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, component.getSelected() + "." + modelImporter.getExtension())));
                 }
-                gui.currentModel = model;
-                gui.closeDialog(dialog);
+                currentModel = model;
+                closeDialog(dialog);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -228,7 +228,7 @@ public class QubbleGUI extends GuiScreen {
             IModelImporter<?> importer = ModelHandler.INSTANCE.getImporter(component.getSelected());
             if (importer != null) {
                 this.openModelSelectionDialog(importer);
-                gui.closeDialog(dialog);
+                closeDialog(dialog);
             }
         }));
         this.openDialogs.add(dialog);
@@ -242,7 +242,7 @@ public class QubbleGUI extends GuiScreen {
             IModelExporter<?> exporter = ModelHandler.INSTANCE.getExporter(component.getSelected());
             if (exporter != null) {
                 this.openModelExportDialog(exporter);
-                gui.closeDialog(dialog);
+                closeDialog(dialog);
             }
         })));
         this.openDialogs.add(dialog);
@@ -258,7 +258,7 @@ public class QubbleGUI extends GuiScreen {
         int dialogHeight = compact ? 60 : 200;
         Dialog dialog = new Dialog("Export " + this.currentModel.getName() + " to " + modelExporter.getName(), this.width / 2 - (dialogWidth / 2), this.height / 2 - (dialogHeight / 2), dialogWidth, dialogHeight);
         for (int argumentIndex = 0; argumentIndex < argumentNames.length; argumentIndex++) {
-            dialog.addComponent(new TextComponent(argumentNames[argumentIndex], 200, argumentY, 0xFFFFFF));
+            dialog.addComponent(new TextComponent(argumentNames[argumentIndex], 200, argumentY, getTextColor()));
             TextBoxComponent textBox = new TextBoxComponent(defaultArguments[argumentIndex], 40, argumentY + 10, 320, 20);
             dialog.addComponent(textBox);
             argumentTextBoxes[argumentIndex] = textBox;

@@ -5,18 +5,19 @@ import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
-public class SelectionListComponent extends Gui implements IComponent<QubbleGUI> {
+public class SelectionListComponent extends Gui implements IComponent<GuiScreen> {
     private int posX;
     private int posY;
     private int width;
     private int height;
     private List<String> entries;
-    private IActionHandler<QubbleGUI, SelectionListComponent> actionHandler;
+    private IActionHandler<GuiScreen, SelectionListComponent> actionHandler;
 
     private String selected;
 
@@ -31,7 +32,7 @@ public class SelectionListComponent extends Gui implements IComponent<QubbleGUI>
 
     private float scrollPerEntry;
 
-    public SelectionListComponent(int posX, int posY, int width, int height, List<String> entries, IActionHandler<QubbleGUI, SelectionListComponent> actionHandler) {
+    public SelectionListComponent(int posX, int posY, int width, int height, List<String> entries, IActionHandler<GuiScreen, SelectionListComponent> actionHandler) {
         this.posX = posX;
         this.posY = posY;
         this.width = width;
@@ -44,11 +45,11 @@ public class SelectionListComponent extends Gui implements IComponent<QubbleGUI>
     }
 
     @Override
-    public void render(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
+    public void render(GuiScreen gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
         int primaryColor = QubbleGUI.getPrimaryColor();
         int secondaryColor = QubbleGUI.getSecondaryColor();
-        gui.drawRectangle(this.posX, this.posY, this.width, this.height, primaryColor);
-        gui.drawOutline(this.posX, this.posY, this.width, this.height, secondaryColor, 1);
+        QubbleGUI.drawRectangle(this.posX, this.posY, this.width, this.height, primaryColor);
+        QubbleGUI.drawOutline(this.posX, this.posY, this.width, this.height, secondaryColor, 1);
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
         int y = (int) (-this.scroll * this.scrollPerEntry * 13);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
@@ -62,7 +63,7 @@ public class SelectionListComponent extends Gui implements IComponent<QubbleGUI>
                 int entryHeight = 12;
                 boolean selected = this.isSelected(entryX, entryY, entryWidth, entryHeight, mouseX, mouseY);
                 this.drawGradientRect(entryX, entryY, entryX + entryWidth, entryY + entryHeight, primaryColor, selected ? secondaryColor : primaryColor);
-                gui.drawOutline(entryX, entryY, entryWidth, entryHeight, Qubble.CONFIG.getAccentColor(), 1);
+            QubbleGUI.drawOutline(entryX, entryY, entryWidth, entryHeight, Qubble.CONFIG.getAccentColor(), 1);
                 fontRenderer.drawString(entry, entryX + 2, entryY + 2, QubbleGUI.getTextColor());
             y += 13;
         }
@@ -71,18 +72,18 @@ public class SelectionListComponent extends Gui implements IComponent<QubbleGUI>
             int scrollX = this.posX + this.width - 9;
             int scrollY = this.posY + this.scroll + 2;
             int height = (int) ((this.height - 2) / ((float) this.entries.size() / (float) this.maxDisplayEntries));
-            gui.drawRectangle(scrollX, scrollY, 6, height, this.scrolling ? primaryColor : secondaryColor);
-            gui.drawOutline(scrollX, scrollY, 6, height, Qubble.CONFIG.getAccentColor(), 1);
+            QubbleGUI.drawRectangle(scrollX, scrollY, 6, height, this.scrolling ? primaryColor : secondaryColor);
+            QubbleGUI.drawOutline(scrollX, scrollY, 6, height, Qubble.CONFIG.getAccentColor(), 1);
         }
     }
 
     @Override
-    public void renderAfter(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
+    public void renderAfter(GuiScreen gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
 
     }
 
     @Override
-    public boolean mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseClicked(GuiScreen gui, float mouseX, float mouseY, int button) {
         boolean flag = false;
         int y = (int) (-this.scroll * this.scrollPerEntry * 13);
         for (String entry : this.entries) {
@@ -114,7 +115,7 @@ public class SelectionListComponent extends Gui implements IComponent<QubbleGUI>
     }
 
     @Override
-    public boolean mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
+    public boolean mouseDragged(GuiScreen gui, float mouseX, float mouseY, int button, long timeSinceClick) {
         if (this.scrolling) {
             this.scroll = (int) Math.max(0, Math.min(this.maxScroll / this.scrollPerEntry, mouseY - this.posY - 2 - this.scrollYOffset));
         }
@@ -122,13 +123,13 @@ public class SelectionListComponent extends Gui implements IComponent<QubbleGUI>
     }
 
     @Override
-    public boolean mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseReleased(GuiScreen gui, float mouseX, float mouseY, int button) {
         this.scrolling = false;
         return false;
     }
 
     @Override
-    public boolean keyPressed(QubbleGUI gui, char character, int key) {
+    public boolean keyPressed(GuiScreen gui, char character, int key) {
         return false;
     }
 
