@@ -3,7 +3,10 @@ package net.ilexiconn.qubble.client.gui.component;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class TextComponent implements IComponent<GuiScreen> {
     private String text;
     private int posX;

@@ -7,8 +7,11 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
+@SideOnly(Side.CLIENT)
 public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
     private String text;
     private int posX;

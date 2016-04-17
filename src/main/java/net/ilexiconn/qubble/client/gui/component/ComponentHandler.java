@@ -2,12 +2,15 @@ package net.ilexiconn.qubble.client.gui.component;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+@SideOnly(Side.CLIENT)
 public enum ComponentHandler {
     INSTANCE;
 

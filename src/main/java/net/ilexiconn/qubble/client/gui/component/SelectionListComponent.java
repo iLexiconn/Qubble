@@ -7,10 +7,13 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
+@SideOnly(Side.CLIENT)
 public class SelectionListComponent extends Gui implements IComponent<GuiScreen> {
     private int posX;
     private int posY;

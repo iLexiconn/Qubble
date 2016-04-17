@@ -7,10 +7,13 @@ import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
+@SideOnly(Side.CLIENT)
 public class ModelViewComponent implements IComponent<QubbleGUI> {
     private float cameraOffsetX = 0.0F;
     private float cameraOffsetY = 0.0F;
