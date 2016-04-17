@@ -1,5 +1,6 @@
 package net.ilexiconn.qubble.client.gui.component;
 
+import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.model.QubbleModelBase;
@@ -7,6 +8,7 @@ import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
@@ -24,6 +26,9 @@ public class ModelViewComponent implements IGUIComponent {
     private float prevCameraOffsetY;
 
     private float zoom = 1.0F;
+    private float prevZoom;
+
+    private float zoomVelocity;
 
     private QubbleModel currentModelContainer;
     private QubbleModelBase currentModel;
@@ -84,13 +89,23 @@ public class ModelViewComponent implements IGUIComponent {
         this.prevCameraOffsetY = this.cameraOffsetY;
         this.prevRotationYaw = this.rotationYaw;
         this.prevRotationPitch = this.rotationPitch;
+        this.prevZoom = this.zoom;
+        this.zoomVelocity += Mouse.getDWheel() * 0.0005F;
+        this.zoom += this.zoomVelocity;
+        this.zoomVelocity *= 0.8F;
+        if (this.zoom < 0.6F) {
+            this.zoom = 0.6F;
+        } else if (this.zoom > 5.0F) {
+            this.zoom = 5.0F;
+        }
     }
 
     private void setupCamera(float scale, float partialTicks) {
         GlStateManager.disableTexture2D();
         GlStateManager.scale(scale, scale, scale);
         GlStateManager.translate(0.0F, -2.0F, -10.0F);
-        GlStateManager.scale(this.zoom, this.zoom, this.zoom);
+        float zoom = QubbleGUI.interpolate(this.prevZoom, this.zoom, partialTicks);
+        GlStateManager.scale(zoom, zoom, zoom);
         GlStateManager.scale(1.0F, -1.0F, 1.0F);
         GlStateManager.translate(QubbleGUI.interpolate(this.prevCameraOffsetX, this.cameraOffsetX, partialTicks), QubbleGUI.interpolate(this.prevCameraOffsetY, this.cameraOffsetY, partialTicks), 0.0F);
         GlStateManager.rotate(QubbleGUI.interpolate(this.prevRotationPitch, this.rotationPitch, partialTicks), 1.0F, 0.0F, 0.0F);
