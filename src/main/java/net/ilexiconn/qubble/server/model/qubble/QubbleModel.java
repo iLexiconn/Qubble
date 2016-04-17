@@ -18,13 +18,14 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
     private int textureHeight;
     private List<QubbleCube> cubes = new ArrayList<>();
     private List<QubbleAnimation> animations = new ArrayList<>();
+    private transient String fileName;
 
     public QubbleModel() {
-
     }
 
-    public QubbleModel(String name, String author, int version, int textureWidth, int textureHeight, List<QubbleCube> cubes) {
+    public QubbleModel(String name, String fileName, String author, int version, int textureWidth, int textureHeight, List<QubbleCube> cubes) {
         this.name = name;
+        this.fileName = fileName;
         this.author = author;
         this.version = version;
         this.textureWidth = textureWidth;
@@ -82,6 +83,10 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
         return name;
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
     public String getAuthor() {
         return author;
     }
@@ -108,6 +113,10 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public void setAuthor(String author) {
@@ -184,5 +193,11 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
 
     private float epsilon(float x) {
         return x < 0 ? x > -0.0001F ? 0 : x : x < 0.0001F ? 0 : x;
+    }
+
+    public QubbleModel copy() {
+        QubbleModel copy = new QubbleModel(this.name, this.fileName, this.author, this.version, this.textureWidth, this.textureHeight, new ArrayList<>(this.cubes));
+        copy.animations = new ArrayList<>(this.animations);
+        return copy;
     }
 }

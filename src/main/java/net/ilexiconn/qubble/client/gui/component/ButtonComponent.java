@@ -53,7 +53,7 @@ public class ButtonComponent extends Gui implements IGUIComponent {
     public void render(QubbleGUI gui, int mouseX, int mouseY, double offsetX, double offsetY, float partialTicks) {
         boolean selected = this.isSelected(mouseX, mouseY);
         GlStateManager.disableTexture2D();
-        this.drawGradientRect(this.posX + 1, this.posY + 1, this.posX + this.width - 1, this.posY + this.height - 1, selected ? primaryColor : primaryColor, selected ? secondaryColor : primaryColor);
+        this.drawGradientRect(this.posX + 1, this.posY + 1, this.posX + this.width - 1, this.posY + this.height - 1, this.primaryColor, selected ? this.secondaryColor : this.primaryColor);
         gui.drawOutline(this.posX, this.posY, this.width, this.height, this.accentColor, 1);
         GlStateManager.enableTexture2D();
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
@@ -84,6 +84,11 @@ public class ButtonComponent extends Gui implements IGUIComponent {
 
     @Override
     public void mouseReleased(QubbleGUI gui, int mouseX, int mouseY, int button) {
+
+    }
+
+    @Override
+    public void keyPressed(QubbleGUI gui, char character, int key) {
 
     }
 

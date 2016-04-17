@@ -6,6 +6,7 @@ import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.component.*;
 import net.ilexiconn.qubble.client.gui.dialog.Dialog;
 import net.ilexiconn.qubble.server.model.ModelHandler;
+import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.minecraft.client.gui.GuiMainMenu;
@@ -55,6 +56,11 @@ public class QubbleGUI extends GuiScreen {
         this.components.add(new ButtonComponent("x", 0, 0, 20, 20, "Close Qubble and return to the main menu", (gui, component) -> ClientProxy.MINECRAFT.displayGuiScreen(QubbleGUI.this.mainMenu)));
         this.components.add(new ButtonComponent("o", 21, 0, 20, 20, "Open a model", (gui, component) -> QubbleGUI.this.openModelSelectionDialog(null)));
         this.components.add(new ButtonComponent("i", 42, 0, 20, 20, "Import a model", (gui, component) -> QubbleGUI.this.openModelImportDialog()));
+        this.components.add(new ButtonComponent("e", 63, 0, 20, 20, "Export this model", (gui, components) -> {
+            if (QubbleGUI.this.currentModel != null) {
+                QubbleGUI.this.openModelExportSelectDialog();
+            }
+        }));
         this.components.add(new ModelViewComponent());
         this.modelTree = new ModelTreeComponent();
         this.components.add(this.modelTree);
@@ -120,6 +126,17 @@ public class QubbleGUI extends GuiScreen {
         }
     }
 
+    @Override
+    public void keyTyped(char character, int keyCode) throws IOException {
+        super.keyTyped(character, keyCode);
+        for (IGUIComponent component : new ArrayList<>(this.components)) {
+            component.keyPressed(this, character, keyCode);
+        }
+        for (Dialog dialog : new ArrayList<>(this.openDialogs)) {
+            dialog.keyPressed(this, character, keyCode);
+        }
+    }
+
     private void drawBackground() {
         GlStateManager.disableTexture2D();
         GlStateManager.disableAlpha();
@@ -178,7 +195,7 @@ public class QubbleGUI extends GuiScreen {
                     model = new QubbleModel();
                     model.deserializeNBT(CompressedStreamTools.readCompressed(new FileInputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, component.getSelected() + ".qbl"))));
                 } else {
-                    model = modelImporter.getModel(modelImporter.read(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, component.getSelected() + "." + modelImporter.getExtension())));
+                    model = modelImporter.getModel(component.getSelected(), modelImporter.read(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, component.getSelected() + "." + modelImporter.getExtension())));
                 }
                 gui.currentModel = model;
                 gui.closeDialog(dialog);
@@ -199,6 +216,52 @@ public class QubbleGUI extends GuiScreen {
                 this.openModelSelectionDialog(importer);
                 gui.closeDialog(dialog);
             }
+        }));
+        this.openDialogs.add(dialog);
+    }
+
+    private void openModelExportSelectDialog() {
+        Dialog dialog = new Dialog("Export model", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
+        List<String> types = new ArrayList<>();
+        ModelHandler.INSTANCE.getExporters().forEach(modelExporter -> types.add(modelExporter.getName()));
+        dialog.addComponent(new SelectionListComponent(1, 12, 198, 187, types, ((gui, component) -> {
+            IModelExporter<?> exporter = ModelHandler.INSTANCE.getExporter(component.getSelected());
+            if (exporter != null) {
+                this.openModelExportDialog(exporter);
+                gui.closeDialog(dialog);
+            }
+        })));
+        this.openDialogs.add(dialog);
+    }
+
+    private <T> void openModelExportDialog(IModelExporter<T> modelExporter) {
+        int argumentY = 20;
+        String[] argumentNames = modelExporter.getArgumentNames();
+        String[] defaultArguments = modelExporter.getDefaultArguments(this.currentModel);
+        TextBoxComponent[] argumentTextBoxes = new TextBoxComponent[argumentNames.length];
+        boolean compact = argumentNames.length == 0;
+        int dialogWidth = compact ? 200 : 400;
+        int dialogHeight = compact ? 60 : 200;
+        Dialog dialog = new Dialog("Export " + this.currentModel.getName() + " to " + modelExporter.getName(), this.width / 2 - (dialogWidth / 2), this.height / 2 - (dialogHeight / 2), dialogWidth, dialogHeight);
+        for (int argumentIndex = 0; argumentIndex < argumentNames.length; argumentIndex++) {
+            dialog.addComponent(new TextComponent(argumentNames[argumentIndex], 200, argumentY, 0xFFFFFF));
+            TextBoxComponent textBox = new TextBoxComponent(defaultArguments[argumentIndex], 40, argumentY + 10, 320, 20);
+            dialog.addComponent(textBox);
+            argumentTextBoxes[argumentIndex] = textBox;
+            argumentY += 40;
+        }
+        dialog.addComponent(new ButtonComponent("Export", dialogWidth / 2 - 50, dialogHeight - 35, 100, 20, (gui, component) -> {
+            String[] arguments = new String[argumentNames.length];
+            for (int i = 0; i < argumentTextBoxes.length; i++) {
+                arguments[i] = argumentTextBoxes[i].getText();
+            }
+            try {
+                QubbleModel copy = QubbleGUI.this.currentModel.copy();
+                modelExporter.save(modelExporter.export(copy, arguments), new File(ClientProxy.QUBBLE_EXPORT_DIRECTORY, copy.getFileName() + "." + modelExporter.getExtension()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            QubbleGUI.this.closeDialog(dialog);
         }));
         this.openDialogs.add(dialog);
     }

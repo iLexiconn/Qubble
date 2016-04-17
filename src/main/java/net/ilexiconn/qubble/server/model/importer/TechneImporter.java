@@ -20,9 +20,10 @@ public class TechneImporter implements IModelImporter<TechneModel> {
     }
 
     @Override
-    public QubbleModel getModel(TechneModel model) {
+    public QubbleModel getModel(String fileName, TechneModel model) {
         QubbleModel qubble = new QubbleModel();
         qubble.setName(model.getFileName());
+        qubble.setFileName(fileName);
         qubble.setAuthor("Unknown");
         qubble.setVersion(1);
         qubble.setTexture(model.getTextureWidth(), model.getTextureHeight());

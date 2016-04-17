@@ -10,7 +10,7 @@ public interface IModelImporter<T> {
 
     String getExtension();
 
-    QubbleModel getModel(T model);
+    QubbleModel getModel(String fileName, T model);
 
     T read(File file) throws IOException;
 }

@@ -24,6 +24,7 @@ public class OBJExporter implements IModelExporter<OBJModel> {
     @Override
     public OBJModel export(QubbleModel model, String... arguments) {
         OBJModel obj = new OBJModel();
+        model.unparent();
         obj.shapes.addAll(model.getCubes().stream().map(cube -> this.convertBoxToShape(obj, model, cube, 0.0625F)).collect(Collectors.toList()));
         return obj;
     }
@@ -72,5 +73,15 @@ public class OBJExporter implements IModelExporter<OBJModel> {
         } else {
             return new TextureCoords((cube.getTextureX() + baseU + mirrorOffset) / qubble.getTextureWidth(), 1.0F - (cube.getTextureY() + baseV) / qubble.getTextureHeight());
         }
+    }
+
+    @Override
+    public String[] getArgumentNames() {
+        return new String[] {};
+    }
+
+    @Override
+    public String[] getDefaultArguments(QubbleModel model) {
+        return new String[] {};
     }
 }

@@ -129,4 +129,14 @@ public class JavaExporter implements IModelExporter<List<String>> {
     public String getFieldName(QubbleCube cube) {
         return cube.getName().replaceAll("[^A-Za-z0-9_$]", "");
     }
+
+    @Override
+    public String[] getArgumentNames() {
+        return new String[] { "Package", "Class Name" };
+    }
+
+    @Override
+    public String[] getDefaultArguments(QubbleModel currentModel) {
+        return new String[] { "pkg", currentModel.getName() };
+    }
 }

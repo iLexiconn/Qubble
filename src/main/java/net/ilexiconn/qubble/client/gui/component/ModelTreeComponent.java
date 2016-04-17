@@ -117,4 +117,9 @@ public class ModelTreeComponent extends Gui implements IGUIComponent {
         this.rescaling = false;
         this.scrolling = false;
     }
+
+    @Override
+    public void keyPressed(QubbleGUI gui, char character, int key) {
+
+    }
 }

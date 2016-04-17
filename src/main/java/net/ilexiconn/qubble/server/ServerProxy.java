@@ -30,11 +30,11 @@ public class ServerProxy {
         IModelExporter<List<String>> kotlinExporter = new KotlinExporter();
 
         try {
-            QubbleModel model = tabulaImporter.getModel(tabulaImporter.read(new File(".", "TabulaModel.tbl")));
+            QubbleModel model = tabulaImporter.getModel("TabulaModel", tabulaImporter.read(new File(".", "TabulaModel.tbl")));
             javaExporter.save(javaExporter.export(model, "net.ilexiconn.test", "TabulaModel"), new File(".", "TabulaModel.java"));
             scalaExporter.save(scalaExporter.export(model, "net.ilexiconn.test", "TabulaModel"), new File(".", "TabulaModel.scala"));
             jsExporter.save(jsExporter.export(model), new File(".", "TabulaModel.js"));
-            objExporter.save(objExporter.export(model.unparent()), new File(".", "TabulaModel.obj"));
+            objExporter.save(objExporter.export(model), new File(".", "TabulaModel.obj"));
             kotlinExporter.save(kotlinExporter.export(model, "net.ilexiconn.test", "TabulaModel"), new File(".", "TabulaModel.kt"));
             CompressedStreamTools.writeCompressed(model.serializeNBT(), new FileOutputStream(new File("TabulaModel.qbl")));
         } catch (IOException e) {
@@ -42,7 +42,7 @@ public class ServerProxy {
         }
 
         try {
-            QubbleModel model = techneImporter.getModel(techneImporter.read(new File(".", "TechneModel.tcn")));
+            QubbleModel model = techneImporter.getModel("TechneModel", techneImporter.read(new File(".", "TechneModel.tcn")));
             javaExporter.save(javaExporter.export(model, "net.ilexiconn.test", "TechneModel"), new File(".", "TechneModel.java"));
             scalaExporter.save(scalaExporter.export(model, "net.ilexiconn.test", "TechneModel"), new File(".", "TechneModel.scala"));
             jsExporter.save(jsExporter.export(model), new File(".", "TechneModel.js"));

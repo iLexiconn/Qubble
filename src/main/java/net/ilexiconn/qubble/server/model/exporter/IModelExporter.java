@@ -13,4 +13,7 @@ public interface IModelExporter<T> {
     T export(QubbleModel model, String... arguments);
 
     void save(T model, File file) throws IOException;
+
+    String[] getArgumentNames();
+    String[] getDefaultArguments(QubbleModel currentModel);
 }

@@ -86,4 +86,14 @@ public class JavaScriptExporter implements IModelExporter<List<String>> {
             return "body";
         }
     }
+
+    @Override
+    public String[] getArgumentNames() {
+        return new String[] {};
+    }
+
+    @Override
+    public String[] getDefaultArguments(QubbleModel currentModel) {
+        return new String[] {};
+    }
 }

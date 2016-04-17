@@ -7,8 +7,11 @@ import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.component.ButtonComponent;
 import net.ilexiconn.qubble.client.gui.component.IGUIComponent;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import org.lwjgl.opengl.GL11;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +53,12 @@ public class Dialog {
     public void render(QubbleGUI gui, int mouseX, int mouseY, float partialTicks) {
         double drawX = ClientUtils.interpolate(this.prevPosX, this.posX, partialTicks);
         double drawY = ClientUtils.interpolate(this.prevPosY, this.posY, partialTicks);
+        ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
+        int scaleFactor = scaledResolution.getScaleFactor();
         int accentColor = Qubble.CONFIG.getAccentColor();
+        GlStateManager.pushMatrix();
+        GL11.glEnable(GL11.GL_SCISSOR_TEST);
+        GL11.glScissor((int) (drawX * scaleFactor), (int) ((gui.height - (drawY + this.height)) * scaleFactor), this.width * scaleFactor, this.height * scaleFactor);
         gui.drawRectangle(drawX, drawY, this.width, this.height, QubbleGUI.getSecondaryColor());
         gui.drawOutline(drawX, drawY, this.width, this.height, accentColor, 1);
         gui.drawOutline(drawX, drawY, this.width, 12, accentColor, 1);
@@ -58,11 +66,11 @@ public class Dialog {
         fontRenderer.drawString(this.name, (float) drawX + 2.0F, (float) drawY + 2.0F, QubbleGUI.getTextColor(), false);
         mouseX -= this.posX;
         mouseY -= this.posY;
-        GlStateManager.pushMatrix();
         GlStateManager.translate(drawX, drawY, 0.0);
         for (IGUIComponent component : this.components) {
             component.render(gui, mouseX, mouseY, drawX, drawY, partialTicks);
         }
+        GL11.glDisable(GL11.GL_SCISSOR_TEST);
         GlStateManager.popMatrix();
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
@@ -103,6 +111,12 @@ public class Dialog {
         mouseY -= this.posY;
         for (IGUIComponent component : this.components) {
             component.mouseReleased(gui, mouseX, mouseY, button);
+        }
+    }
+
+    public void keyPressed(QubbleGUI gui, char character, int keyCode) {
+        for (IGUIComponent component : new ArrayList<>(this.components)) {
+            component.keyPressed(gui, character, keyCode);
         }
     }
 }

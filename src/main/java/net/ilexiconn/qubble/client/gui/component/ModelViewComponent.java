@@ -14,8 +14,8 @@ public class ModelViewComponent implements IGUIComponent {
     private float cameraOffsetX = 0.0F;
     private float cameraOffsetY = 0.0F;
 
-    private float rotationYaw = 45.0F;
-    private float rotationPitch = 45.0F;
+    private float rotationYaw = 225.0F;
+    private float rotationPitch = -15.0F;
 
     private float zoom = 1.0F;
 
@@ -110,6 +110,11 @@ public class ModelViewComponent implements IGUIComponent {
 
     @Override
     public void mouseReleased(QubbleGUI gui, int mouseX, int mouseY, int button) {
+
+    }
+
+    @Override
+    public void keyPressed(QubbleGUI gui, char character, int key) {
 
     }
 }

@@ -61,7 +61,7 @@ public class SelectionListComponent extends Gui implements IGUIComponent {
                 int entryWidth = this.width - 16;
                 int entryHeight = 12;
                 boolean selected = this.isSelected(entryX, entryY, entryWidth, entryHeight, mouseX, mouseY);
-                this.drawGradientRect(entryX, entryY, entryX + entryWidth, entryY + entryHeight, selected ? primaryColor : primaryColor, selected ? secondaryColor : primaryColor);
+                this.drawGradientRect(entryX, entryY, entryX + entryWidth, entryY + entryHeight, primaryColor, selected ? secondaryColor : primaryColor);
                 gui.drawOutline(entryX, entryY, entryWidth, entryHeight, Qubble.CONFIG.getAccentColor(), 1);
                 fontRenderer.drawString(entry, entryX + 2, entryY + 2, 0xFFFFFF);
             y += 13;
@@ -119,6 +119,11 @@ public class SelectionListComponent extends Gui implements IGUIComponent {
     @Override
     public void mouseReleased(QubbleGUI gui, int mouseX, int mouseY, int button) {
         this.scrolling = false;
+    }
+
+    @Override
+    public void keyPressed(QubbleGUI gui, char character, int key) {
+
     }
 
     private boolean isSelected(int entryX, int entryY, int entryWidth, int entryHeight, int mouseX, int mouseY) {

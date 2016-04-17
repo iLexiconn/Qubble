@@ -15,4 +15,6 @@ public interface IGUIComponent {
     void mouseDragged(QubbleGUI gui, int mouseX, int mouseY, int button, long timeSinceClick);
 
     void mouseReleased(QubbleGUI gui, int mouseX, int mouseY, int button);
+
+    void keyPressed(QubbleGUI gui, char character, int key);
 }

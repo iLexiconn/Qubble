@@ -21,13 +21,13 @@ public class JavaScriptImporter implements IModelImporter<List<String>> {
     }
 
     @Override
-    public QubbleModel getModel(List<String> model) {
+    public QubbleModel getModel(String fileName, List<String> model) {
         List<QubbleCube> cubes = new ArrayList<>();
         int textureWidth = 64;
         int textureHeight = 32;
         int textureOffsetX = 0;
         int textureOffsetY = 0;
-        String name = "Unknown";
+        String name = fileName;
         String author = "Unknown";
         String cube = "Unknown";
         for (String line : model) {
@@ -55,7 +55,7 @@ public class JavaScriptImporter implements IModelImporter<List<String>> {
                 cube = "Unknown";
             }
         }
-        return new QubbleModel(name, author, 1, textureWidth, textureHeight, cubes);
+        return new QubbleModel(name, fileName, author, 1, textureWidth, textureHeight, cubes);
     }
 
     @Override
