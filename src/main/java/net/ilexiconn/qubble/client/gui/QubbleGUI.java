@@ -15,15 +15,20 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +44,7 @@ public class QubbleGUI extends GuiScreen {
 
     private GuiMainMenu mainMenu;
 
+    private ModelViewComponent viewComponent;
     private QubbleModel currentModel;
 
     public QubbleGUI(GuiMainMenu mainMenu) {
@@ -53,12 +59,17 @@ public class QubbleGUI extends GuiScreen {
         ComponentHandler.INSTANCE.addComponent(this, new ButtonComponent("x", 0, 0, 20, 20, "Close Qubble and return to the main menu", (gui, component) -> ClientProxy.MINECRAFT.displayGuiScreen(QubbleGUI.this.mainMenu)));
         ComponentHandler.INSTANCE.addComponent(this, new ButtonComponent("o", 21, 0, 20, 20, "Open a model", (gui, component) -> QubbleGUI.this.openModelSelectionDialog(null)));
         ComponentHandler.INSTANCE.addComponent(this, new ButtonComponent("i", 42, 0, 20, 20, "Import a model", (gui, component) -> QubbleGUI.this.openModelImportDialog()));
-        ComponentHandler.INSTANCE.addComponent(this, new ButtonComponent("e", 63, 0, 20, 20, "Export this model", (gui, components) -> {
+        ComponentHandler.INSTANCE.addComponent(this, new ButtonComponent("t", 63, 0, 20, 20, "Import a texture", (gui, component) -> {
+            if (QubbleGUI.this.currentModel != null) {
+                QubbleGUI.this.openTextureSelectDialog();
+            }
+        }));
+        ComponentHandler.INSTANCE.addComponent(this, new ButtonComponent("e", 84, 0, 20, 20, "Export this model", (gui, components) -> {
             if (QubbleGUI.this.currentModel != null) {
                 QubbleGUI.this.openModelExportSelectDialog();
             }
         }));
-        ComponentHandler.INSTANCE.addComponent(this, new ModelViewComponent());
+        ComponentHandler.INSTANCE.addComponent(this, viewComponent = new ModelViewComponent());
         ComponentHandler.INSTANCE.addComponent(this, new ModelTreeComponent());
     }
 
@@ -203,6 +214,23 @@ public class QubbleGUI extends GuiScreen {
         DialogHandler.INSTANCE.openDialog(this, dialog);
     }
 
+    private void openTextureSelectDialog() {
+        Dialog<QubbleGUI> dialog = new Dialog(this, "Import texture", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
+        dialog.addComponent(new SelectionListComponent(1, 12, 198, 187, this.getFiles(ClientProxy.QUBBLE_TEXTURE_DIRECTORY, ".png"), (gui, component) -> {
+            try {
+                InputStream stream = new FileInputStream(new File(ClientProxy.QUBBLE_TEXTURE_DIRECTORY, component.getSelected() + ".png"));
+                BufferedImage bufferedImage = ImageIO.read(stream);
+                DynamicTexture dynamicTexture = new DynamicTexture(bufferedImage);
+                ResourceLocation resourceLocation = ClientProxy.MINECRAFT.getTextureManager().getDynamicTextureLocation("texture_" + this.currentModel.getName(), dynamicTexture);
+                this.viewComponent.texture = resourceLocation;
+                DialogHandler.INSTANCE.closeDialog(this, dialog);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
+        DialogHandler.INSTANCE.openDialog(this, dialog);
+    }
+
     private void openModelExportSelectDialog() {
         Dialog<QubbleGUI> dialog = new Dialog(this, "Export model", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
         List<String> types = new ArrayList<>();
@@ -254,13 +282,17 @@ public class QubbleGUI extends GuiScreen {
         if (modelImporter != null) {
             extension = "." + modelImporter.getExtension();
         }
-        List<String> models = new ArrayList<>();
-        for (File modelFile : ClientProxy.QUBBLE_MODEL_DIRECTORY.listFiles()) {
+        return this.getFiles(ClientProxy.QUBBLE_MODEL_DIRECTORY, extension);
+    }
+
+    private List<String> getFiles(File directory, String extension) {
+        List<String> list = new ArrayList<>();
+        for (File modelFile : directory.listFiles()) {
             if (modelFile.isFile() && modelFile.getName().endsWith(extension)) {
-                models.add(modelFile.getName().split(extension)[0]);
+                list.add(modelFile.getName().split(extension)[0]);
             }
         }
-        return models;
+        return list;
     }
 
     public static int getPrimaryColor() {

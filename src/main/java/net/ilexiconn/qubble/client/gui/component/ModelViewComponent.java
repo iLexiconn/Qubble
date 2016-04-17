@@ -7,6 +7,7 @@ import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
@@ -32,6 +33,7 @@ public class ModelViewComponent implements IComponent<QubbleGUI> {
 
     private QubbleModel currentModelContainer;
     private QubbleModelBase currentModel;
+    public ResourceLocation texture;
 
     private float prevMouseX;
     private float prevMouseY;
@@ -71,6 +73,10 @@ public class ModelViewComponent implements IComponent<QubbleGUI> {
                 this.currentModelContainer = gui.getCurrentModel();
             }
             GlStateManager.translate(0.0F, -1.0F, 0.0F);
+            if (this.texture != null) {
+                GL11.glEnable(GL11.GL_TEXTURE_2D);
+                ClientProxy.MINECRAFT.getTextureManager().bindTexture(this.texture);
+            }
             this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
             GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
             RenderHelper.disableStandardItemLighting();
