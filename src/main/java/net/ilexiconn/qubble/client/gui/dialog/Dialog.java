@@ -1,6 +1,5 @@
 package net.ilexiconn.qubble.client.gui.dialog;
 
-import net.ilexiconn.llibrary.client.util.ClientUtils;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
@@ -50,8 +49,8 @@ public class Dialog {
     }
 
     public void render(QubbleGUI gui, float mouseX, float mouseY, float partialTicks) {
-        double drawX = ClientUtils.interpolate(this.prevPosX, this.posX, partialTicks);
-        double drawY = ClientUtils.interpolate(this.prevPosY, this.posY, partialTicks);
+        double drawX = QubbleGUI.interpolate(this.prevPosX, this.posX, partialTicks);
+        double drawY = QubbleGUI.interpolate(this.prevPosY, this.posY, partialTicks);
         ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
         int scaleFactor = scaledResolution.getScaleFactor();
         int accentColor = Qubble.CONFIG.getAccentColor();

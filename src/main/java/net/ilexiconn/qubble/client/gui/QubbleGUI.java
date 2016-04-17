@@ -313,4 +313,8 @@ public class QubbleGUI extends GuiScreen {
     public static int getTextColor() {
         return Qubble.CONFIG.darkMode ? TEXT_COLOR_DARK : TEXT_COLOR_LIGHT;
     }
+
+    public static float interpolate(float prev, float current, float partialTicks) {
+        return prev + partialTicks * (current - prev);
+    }
 }
