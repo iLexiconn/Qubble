@@ -58,7 +58,7 @@ public class TabulaImporter implements IModelImporter<TabulaModelContainer> {
             } else {
                 parent.getChildren().add(qubble);
             }
-            list.addAll(this.addChildren(qubble, cube.getChildren()));
+            this.addChildren(qubble, cube.getChildren());
         }
         return list;
     }
