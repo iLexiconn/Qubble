@@ -10,13 +10,13 @@ import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
-public class SelectionListComponent extends Gui implements IGUIComponent {
+public class SelectionListComponent extends Gui implements IComponent<QubbleGUI> {
     private int posX;
     private int posY;
     private int width;
     private int height;
     private List<String> entries;
-    private IActionHandler<SelectionListComponent> actionHandler;
+    private IActionHandler<QubbleGUI, SelectionListComponent> actionHandler;
 
     private String selected;
 
@@ -31,7 +31,7 @@ public class SelectionListComponent extends Gui implements IGUIComponent {
 
     private float scrollPerEntry;
 
-    public SelectionListComponent(int posX, int posY, int width, int height, List<String> entries, IActionHandler<SelectionListComponent> actionHandler) {
+    public SelectionListComponent(int posX, int posY, int width, int height, List<String> entries, IActionHandler<QubbleGUI, SelectionListComponent> actionHandler) {
         this.posX = posX;
         this.posY = posY;
         this.width = width;
@@ -63,7 +63,7 @@ public class SelectionListComponent extends Gui implements IGUIComponent {
                 boolean selected = this.isSelected(entryX, entryY, entryWidth, entryHeight, mouseX, mouseY);
                 this.drawGradientRect(entryX, entryY, entryX + entryWidth, entryY + entryHeight, primaryColor, selected ? secondaryColor : primaryColor);
                 gui.drawOutline(entryX, entryY, entryWidth, entryHeight, Qubble.CONFIG.getAccentColor(), 1);
-                fontRenderer.drawString(entry, entryX + 2, entryY + 2, 0xFFFFFF);
+                fontRenderer.drawString(entry, entryX + 2, entryY + 2, QubbleGUI.getTextColor());
             y += 13;
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
@@ -82,7 +82,8 @@ public class SelectionListComponent extends Gui implements IGUIComponent {
     }
 
     @Override
-    public void mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
+        boolean flag = false;
         int y = (int) (-this.scroll * this.scrollPerEntry * 13);
         for (String entry : this.entries) {
             if (y + 13 < this.height && y >= 0) {
@@ -93,6 +94,7 @@ public class SelectionListComponent extends Gui implements IGUIComponent {
                 if (this.isSelected(entryX, entryY, entryWidth, entryHeight, mouseX, mouseY)) {
                     this.selected = entry;
                     this.actionHandler.onAction(gui, this);
+                    flag = true;
                     break;
                 }
             }
@@ -105,25 +107,29 @@ public class SelectionListComponent extends Gui implements IGUIComponent {
             if (mouseX >= scrollX && mouseX < scrollX + 6 && mouseY >= scrollY && mouseY < scrollY + height) {
                 this.scrolling = true;
                 this.scrollYOffset = (int) (mouseY - scrollY);
+                flag = true;
             }
         }
+        return flag;
     }
 
     @Override
-    public void mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
+    public boolean mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
         if (this.scrolling) {
             this.scroll = (int) Math.max(0, Math.min(this.maxScroll / this.scrollPerEntry, mouseY - this.posY - 2 - this.scrollYOffset));
         }
+        return this.scrolling;
     }
 
     @Override
-    public void mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
         this.scrolling = false;
+        return false;
     }
 
     @Override
-    public void keyPressed(QubbleGUI gui, char character, int key) {
-
+    public boolean keyPressed(QubbleGUI gui, char character, int key) {
+        return false;
     }
 
     private boolean isSelected(int entryX, int entryY, int entryWidth, int entryHeight, float mouseX, float mouseY) {

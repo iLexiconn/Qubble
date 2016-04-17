@@ -1,6 +1,5 @@
 package net.ilexiconn.qubble.client.gui.component;
 
-import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.model.QubbleModelBase;
@@ -12,7 +11,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
-public class ModelViewComponent implements IGUIComponent {
+public class ModelViewComponent implements IComponent<QubbleGUI> {
     private float cameraOffsetX = 0.0F;
     private float cameraOffsetY = 0.0F;
 
@@ -115,11 +114,12 @@ public class ModelViewComponent implements IGUIComponent {
     }
 
     @Override
-    public void mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
+        return false;
     }
 
     @Override
-    public void mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
+    public boolean mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
         float xMovement = mouseX - this.prevMouseX;
         float yMovement = mouseY - this.prevMouseY;
         if (button == 0) {
@@ -131,15 +131,16 @@ public class ModelViewComponent implements IGUIComponent {
             this.cameraOffsetX = this.cameraOffsetX + xMovement * 0.016F;
             this.cameraOffsetY = this.cameraOffsetY + yMovement * 0.016F;
         }
+        return true;
     }
 
     @Override
-    public void mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
-
+    public boolean mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
+        return false;
     }
 
     @Override
-    public void keyPressed(QubbleGUI gui, char character, int key) {
-
+    public boolean keyPressed(QubbleGUI gui, char character, int key) {
+        return false;
     }
 }

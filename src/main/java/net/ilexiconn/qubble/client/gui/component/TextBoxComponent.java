@@ -8,7 +8,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.input.Keyboard;
 
-public class TextBoxComponent extends Gui implements IGUIComponent {
+public class TextBoxComponent extends Gui implements IComponent<QubbleGUI> {
     private String text;
     private int posX;
     private int posY;
@@ -36,9 +36,9 @@ public class TextBoxComponent extends Gui implements IGUIComponent {
         int x = this.posX + (this.width / 2);
         int y = this.posY + (this.height / 2) - (fontRenderer.FONT_HEIGHT / 2);
         int centerWidth = fontRenderer.getStringWidth(this.text) / 2;
-        fontRenderer.drawString(this.text, x - (centerWidth) + 0.625F, y - 0.625F, 0xFFFFFF, false);
+        fontRenderer.drawString(this.text, x - (centerWidth) + 0.625F, y - 0.625F, QubbleGUI.getTextColor(), false);
         if (this.selected && System.currentTimeMillis() % 1000 > 500) {
-            gui.drawRectangle(x + centerWidth + 1, y - 0.625, 1, fontRenderer.FONT_HEIGHT, 0xFFFFFFFF);
+            gui.drawRectangle(x + centerWidth + 1, y - 0.625, 1, fontRenderer.FONT_HEIGHT, QubbleGUI.getTextColor());
         }
     }
 
@@ -47,20 +47,23 @@ public class TextBoxComponent extends Gui implements IGUIComponent {
     }
 
     @Override
-    public void mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
         this.selected = this.isMouseSelecting(mouseX, mouseY);
+        return this.selected;
     }
 
     @Override
-    public void mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
+    public boolean mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
+        return false;
     }
 
     @Override
-    public void mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
+        return false;
     }
 
     @Override
-    public void keyPressed(QubbleGUI gui, char character, int key) {
+    public boolean keyPressed(QubbleGUI gui, char character, int key) {
         if (this.selected) {
             if (key == Keyboard.KEY_BACK) {
                 if (this.text.length() > 0) {
@@ -74,6 +77,7 @@ public class TextBoxComponent extends Gui implements IGUIComponent {
                 }
             }
         }
+        return this.selected;
     }
 
     private boolean isMouseSelecting(float mouseX, float mouseY) {

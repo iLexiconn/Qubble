@@ -4,7 +4,7 @@ import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.minecraft.client.gui.FontRenderer;
 
-public class TextComponent implements IGUIComponent {
+public class TextComponent implements IComponent<QubbleGUI> {
     private String text;
     private int posX;
     private int posY;
@@ -28,18 +28,22 @@ public class TextComponent implements IGUIComponent {
     }
 
     @Override
-    public void mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
+        return false;
     }
 
     @Override
-    public void mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
+    public boolean mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
+        return false;
     }
 
     @Override
-    public void mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
+        return false;
     }
 
     @Override
-    public void keyPressed(QubbleGUI gui, char character, int key) {
+    public boolean keyPressed(QubbleGUI gui, char character, int key) {
+        return false;
     }
 }

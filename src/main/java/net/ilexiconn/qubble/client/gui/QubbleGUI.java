@@ -40,7 +40,6 @@ public class QubbleGUI extends GuiScreen {
     private GuiMainMenu mainMenu;
 
     private List<Dialog> openDialogs = new ArrayList<>();
-    private List<IGUIComponent> components = new ArrayList<>();
 
     private ModelTreeComponent modelTree;
 
@@ -53,19 +52,18 @@ public class QubbleGUI extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
-        this.components.clear();
+        ComponentHandler.INSTANCE.clearGUI(this);
         this.openDialogs.clear();
-        this.components.add(new ButtonComponent("x", 0, 0, 20, 20, "Close Qubble and return to the main menu", (gui, component) -> ClientProxy.MINECRAFT.displayGuiScreen(QubbleGUI.this.mainMenu)));
-        this.components.add(new ButtonComponent("o", 21, 0, 20, 20, "Open a model", (gui, component) -> QubbleGUI.this.openModelSelectionDialog(null)));
-        this.components.add(new ButtonComponent("i", 42, 0, 20, 20, "Import a model", (gui, component) -> QubbleGUI.this.openModelImportDialog()));
-        this.components.add(new ButtonComponent("e", 63, 0, 20, 20, "Export this model", (gui, components) -> {
+        ComponentHandler.INSTANCE.addComponent(this, new ButtonComponent("x", 0, 0, 20, 20, "Close Qubble and return to the main menu", (gui, component) -> ClientProxy.MINECRAFT.displayGuiScreen(QubbleGUI.this.mainMenu)));
+        ComponentHandler.INSTANCE.addComponent(this, new ButtonComponent("o", 21, 0, 20, 20, "Open a model", (gui, component) -> QubbleGUI.this.openModelSelectionDialog(null)));
+        ComponentHandler.INSTANCE.addComponent(this, new ButtonComponent("i", 42, 0, 20, 20, "Import a model", (gui, component) -> QubbleGUI.this.openModelImportDialog()));
+        ComponentHandler.INSTANCE.addComponent(this, new ButtonComponent("e", 63, 0, 20, 20, "Export this model", (gui, components) -> {
             if (QubbleGUI.this.currentModel != null) {
                 QubbleGUI.this.openModelExportSelectDialog();
             }
         }));
-        this.components.add(new ModelViewComponent());
-        this.modelTree = new ModelTreeComponent();
-        this.components.add(this.modelTree);
+        ComponentHandler.INSTANCE.addComponent(this, new ModelViewComponent());
+        ComponentHandler.INSTANCE.addComponent(this, this.modelTree = new ModelTreeComponent());
     }
 
     @Override
@@ -75,9 +73,7 @@ public class QubbleGUI extends GuiScreen {
         ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
         float preciseMouseX = this.getPreciseMouseX(scaledResolution);
         float preciseMouseY = this.getPreciseMouseY(scaledResolution);
-        for (IGUIComponent component : new ArrayList<>(this.components)) {
-            component.render(this, preciseMouseX, preciseMouseY, 0, 0, partialTicks);
-        }
+        ComponentHandler.INSTANCE.render(this, mouseX, mouseY, partialTicks);
         boolean flag = false;
         for (Dialog dialog : new ArrayList<>(this.openDialogs)) {
             dialog.render(this, preciseMouseX, preciseMouseY, partialTicks);
@@ -88,9 +84,7 @@ public class QubbleGUI extends GuiScreen {
         if (flag) {
             return;
         }
-        for (IGUIComponent component : new ArrayList<>(this.components)) {
-            component.renderAfter(this, preciseMouseX, preciseMouseY, 0, 0, partialTicks);
-        }
+        ComponentHandler.INSTANCE.renderAfter(this, mouseX, mouseY, partialTicks);
     }
 
     @Override
@@ -99,12 +93,12 @@ public class QubbleGUI extends GuiScreen {
         ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
         float preciseMouseX = this.getPreciseMouseX(scaledResolution);
         float preciseMouseY = this.getPreciseMouseY(scaledResolution);
-        for (IGUIComponent component : new ArrayList<>(this.components)) {
-            component.mouseDragged(this, preciseMouseX, preciseMouseY, clickedMouseButton, timeSinceLastClick);
-        }
         for (Dialog dialog : new ArrayList<>(this.openDialogs)) {
-            dialog.mouseDragged(this, preciseMouseX, preciseMouseY, clickedMouseButton, timeSinceLastClick);
+            if (dialog.mouseDragged(this, preciseMouseX, preciseMouseY, clickedMouseButton, timeSinceLastClick)) {
+                return;
+            }
         }
+        ComponentHandler.INSTANCE.mouseDragged(this, preciseMouseX, preciseMouseY, clickedMouseButton, timeSinceLastClick);
     }
 
     @Override
@@ -121,9 +115,7 @@ public class QubbleGUI extends GuiScreen {
                 return;
             }
         }
-        for (IGUIComponent component : new ArrayList<>(this.components)) {
-            component.mouseClicked(this, preciseMouseX, preciseMouseY, button);
-        }
+        ComponentHandler.INSTANCE.mouseClicked(this, preciseMouseX, preciseMouseY, button);
     }
 
     @Override
@@ -132,23 +124,23 @@ public class QubbleGUI extends GuiScreen {
         ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
         float preciseMouseX = this.getPreciseMouseX(scaledResolution);
         float preciseMouseY = this.getPreciseMouseY(scaledResolution);
-        for (IGUIComponent component : new ArrayList<>(this.components)) {
-            component.mouseReleased(this, preciseMouseX, preciseMouseY, button);
-        }
         for (Dialog dialog : new ArrayList<>(this.openDialogs)) {
-            dialog.mouseReleased(this, preciseMouseX, preciseMouseY, button);
+            if (dialog.mouseReleased(this, preciseMouseX, preciseMouseY, button)) {
+                return;
+            }
         }
+        ComponentHandler.INSTANCE.mouseReleased(this, preciseMouseX, preciseMouseY, button);
     }
 
     @Override
     public void keyTyped(char character, int keyCode) throws IOException {
         super.keyTyped(character, keyCode);
-        for (IGUIComponent component : new ArrayList<>(this.components)) {
-            component.keyPressed(this, character, keyCode);
-        }
         for (Dialog dialog : new ArrayList<>(this.openDialogs)) {
-            dialog.keyPressed(this, character, keyCode);
+            if (dialog.keyPressed(this, character, keyCode)) {
+                return;
+            }
         }
+        ComponentHandler.INSTANCE.keyPressed(this, character, keyCode);
     }
 
     private float getPreciseMouseX(ScaledResolution scaledResolution) {
@@ -171,7 +163,7 @@ public class QubbleGUI extends GuiScreen {
         GlStateManager.enableTexture2D();
     }
 
-    public void drawRectangle(double x, double y, double width, double height, int color) {
+    public static void drawRectangle(double x, double y, double width, double height, int color) {
         GlStateManager.disableTexture2D();
         GlStateManager.enableBlend();
         GlStateManager.disableAlpha();
@@ -192,7 +184,7 @@ public class QubbleGUI extends GuiScreen {
         GlStateManager.enableTexture2D();
     }
 
-    public void drawOutline(double x, double y, double width, double height, int color, int outlineSize) {
+    public static void drawOutline(double x, double y, double width, double height, int color, int outlineSize) {
         drawRectangle(x, y, width - outlineSize, outlineSize, color);
         drawRectangle(x + width - outlineSize, y, outlineSize, height - outlineSize, color);
         drawRectangle(x, y + height - outlineSize, width, outlineSize, color);
