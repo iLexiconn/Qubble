@@ -23,7 +23,7 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
     public QubbleModel() {
     }
 
-    public QubbleModel(String name, String fileName, String author, int version, int textureWidth, int textureHeight, List<QubbleCube> cubes) {
+    public QubbleModel(String name, String fileName, String author, int version, int textureWidth, int textureHeight, List<QubbleCube> cubes, List<QubbleAnimation> animations) {
         this.name = name;
         this.fileName = fileName;
         this.author = author;
@@ -31,6 +31,7 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;
         this.cubes = cubes;
+        this.animations = animations;
     }
 
     @Override
@@ -196,8 +197,6 @@ public class QubbleModel implements INBTSerializable<NBTTagCompound> {
     }
 
     public QubbleModel copy() {
-        QubbleModel copy = new QubbleModel(this.name, this.fileName, this.author, this.version, this.textureWidth, this.textureHeight, new ArrayList<>(this.cubes));
-        copy.animations = new ArrayList<>(this.animations);
-        return copy;
+        return new QubbleModel(this.name, this.fileName, this.author, this.version, this.textureWidth, this.textureHeight, new ArrayList<>(this.cubes), new ArrayList<>(this.animations));
     }
 }

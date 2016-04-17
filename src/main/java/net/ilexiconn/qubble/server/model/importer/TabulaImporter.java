@@ -33,7 +33,7 @@ public class TabulaImporter implements IModelImporter<TabulaModelContainer> {
         for (TabulaCubeGroupContainer cubeGroup : model.getCubeGroups()) {
             cubes.addAll(this.addChildrenFromGroup(null, cubeGroup));
         }
-        return new QubbleModel(model.getName(), fileName, model.getAuthor(), 1, model.getTextureWidth(), model.getTextureHeight(), cubes);
+        return new QubbleModel(model.getName(), fileName, model.getAuthor(), 1, model.getTextureWidth(), model.getTextureHeight(), cubes, new ArrayList<>());
     }
 
     @Override

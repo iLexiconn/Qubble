@@ -55,7 +55,7 @@ public class JavaScriptImporter implements IModelImporter<List<String>> {
                 cube = "Unknown";
             }
         }
-        return new QubbleModel(name, fileName, author, 1, textureWidth, textureHeight, cubes);
+        return new QubbleModel(name, fileName, author, 1, textureWidth, textureHeight, cubes, new ArrayList<>());
     }
 
     @Override

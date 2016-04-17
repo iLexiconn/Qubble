@@ -11,7 +11,6 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
