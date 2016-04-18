@@ -60,7 +60,7 @@ public class Dialog<T extends GuiScreen> {
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         GL11.glScissor((int) (drawX * scaleFactor), (int) ((gui.height - (drawY + this.height)) * scaleFactor) + 1, this.width * scaleFactor, this.height * scaleFactor);
         QubbleGUI.drawRectangle(drawX, drawY, this.width, this.height, QubbleGUI.getSecondaryColor());
-        QubbleGUI.drawOutline(drawX, drawY, this.width, this.height, accentColor, 1);
+        QubbleGUI.drawOutline(drawX, drawY, this.width, this.height - 1, accentColor, 1);
         QubbleGUI.drawOutline(drawX, drawY, this.width, 12, accentColor, 1);
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
         fontRenderer.drawString(this.name, (float) drawX + 2.0F, (float) drawY + 2.0F, QubbleGUI.getTextColor(), false);

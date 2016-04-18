@@ -9,10 +9,10 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import org.lwjgl.BufferUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
@@ -47,7 +47,7 @@ public class ModelViewComponent implements IComponent<QubbleGUI> {
     public void render(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
         GlStateManager.disableLighting();
         GlStateManager.disableTexture2D();
-        gui.drawOutline(0, 20, gui.width, gui.height - 20, QubbleGUI.getPrimaryColor(), 1);
+        QubbleGUI.drawOutline(0, 20, gui.width, gui.height - 20, QubbleGUI.getPrimaryColor(), 1);
         ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         int scaleFactor = scaledResolution.getScaleFactor();

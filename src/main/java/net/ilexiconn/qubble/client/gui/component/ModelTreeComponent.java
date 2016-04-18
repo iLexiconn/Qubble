@@ -33,7 +33,7 @@ public class ModelTreeComponent extends Gui implements IComponent<QubbleGUI> {
 
         int height = gui.height - 22;
 
-        gui.drawRectangle(0, 21, this.width, height, QubbleGUI.getSecondaryColor());
+        QubbleGUI.drawRectangle(0, 21, this.width, height, QubbleGUI.getSecondaryColor());
 
         float scrollPerEntry = (float) (this.partY) / (float) (height - 21);
 
@@ -51,7 +51,7 @@ public class ModelTreeComponent extends Gui implements IComponent<QubbleGUI> {
 
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
-        gui.drawOutline(0, 21, this.width, height + 1, Qubble.CONFIG.getAccentColor(), 1);
+        QubbleGUI.drawOutline(0, 21, this.width, height + 1, Qubble.CONFIG.getAccentColor(), 1);
 
         float maxDisplayEntries = height / 13;
         float maxScroll = Math.max(0, this.partY - maxDisplayEntries);
@@ -60,8 +60,8 @@ public class ModelTreeComponent extends Gui implements IComponent<QubbleGUI> {
             int scrollX = this.width - 9;
             int scrollY = this.scroll + 23;
             int scrollerHeight = (int) ((height - 21) / ((float) this.partY / maxDisplayEntries));
-            gui.drawRectangle(scrollX, scrollY, 6, scrollerHeight, this.scrolling ? QubbleGUI.getPrimaryColor() : QubbleGUI.getSecondaryColor());
-            gui.drawOutline(scrollX, scrollY, 6, scrollerHeight, Qubble.CONFIG.getAccentColor(), 1);
+            QubbleGUI.drawRectangle(scrollX, scrollY, 6, scrollerHeight, this.scrolling ? QubbleGUI.getPrimaryColor() : QubbleGUI.getSecondaryColor());
+            QubbleGUI.drawOutline(scrollX, scrollY, 6, scrollerHeight, Qubble.CONFIG.getAccentColor(), 1);
         }
     }
 

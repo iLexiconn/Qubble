@@ -23,7 +23,7 @@ public class TextComponent implements IComponent<GuiScreen> {
     @Override
     public void render(GuiScreen gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
-        fontRenderer.drawString(this.text, this.posX - (fontRenderer.getStringWidth(this.text) / 2), this.posY - (fontRenderer.FONT_HEIGHT / 2), this.color);
+        fontRenderer.drawString(this.text, this.posX, this.posY, this.color);
     }
 
     @Override

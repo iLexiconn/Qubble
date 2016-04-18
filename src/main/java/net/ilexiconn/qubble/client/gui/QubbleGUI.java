@@ -113,6 +113,11 @@ public class QubbleGUI extends GuiScreen {
                 QubbleGUI.this.openModelExportSelectDialog();
             }
         }));
+        ComponentHandler.INSTANCE.addComponent(this, new ButtonComponent("s", 105, 0, 20, 20, "Model settings", (gui, component) -> {
+            if (QubbleGUI.this.currentModel != null) {
+                QubbleGUI.this.openModelSettingsDialog();
+            }
+        }));
         ComponentHandler.INSTANCE.addComponent(this, viewComponent = new ModelViewComponent());
         ComponentHandler.INSTANCE.addComponent(this, new ModelTreeComponent());
     }
@@ -290,6 +295,21 @@ public class QubbleGUI extends GuiScreen {
             DialogHandler.INSTANCE.closeDialog(this, dialog);
         }));
         DialogHandler.INSTANCE.openDialog(this, dialog);
+    }
+
+    private void openModelSettingsDialog() {
+        Dialog<QubbleGUI> settingsDialog = new Dialog<>(this, "Model Settings", this.width / 2 - 100, this.height / 2 - 100, 200, 200);
+        settingsDialog.addComponent(new TextComponent("Name", 6, 16, getTextColor()));
+        TextBoxComponent modelName = new TextBoxComponent(this.currentModel.getName(), 5, 28, 190, 16);
+        settingsDialog.addComponent(modelName);
+        settingsDialog.addComponent(new TextComponent("Author", 6, 60, getTextColor()));
+        TextBoxComponent modelAuthor = new TextBoxComponent(this.currentModel.getAuthor(), 5, 72, 190, 16);
+        settingsDialog.addComponent(modelAuthor);
+        settingsDialog.addComponent(new ButtonComponent("Save", 153, 171, 40, 20, (gui, component) -> {
+            this.currentModel.setName(modelName.getText());
+            this.currentModel.setAuthor(modelAuthor.getText());
+        }));
+        DialogHandler.INSTANCE.openDialog(this, settingsDialog);
     }
 
     private List<String> getModels(IModelImporter<?> modelImporter) {
