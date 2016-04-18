@@ -6,6 +6,7 @@ import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.model.QubbleModelBase;
 import net.ilexiconn.qubble.client.model.QubbleModelRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import org.lwjgl.BufferUtils;
@@ -105,6 +106,13 @@ public class ModelViewComponent implements IComponent<QubbleGUI> {
             this.currentModelContainer = newModel;
         }
         GlStateManager.translate(0.0F, -1.0F, 0.0F);
+        int displayList = 0;
+        if (this.currentModel != null && !selection && this.selected != null) {
+            displayList = GLAllocation.generateDisplayLists(1);
+            GlStateManager.glNewList(displayList, GL11.GL_COMPILE);
+            this.currentModel.renderSelectedOutline(this.selected, 0.0625F);
+            GlStateManager.glEndList();
+        }
         if (!selection) {
             if (this.texture != null) {
                 GlStateManager.enableTexture2D();
@@ -119,8 +127,9 @@ public class ModelViewComponent implements IComponent<QubbleGUI> {
                 this.currentModelSelection.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
             }
         }
-        if (this.currentModel != null && !selection && this.selected != null) {
-            this.currentModel.renderSelectedOutline(this.selected, 0.0625F);
+        if (this.selected != null && !selection) {
+            GlStateManager.callList(displayList);
+            GLAllocation.deleteDisplayLists(displayList);
         }
         GlStateManager.enableTexture2D();
         GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
@@ -160,9 +169,9 @@ public class ModelViewComponent implements IComponent<QubbleGUI> {
         float xMovement = mouseX - this.prevMouseX;
         float yMovement = mouseY - this.prevMouseY;
         if (button == 0) {
-            this.rotationYaw += xMovement;
+            this.rotationYaw += xMovement / this.zoom;
             if ((this.rotationPitch > -90.0F || yMovement < 0.0F) && (this.rotationPitch < 90.0F || yMovement > 0.0F)) {
-                this.rotationPitch -= yMovement;
+                this.rotationPitch -= yMovement / this.zoom;
             }
             this.dragged = true;
             return true;

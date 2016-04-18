@@ -4,10 +4,15 @@ import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.model.tools.AdvancedModelBase;
 import net.ilexiconn.qubble.Qubble;
+import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,15 +80,55 @@ public class QubbleModelBase extends AdvancedModelBase {
         GlStateManager.disableDepth();
         GlStateManager.disableLighting();
         GlStateManager.disableTexture2D();
-        int sizeX = selected.sizeX;
-        int sizeY = selected.sizeY;
-        int sizeZ = selected.sizeZ;
-        GlStateManager.scale(0.25F, 0.25F, 0.25F);
-        new OutlineModel(sizeX * 4, sizeY * 4, sizeZ * 4).render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, scale);
+        GlStateManager.scale(scale, scale, scale);
+        renderOutline(selected);
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();
-        GlStateManager.color(1.0F, 1.0F, 1.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
+        GlStateManager.pushMatrix();
+        if (selected.getParent() != null) {
+            selected.getParent().parentedPostRender(scale);
+        }
+        selected.render(scale);
+        GlStateManager.popMatrix();
+    }
+
+    private void renderOutline(QubbleModelRenderer modelRenderer) {
+        ModelBox box = modelRenderer.cubeList.get(0);
+        Tessellator tessellator = Tessellator.getInstance();
+        GlStateManager.glLineWidth(8.0F);
+        VertexBuffer buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
+        buffer.pos(box.posX1, box.posY1, box.posZ1).endVertex();
+        buffer.pos(box.posX2, box.posY1, box.posZ1).endVertex();
+        buffer.pos(box.posX2, box.posY1, box.posZ2).endVertex();
+        buffer.pos(box.posX1, box.posY1, box.posZ2).endVertex();
+        buffer.pos(box.posX1, box.posY1, box.posZ1).endVertex();
+        tessellator.draw();
+        buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
+        buffer.pos(box.posX1, box.posY2, box.posZ1).endVertex();
+        buffer.pos(box.posX2, box.posY2, box.posZ1).endVertex();
+        buffer.pos(box.posX2, box.posY2, box.posZ2).endVertex();
+        buffer.pos(box.posX1, box.posY2, box.posZ2).endVertex();
+        buffer.pos(box.posX1, box.posY2, box.posZ1).endVertex();
+        tessellator.draw();
+        buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
+        buffer.pos(box.posX1, box.posY1, box.posZ1).endVertex();
+        buffer.pos(box.posX1, box.posY2, box.posZ1).endVertex();
+        tessellator.draw();
+        buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
+        buffer.pos(box.posX2, box.posY1, box.posZ1).endVertex();
+        buffer.pos(box.posX2, box.posY2, box.posZ1).endVertex();
+        tessellator.draw();
+        buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
+        buffer.pos(box.posX1, box.posY1, box.posZ2).endVertex();
+        buffer.pos(box.posX1, box.posY2, box.posZ2).endVertex();
+        tessellator.draw();
+        buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
+        buffer.pos(box.posX2, box.posY1, box.posZ2).endVertex();
+        buffer.pos(box.posX2, box.posY2, box.posZ2).endVertex();
+        tessellator.draw();
     }
 
     public QubbleModelRenderer getBox(int id) {
