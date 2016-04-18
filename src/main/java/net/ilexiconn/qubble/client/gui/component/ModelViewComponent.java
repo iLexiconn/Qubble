@@ -122,14 +122,27 @@ public class ModelViewComponent implements IComponent<QubbleGUI> {
                 this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
             }
         } else {
-            GlStateManager.disableTexture2D();
             if (this.currentModelSelection != null) {
                 this.currentModelSelection.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
             }
         }
         if (this.selected != null && !selection) {
+            GlStateManager.disableTexture2D();
+            GlStateManager.disableLighting();
+            GlStateManager.disableDepth();
             GlStateManager.callList(displayList);
             GLAllocation.deleteDisplayLists(displayList);
+            GlStateManager.enableDepth();
+            GlStateManager.enableLighting();
+            GlStateManager.pushMatrix();
+            if (this.texture != null) {
+                GlStateManager.enableTexture2D();
+            }
+            if (this.selected.getParent() != null) {
+                this.selected.getParent().parentedPostRender(0.0625F);
+            }
+            this.selected.renderSingle(0.0625F);
+            GlStateManager.popMatrix();
         }
         GlStateManager.enableTexture2D();
         GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
@@ -176,8 +189,8 @@ public class ModelViewComponent implements IComponent<QubbleGUI> {
             this.dragged = true;
             return true;
         } else if (button == 1) {
-            this.cameraOffsetX = this.cameraOffsetX + xMovement * 0.016F;
-            this.cameraOffsetY = this.cameraOffsetY + yMovement * 0.016F;
+            this.cameraOffsetX = this.cameraOffsetX + (xMovement / this.zoom) * 0.016F;
+            this.cameraOffsetY = this.cameraOffsetY + (yMovement / this.zoom) * 0.016F;
             return true;
         }
         return false;

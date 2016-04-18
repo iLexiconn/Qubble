@@ -117,6 +117,51 @@ public class QubbleModelRenderer extends AdvancedModelRenderer {
         }
     }
 
+    public void renderSingle(float scale) {
+        if (!this.isHidden) {
+            if (this.showModel) {
+                GlStateManager.pushMatrix();
+                if (this.selection) {
+                    GlStateManager.color(this.r, this.g, this.b, 1.0F);
+                }
+                if (!this.compiled) {
+                    this.compileDisplayList(scale);
+                }
+                GlStateManager.translate(this.offsetX, this.offsetY, this.offsetZ);
+                GlStateManager.translate(this.rotationPointX * scale, this.rotationPointY * scale, this.rotationPointZ * scale);
+                if (this.rotateAngleZ != 0.0F) {
+                    GlStateManager.rotate((float) Math.toDegrees(this.rotateAngleZ), 0.0F, 0.0F, 1.0F);
+                }
+                if (this.rotateAngleY != 0.0F) {
+                    GlStateManager.rotate((float) Math.toDegrees(this.rotateAngleY), 0.0F, 1.0F, 0.0F);
+                }
+                if (this.rotateAngleX != 0.0F) {
+                    GlStateManager.rotate((float) Math.toDegrees(this.rotateAngleX), 1.0F, 0.0F, 0.0F);
+                }
+                if (this.scaleX != 1.0F || this.scaleY != 1.0F || this.scaleZ != 1.0F) {
+                    GlStateManager.scale(this.scaleX, this.scaleY, this.scaleZ);
+                }
+                GlStateManager.callList(this.displayList);
+                if (!this.scaleChildren && (this.scaleX != 1.0F || this.scaleY != 1.0F || this.scaleZ != 1.0F)) {
+                    GlStateManager.popMatrix();
+                    GlStateManager.pushMatrix();
+                    GlStateManager.translate(this.offsetX, this.offsetY, this.offsetZ);
+                    GlStateManager.translate(this.rotationPointX * scale, this.rotationPointY * scale, this.rotationPointZ * scale);
+                    if (this.rotateAngleZ != 0.0F) {
+                        GlStateManager.rotate((float) Math.toDegrees(this.rotateAngleZ), 0.0F, 0.0F, 1.0F);
+                    }
+                    if (this.rotateAngleY != 0.0F) {
+                        GlStateManager.rotate((float) Math.toDegrees(this.rotateAngleY), 0.0F, 1.0F, 0.0F);
+                    }
+                    if (this.rotateAngleX != 0.0F) {
+                        GlStateManager.rotate((float) Math.toDegrees(this.rotateAngleX), 1.0F, 0.0F, 0.0F);
+                    }
+                }
+                GlStateManager.popMatrix();
+            }
+        }
+    }
+
     private void compileDisplayList(float scale) {
         this.displayList = GLAllocation.generateDisplayLists(1);
         GlStateManager.glNewList(this.displayList, GL11.GL_COMPILE);

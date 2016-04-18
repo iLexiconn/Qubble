@@ -77,20 +77,9 @@ public class QubbleModelBase extends AdvancedModelBase {
         float g = (float) (accent >> 8 & 0xFF) / 255.0F;
         float b = (float) (accent & 0xFF) / 255.0F;
         GlStateManager.color(r, g, b, 1.0F);
-        GlStateManager.disableDepth();
-        GlStateManager.disableLighting();
-        GlStateManager.disableTexture2D();
         GlStateManager.scale(scale, scale, scale);
-        renderOutline(selected);
-        GlStateManager.enableLighting();
-        GlStateManager.enableDepth();
+        this.renderOutline(selected);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.popMatrix();
-        GlStateManager.pushMatrix();
-        if (selected.getParent() != null) {
-            selected.getParent().parentedPostRender(scale);
-        }
-        selected.render(scale);
         GlStateManager.popMatrix();
     }
 
