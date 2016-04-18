@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
-import net.ilexiconn.qubble.server.model.qubble.QubbleCube;
-import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -132,11 +132,11 @@ public class JavaExporter implements IModelExporter<List<String>> {
 
     @Override
     public String[] getArgumentNames() {
-        return new String[] { "Package", "Class Name" };
+        return new String[]{"Package", "Class Name"};
     }
 
     @Override
     public String[] getDefaultArguments(QubbleModel currentModel) {
-        return new String[] { "pkg", currentModel.getName() };
+        return new String[]{"pkg", currentModel.getName()};
     }
 }

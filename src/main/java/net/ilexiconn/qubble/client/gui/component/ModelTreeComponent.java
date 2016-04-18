@@ -1,17 +1,20 @@
 package net.ilexiconn.qubble.client.gui.component;
 
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
-import net.ilexiconn.qubble.server.model.qubble.QubbleCube;
-import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
-public class ModelTreeComponent extends Gui implements IGUIComponent {
+@SideOnly(Side.CLIENT)
+public class ModelTreeComponent extends Gui implements IComponent<QubbleGUI> {
     private int width = 100;
     private boolean rescaling;
     private int partY;
@@ -71,7 +74,7 @@ public class ModelTreeComponent extends Gui implements IGUIComponent {
         int y = (int) (-this.scroll * scrollPerEntry);
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
         String name = cube.getName();
-        fontRenderer.drawString(name, xOffset + 5, 25 + (this.partY + y) * 12, 0xFFFFFF);
+        fontRenderer.drawString(name, xOffset + 5, 25 + (this.partY + y) * 12, QubbleGUI.getTextColor());
         gui.drawOutline(xOffset + 3, 23 + (this.partY + y) * 12, this.width - xOffset - 14, 11, QubbleGUI.getPrimaryColor(), 1);
         this.partY++;
         for (QubbleCube child : cube.getChildren()) {
@@ -80,7 +83,7 @@ public class ModelTreeComponent extends Gui implements IGUIComponent {
     }
 
     @Override
-    public void mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
         if (mouseX > this.width - 4 && mouseX < this.width + 4 && mouseY > 21) {
             this.rescaling = true;
         }
@@ -94,12 +97,14 @@ public class ModelTreeComponent extends Gui implements IGUIComponent {
             if (mouseX >= scrollX && mouseX < scrollX + 6 && mouseY >= scrollY && mouseY < scrollY + scrollerHeight) {
                 this.scrolling = true;
                 this.scrollYOffset = (int) (mouseY - scrollY);
+                return true;
             }
         }
+        return this.rescaling;
     }
 
     @Override
-    public void mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
+    public boolean mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
         if (this.rescaling) {
             this.width = (int) Math.max(50, Math.min(300, mouseX));
         }
@@ -110,16 +115,18 @@ public class ModelTreeComponent extends Gui implements IGUIComponent {
             float scrollPerEntry = (float) (this.partY) / (float) (height - 23);
             this.scroll = (int) Math.max(0, Math.min(maxScroll / scrollPerEntry, mouseY - 23 - this.scrollYOffset));
         }
+        return this.rescaling || this.scrolling;
     }
 
     @Override
-    public void mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
         this.rescaling = false;
         this.scrolling = false;
+        return false;
     }
 
     @Override
-    public void keyPressed(QubbleGUI gui, char character, int key) {
-
+    public boolean keyPressed(QubbleGUI gui, char character, int key) {
+        return false;
     }
 }

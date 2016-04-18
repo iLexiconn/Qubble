@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.server.model.importer;
 
-import net.ilexiconn.qubble.server.model.qubble.QubbleCube;
-import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -29,7 +29,7 @@ public class JavaScriptImporter implements IModelImporter<List<String>> {
         int textureOffsetY = 0;
         String name = fileName;
         String author = "Unknown";
-        String cube = "Unknown";
+        String cubeName = "Unknown";
         for (String line : model) {
             if (line.startsWith("//") && line.contains("by")) {
                 String[] array = line.substring(2, line.length()).split(" by ");
@@ -40,7 +40,7 @@ public class JavaScriptImporter implements IModelImporter<List<String>> {
                 textureWidth = Integer.parseInt(values[0].trim());
                 textureHeight = Integer.parseInt(values[1].trim());
             } else if (line.contains("//")) {
-                cube = line.substring(line.indexOf("//") + 2, line.length());
+                cubeName = line.substring(line.indexOf("//") + 2, line.length());
             } else if (line.contains("setTextureOffset")) {
                 String[] values = line.substring(line.indexOf("(") + 1, line.length() - 2).split(",");
                 textureOffsetX = Integer.parseInt(values[0].trim());
@@ -49,13 +49,21 @@ public class JavaScriptImporter implements IModelImporter<List<String>> {
                 String[] values = line.substring(line.indexOf("(") + 1, line.length() - 2).split(",");
                 int[] dimension = {Integer.parseInt(values[3].trim()), Integer.parseInt(values[4].trim()), Integer.parseInt(values[5].trim())};
                 float[] position = {Float.parseFloat(values[0].trim()), Float.parseFloat(values[1].trim()), Float.parseFloat(values[2].trim())};
-                cubes.add(new QubbleCube(cube, new ArrayList<>(), dimension, position, new float[]{0.0F, 0.0F, 0.0F}, new float[]{0.0F, 0.0F, 0.0F}, new float[]{0.0F, 0.0F, 0.0F}, new int[]{textureOffsetX, textureOffsetY}, false, 100.0F));
+                QubbleCube cube = QubbleCube.create(cubeName);
+                cube.setDimensions(dimension[0], dimension[1], dimension[2]);
+                cube.setPosition(position[0], position[1], position[2]);
+                cube.setTexture(textureOffsetX, textureOffsetY);
+                cube.setOpacity(100.0F);
+                cubes.add(cube);
                 textureOffsetX = 0;
                 textureOffsetY = 0;
-                cube = "Unknown";
+                cubeName = "Unknown";
             }
         }
-        return new QubbleModel(name, fileName, author, 1, textureWidth, textureHeight, cubes, new ArrayList<>());
+        QubbleModel qubble = QubbleModel.create(name, author, textureWidth, textureHeight);
+        qubble.setFileName(fileName);
+        qubble.getCubes().addAll(cubes);
+        return qubble;
     }
 
     @Override

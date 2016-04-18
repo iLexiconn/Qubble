@@ -1,10 +1,13 @@
 package net.ilexiconn.qubble.client.gui.component;
 
 import net.ilexiconn.qubble.client.ClientProxy;
-import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TextComponent implements IGUIComponent {
+@SideOnly(Side.CLIENT)
+public class TextComponent implements IComponent<GuiScreen> {
     private String text;
     private int posX;
     private int posY;
@@ -18,28 +21,32 @@ public class TextComponent implements IGUIComponent {
     }
 
     @Override
-    public void render(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
+    public void render(GuiScreen gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
         fontRenderer.drawString(this.text, this.posX - (fontRenderer.getStringWidth(this.text) / 2), this.posY - (fontRenderer.FONT_HEIGHT / 2), this.color);
     }
 
     @Override
-    public void renderAfter(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
+    public void renderAfter(GuiScreen gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
     }
 
     @Override
-    public void mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseClicked(GuiScreen gui, float mouseX, float mouseY, int button) {
+        return false;
     }
 
     @Override
-    public void mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
+    public boolean mouseDragged(GuiScreen gui, float mouseX, float mouseY, int button, long timeSinceClick) {
+        return false;
     }
 
     @Override
-    public void mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseReleased(GuiScreen gui, float mouseX, float mouseY, int button) {
+        return false;
     }
 
     @Override
-    public void keyPressed(QubbleGUI gui, char character, int key) {
+    public boolean keyPressed(GuiScreen gui, char character, int key) {
+        return false;
     }
 }

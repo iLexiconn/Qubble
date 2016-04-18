@@ -12,16 +12,16 @@ public enum ModelImporters {
         this.modelImporter = modelImporter;
     }
 
-    public IModelImporter<?> getModelImporter() {
-        return modelImporter;
-    }
-
     public static IModelImporter<?> getBuiltinImporter(String name) {
-        for (ModelImporters importer :  ModelImporters.VALUES) {
+        for (ModelImporters importer : ModelImporters.VALUES) {
             if (importer.getModelImporter().getName().equals(name)) {
                 return importer.getModelImporter();
             }
         }
         return null;
+    }
+
+    public IModelImporter<?> getModelImporter() {
+        return modelImporter;
     }
 }

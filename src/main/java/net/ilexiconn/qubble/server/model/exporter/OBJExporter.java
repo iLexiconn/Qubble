@@ -1,14 +1,13 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
-import net.ilexiconn.qubble.server.model.qubble.QubbleCube;
-import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
-import net.ilexiconn.qubble.server.model.obj.*;
+import net.ilexiconn.llibrary.client.model.obj.*;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.stream.Collectors;
 
 public class OBJExporter implements IModelExporter<OBJModel> {
     @Override
@@ -25,14 +24,14 @@ public class OBJExporter implements IModelExporter<OBJModel> {
     public OBJModel export(QubbleModel model, String... arguments) {
         OBJModel obj = new OBJModel();
         model.unparent();
-        obj.shapes.addAll(model.getCubes().stream().map(cube -> this.convertBoxToShape(obj, model, cube, 0.0625F)).collect(Collectors.toList()));
+        model.getCubes().stream().map(cube -> this.convertBoxToShape(obj, model, cube, 0.0625F)).forEach(obj::addShape);
         return obj;
     }
 
     @Override
     public void save(OBJModel model, File file) throws IOException {
         PrintWriter writer = new PrintWriter(file, "UTF-8");
-        model.shapes.forEach(shape -> shape.toStringList().forEach(writer::println));
+        writer.append(model.toString());
         writer.close();
     }
 
@@ -47,16 +46,16 @@ public class OBJExporter implements IModelExporter<OBJModel> {
         Vertex backBottomRight = new Vertex(cube.getOffsetX() + cube.getDimensionX(), cube.getOffsetY() + cube.getDimensionY(), cube.getOffsetZ() + cube.getDimensionZ());
         Vertex backBottomLeft = new Vertex(cube.getOffsetX(), cube.getOffsetY() + cube.getDimensionY(), cube.getOffsetZ() + cube.getDimensionZ());
         if (cube.getDimensionX() > 0.0F && cube.getDimensionY() > 0.0F) {
-            shape.faces.add(new Face(shape).append(frontBottomLeft, this.createUV(model, cube, cube.getDimensionZ(), cube.getDimensionZ() + cube.getDimensionY(), cube.getDimensionX())).append(frontBottomRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), cube.getDimensionZ() + cube.getDimensionY(), -cube.getDimensionX())).append(frontTopRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), cube.getDimensionZ(), -cube.getDimensionX())).append(frontTopLeft, this.createUV(model, cube, cube.getDimensionZ(), cube.getDimensionZ(), cube.getDimensionX())));
-            shape.faces.add(new Face(shape).append(backBottomRight, this.createUV(model, cube, cube.getDimensionZ() * 2.0F + cube.getDimensionX(), cube.getDimensionZ() + cube.getDimensionY(), cube.getDimensionX())).append(backBottomLeft, this.createUV(model, cube, cube.getDimensionZ() * 2.0F + cube.getDimensionX() * 2.0F, cube.getDimensionZ() + cube.getDimensionY(), -cube.getDimensionX())).append(backTopLeft, this.createUV(model, cube, cube.getDimensionZ() * 2.0F + cube.getDimensionX() * 2.0F, cube.getDimensionZ(), -cube.getDimensionX())).append(backTopRight, this.createUV(model, cube, cube.getDimensionZ() * 2.0F + cube.getDimensionX(), cube.getDimensionZ(), cube.getDimensionX())));
+            shape.addFace(new Face(shape).append(frontBottomLeft, this.createUV(model, cube, cube.getDimensionZ(), cube.getDimensionZ() + cube.getDimensionY(), cube.getDimensionX())).append(frontBottomRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), cube.getDimensionZ() + cube.getDimensionY(), -cube.getDimensionX())).append(frontTopRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), cube.getDimensionZ(), -cube.getDimensionX())).append(frontTopLeft, this.createUV(model, cube, cube.getDimensionZ(), cube.getDimensionZ(), cube.getDimensionX())));
+            shape.addFace(new Face(shape).append(backBottomRight, this.createUV(model, cube, cube.getDimensionZ() * 2.0F + cube.getDimensionX(), cube.getDimensionZ() + cube.getDimensionY(), cube.getDimensionX())).append(backBottomLeft, this.createUV(model, cube, cube.getDimensionZ() * 2.0F + cube.getDimensionX() * 2.0F, cube.getDimensionZ() + cube.getDimensionY(), -cube.getDimensionX())).append(backTopLeft, this.createUV(model, cube, cube.getDimensionZ() * 2.0F + cube.getDimensionX() * 2.0F, cube.getDimensionZ(), -cube.getDimensionX())).append(backTopRight, this.createUV(model, cube, cube.getDimensionZ() * 2.0F + cube.getDimensionX(), cube.getDimensionZ(), cube.getDimensionX())));
         }
         if (cube.getDimensionX() > 0.0F && cube.getDimensionZ() > 0.0F) {
-            shape.faces.add(new Face(shape).append(frontTopLeft, this.createUV(model, cube, cube.getDimensionZ(), cube.getDimensionZ(), cube.getDimensionX())).append(frontTopRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), cube.getDimensionZ(), -cube.getDimensionX())).append(backTopRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), 0.0F, -cube.getDimensionX())).append(backTopLeft, this.createUV(model, cube, cube.getDimensionZ(), 0.0F, cube.getDimensionX())));
-            shape.faces.add(new Face(shape).append(backBottomLeft, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), cube.getDimensionZ(), cube.getDimensionX())).append(backBottomRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX() * 2.0F, cube.getDimensionZ(), -cube.getDimensionX())).append(frontBottomRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX() * 2.0F, 0.0F, -cube.getDimensionX())).append(frontBottomLeft, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), 0.0F, cube.getDimensionX())));
+            shape.addFace(new Face(shape).append(frontTopLeft, this.createUV(model, cube, cube.getDimensionZ(), cube.getDimensionZ(), cube.getDimensionX())).append(frontTopRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), cube.getDimensionZ(), -cube.getDimensionX())).append(backTopRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), 0.0F, -cube.getDimensionX())).append(backTopLeft, this.createUV(model, cube, cube.getDimensionZ(), 0.0F, cube.getDimensionX())));
+            shape.addFace(new Face(shape).append(backBottomLeft, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), cube.getDimensionZ(), cube.getDimensionX())).append(backBottomRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX() * 2.0F, cube.getDimensionZ(), -cube.getDimensionX())).append(frontBottomRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX() * 2.0F, 0.0F, -cube.getDimensionX())).append(frontBottomLeft, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), 0.0F, cube.getDimensionX())));
         }
         if (cube.getDimensionY() > 0.0F && cube.getDimensionZ() > 0.0F) {
-            shape.faces.add(new Face(shape).append(backBottomLeft, this.createUV(model, cube, 0.0F, cube.getDimensionZ() + cube.getDimensionY(), cube.getDimensionX() + cube.getDimensionZ() * 2.0F)).append(frontBottomLeft, this.createUV(model, cube, cube.getDimensionZ(), cube.getDimensionZ() + cube.getDimensionY(), cube.getDimensionX())).append(frontTopLeft, this.createUV(model, cube, cube.getDimensionZ(), cube.getDimensionZ(), cube.getDimensionX())).append(backTopLeft, this.createUV(model, cube, 0.0F, cube.getDimensionZ(), cube.getDimensionX() + cube.getDimensionZ() * 2.0F)));
-            shape.faces.add(new Face(shape).append(frontBottomRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), cube.getDimensionZ() + cube.getDimensionY(), -cube.getDimensionX())).append(backBottomRight, this.createUV(model, cube, cube.getDimensionZ() * 2.0F + cube.getDimensionX(), cube.getDimensionZ() + cube.getDimensionY(), -cube.getDimensionX() - cube.getDimensionZ() * 2.0F)).append(backTopRight, this.createUV(model, cube, cube.getDimensionZ() * 2.0F + cube.getDimensionX(), cube.getDimensionZ(), -cube.getDimensionX() - cube.getDimensionZ() * 2.0F)).append(frontTopRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), cube.getDimensionZ(), -cube.getDimensionX())));
+            shape.addFace(new Face(shape).append(backBottomLeft, this.createUV(model, cube, 0.0F, cube.getDimensionZ() + cube.getDimensionY(), cube.getDimensionX() + cube.getDimensionZ() * 2.0F)).append(frontBottomLeft, this.createUV(model, cube, cube.getDimensionZ(), cube.getDimensionZ() + cube.getDimensionY(), cube.getDimensionX())).append(frontTopLeft, this.createUV(model, cube, cube.getDimensionZ(), cube.getDimensionZ(), cube.getDimensionX())).append(backTopLeft, this.createUV(model, cube, 0.0F, cube.getDimensionZ(), cube.getDimensionX() + cube.getDimensionZ() * 2.0F)));
+            shape.addFace(new Face(shape).append(frontBottomRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), cube.getDimensionZ() + cube.getDimensionY(), -cube.getDimensionX())).append(backBottomRight, this.createUV(model, cube, cube.getDimensionZ() * 2.0F + cube.getDimensionX(), cube.getDimensionZ() + cube.getDimensionY(), -cube.getDimensionX() - cube.getDimensionZ() * 2.0F)).append(backTopRight, this.createUV(model, cube, cube.getDimensionZ() * 2.0F + cube.getDimensionX(), cube.getDimensionZ(), -cube.getDimensionX() - cube.getDimensionZ() * 2.0F)).append(frontTopRight, this.createUV(model, cube, cube.getDimensionZ() + cube.getDimensionX(), cube.getDimensionZ(), -cube.getDimensionX())));
         }
         shape.rotate(-cube.getRotationX(), 1.0F, 0.0F, 0.0F);
         shape.rotate(-cube.getRotationY(), 0.0F, 1.0F, 0.0F);
@@ -77,11 +76,11 @@ public class OBJExporter implements IModelExporter<OBJModel> {
 
     @Override
     public String[] getArgumentNames() {
-        return new String[] {};
+        return new String[]{};
     }
 
     @Override
     public String[] getDefaultArguments(QubbleModel model) {
-        return new String[] {};
+        return new String[]{};
     }
 }

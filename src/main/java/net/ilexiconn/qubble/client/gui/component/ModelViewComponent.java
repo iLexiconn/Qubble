@@ -1,5 +1,6 @@
 package net.ilexiconn.qubble.client.gui.component;
 
+import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.model.QubbleModelBase;
@@ -10,38 +11,37 @@ import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import org.lwjgl.BufferUtils;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
 import java.nio.FloatBuffer;
 
-public class ModelViewComponent implements IGUIComponent {
+@SideOnly(Side.CLIENT)
+public class ModelViewComponent implements IComponent<QubbleGUI> {
+    public ResourceLocation texture;
     private float cameraOffsetX = 0.0F;
     private float cameraOffsetY = 0.0F;
-
     private float rotationYaw = 225.0F;
     private float rotationPitch = -15.0F;
-
     private float prevRotationYaw;
     private float prevRotationPitch;
-
     private float prevCameraOffsetX;
     private float prevCameraOffsetY;
-
     private float zoom = 1.0F;
     private float zoomVelocity;
-
     private QubbleModel currentModelContainer;
     private QubbleModelBase currentModel;
     private QubbleModelBase currentModelSelection;
-
     private float prevMouseX;
     private float prevMouseY;
 
     private QubbleModelRenderer selected;
-
     private boolean dragged;
+
     private float partialTicks;
 
     @Override
@@ -107,6 +107,10 @@ public class ModelViewComponent implements IGUIComponent {
             this.currentModelContainer = newModel;
         }
         GlStateManager.translate(0.0F, -1.0F, 0.0F);
+        if (this.texture != null) {
+            GlStateManager.enableTexture2D();
+            ClientProxy.MINECRAFT.getTextureManager().bindTexture(this.texture);
+        }
         if (!selection) {
             if (this.currentModel != null) {
                 this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
@@ -119,6 +123,7 @@ public class ModelViewComponent implements IGUIComponent {
         if (this.currentModel != null && !selection && this.selected != null) {
             this.currentModel.renderSelectedOutline(this.selected, 0.0625F);
         }
+        GlStateManager.enableTexture2D();
         GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
         RenderHelper.disableStandardItemLighting();
         GlStateManager.popMatrix();
@@ -147,11 +152,12 @@ public class ModelViewComponent implements IGUIComponent {
     }
 
     @Override
-    public void mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseClicked(QubbleGUI gui, float mouseX, float mouseY, int button) {
+        return false;
     }
 
     @Override
-    public void mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
+    public boolean mouseDragged(QubbleGUI gui, float mouseX, float mouseY, int button, long timeSinceClick) {
         float xMovement = mouseX - this.prevMouseX;
         float yMovement = mouseY - this.prevMouseY;
         if (button == 0) {
@@ -160,14 +166,17 @@ public class ModelViewComponent implements IGUIComponent {
                 this.rotationPitch -= yMovement;
             }
             this.dragged = true;
+            return true;
         } else if (button == 1) {
             this.cameraOffsetX = this.cameraOffsetX + xMovement * 0.016F;
             this.cameraOffsetY = this.cameraOffsetY + yMovement * 0.016F;
+            return true;
         }
+        return false;
     }
 
     @Override
-    public void mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
+    public boolean mouseReleased(QubbleGUI gui, float mouseX, float mouseY, int button) {
         if (button == 0) {
             if (!this.dragged && this.currentModel != null) {
                 ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
@@ -185,13 +194,15 @@ public class ModelViewComponent implements IGUIComponent {
                 if (this.selected != null) {
                     this.selected.setSelected(true);
                 }
+                return true;
             }
         }
         this.dragged = false;
+        return false;
     }
 
     @Override
-    public void keyPressed(QubbleGUI gui, char character, int key) {
-
+    public boolean keyPressed(QubbleGUI gui, char character, int key) {
+        return false;
     }
 }
