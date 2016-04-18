@@ -74,6 +74,7 @@ public class QubbleModelBase extends AdvancedModelBase {
         GlStateManager.color(r, g, b, 1.0F);
         GlStateManager.disableDepth();
         GlStateManager.disableLighting();
+        GlStateManager.disableTexture2D();
         int sizeX = selected.sizeX;
         int sizeY = selected.sizeY;
         int sizeZ = selected.sizeZ;

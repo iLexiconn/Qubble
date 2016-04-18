@@ -105,15 +105,16 @@ public class ModelViewComponent implements IComponent<QubbleGUI> {
             this.currentModelContainer = newModel;
         }
         GlStateManager.translate(0.0F, -1.0F, 0.0F);
-        if (this.texture != null) {
-            GlStateManager.enableTexture2D();
-            ClientProxy.MINECRAFT.getTextureManager().bindTexture(this.texture);
-        }
         if (!selection) {
+            if (this.texture != null) {
+                GlStateManager.enableTexture2D();
+                ClientProxy.MINECRAFT.getTextureManager().bindTexture(this.texture);
+            }
             if (this.currentModel != null) {
                 this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
             }
         } else {
+            GlStateManager.disableTexture2D();
             if (this.currentModelSelection != null) {
                 this.currentModelSelection.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
             }
