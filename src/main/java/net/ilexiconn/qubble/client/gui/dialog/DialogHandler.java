@@ -53,6 +53,7 @@ public enum DialogHandler {
     }
 
     public <T extends GuiScreen> boolean mouseClicked(T gui, float mouseX, float mouseY, int button) {
+        boolean flag = false;
         if (this.dialogMap.containsKey(gui)) {
             List<Dialog<T>> dialogList = (List<Dialog<T>>) ((List<?>) this.dialogMap.get(gui));
             for (Dialog<T> dialog : Lists.reverse(dialogList)) {
@@ -61,34 +62,42 @@ public enum DialogHandler {
                         this.dialogMap.get(gui).add(dialog);
                     }
                     return true;
+                } else if (mouseX > dialog.posX && mouseX < dialog.posX + dialog.width && mouseY > dialog.posY && mouseY < dialog.posY + dialog.height) {
+                    flag = true;
                 }
             }
         }
-        return false;
+        return flag;
     }
 
     public <T extends GuiScreen> boolean mouseDragged(T gui, float mouseX, float mouseY, int button, long timeSinceClick) {
+        boolean flag = false;
         if (this.dialogMap.containsKey(gui)) {
             List<Dialog<T>> dialogList = (List<Dialog<T>>) ((List<?>) this.dialogMap.get(gui));
             for (Dialog<T> dialog : Lists.reverse(dialogList)) {
                 if (dialog.mouseDragged(mouseX, mouseY, button, timeSinceClick)) {
                     return true;
+                } else if (mouseX > dialog.posX && mouseX < dialog.posX + dialog.width && mouseY > dialog.posY && mouseY < dialog.posY + dialog.height) {
+                    flag = true;
                 }
             }
         }
-        return false;
+        return flag;
     }
 
     public <T extends GuiScreen> boolean mouseReleased(T gui, float mouseX, float mouseY, int button) {
+        boolean flag = false;
         if (this.dialogMap.containsKey(gui)) {
             List<Dialog<T>> dialogList = (List<Dialog<T>>) ((List<?>) this.dialogMap.get(gui));
             for (Dialog<T> dialog : Lists.reverse(dialogList)) {
                 if (dialog.mouseReleased(mouseX, mouseY, button)) {
                     return true;
+                } else if (mouseX > dialog.posX && mouseX < dialog.posX + dialog.width && mouseY > dialog.posY && mouseY < dialog.posY + dialog.height) {
+                    flag = true;
                 }
             }
         }
-        return false;
+        return flag;
     }
 
     public <T extends GuiScreen> boolean keyPressed(T gui, char character, int key) {
