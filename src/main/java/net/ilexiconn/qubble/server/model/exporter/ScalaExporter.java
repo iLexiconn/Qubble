@@ -118,11 +118,11 @@ public class ScalaExporter implements IModelExporter<List<String>> {
 
     @Override
     public String[] getArgumentNames() {
-        return new String[] { "Package", "Class Name" };
+        return new String[]{"Package", "Class Name"};
     }
 
     @Override
     public String[] getDefaultArguments(QubbleModel currentModel) {
-        return new String[] { "pkg", currentModel.getName() };
+        return new String[]{"pkg", currentModel.getName()};
     }
 }

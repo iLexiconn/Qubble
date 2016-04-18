@@ -30,7 +30,7 @@ public class TabulaExporter implements IModelExporter<TabulaModelContainer> {
     public TabulaModelContainer export(QubbleModel model, String... arguments) {
         List<TabulaCubeContainer> tabulaCubes = new ArrayList<>();
         for (QubbleCube cube : model.getCubes()) {
-            TabulaCubeContainer tabulaCube = new TabulaCubeContainer(cube.getName(), RandomStringUtils.randomAscii(20), null, new int[] { cube.getDimensionX(), cube.getDimensionY(), cube.getDimensionZ() }, new double[] { cube.getPositionX(), cube.getPositionY(), cube.getPositionZ() }, new double[] { cube.getOffsetX(), cube.getOffsetY(), cube.getOffsetZ() }, new double[] { cube.getRotationX(), cube.getRotationY(), cube.getRotationZ() }, new double[] { cube.getScaleX(), cube.getScaleY(), cube.getScaleZ() }, new int[] { cube.getTextureX(), cube.getTextureY() }, cube.isTextureMirrored(), cube.getOpacity(), 0.0, false);
+            TabulaCubeContainer tabulaCube = new TabulaCubeContainer(cube.getName(), RandomStringUtils.randomAscii(20), null, new int[]{cube.getDimensionX(), cube.getDimensionY(), cube.getDimensionZ()}, new double[]{cube.getPositionX(), cube.getPositionY(), cube.getPositionZ()}, new double[]{cube.getOffsetX(), cube.getOffsetY(), cube.getOffsetZ()}, new double[]{cube.getRotationX(), cube.getRotationY(), cube.getRotationZ()}, new double[]{cube.getScaleX(), cube.getScaleY(), cube.getScaleZ()}, new int[]{cube.getTextureX(), cube.getTextureY()}, cube.isTextureMirrored(), cube.getOpacity(), 0.0, false);
             tabulaCube.getChildren().addAll(this.convertChildren(cube, tabulaCube));
             tabulaCubes.add(tabulaCube);
         }
@@ -59,11 +59,11 @@ public class TabulaExporter implements IModelExporter<TabulaModelContainer> {
 
     @Override
     public String[] getArgumentNames() {
-        return new String[] {};
+        return new String[]{};
     }
 
     @Override
     public String[] getDefaultArguments(QubbleModel currentModel) {
-        return new String[] {};
+        return new String[]{};
     }
 }

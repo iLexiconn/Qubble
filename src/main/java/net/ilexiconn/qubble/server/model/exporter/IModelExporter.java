@@ -15,5 +15,6 @@ public interface IModelExporter<T> {
     void save(T model, File file) throws IOException;
 
     String[] getArgumentNames();
+
     String[] getDefaultArguments(QubbleModel currentModel);
 }

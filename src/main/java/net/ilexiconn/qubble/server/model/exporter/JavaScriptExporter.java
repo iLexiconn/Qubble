@@ -89,11 +89,11 @@ public class JavaScriptExporter implements IModelExporter<List<String>> {
 
     @Override
     public String[] getArgumentNames() {
-        return new String[] {};
+        return new String[]{};
     }
 
     @Override
     public String[] getDefaultArguments(QubbleModel currentModel) {
-        return new String[] {};
+        return new String[]{};
     }
 }

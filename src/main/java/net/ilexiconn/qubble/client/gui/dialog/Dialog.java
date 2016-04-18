@@ -18,18 +18,14 @@ import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class Dialog<T extends GuiScreen> {
-    private T gui;
-    private String name;
-
     public float posX;
     public float posY;
-
-    private float prevPosX;
-    private float prevPosY;
-
     public int width;
     public int height;
-
+    private T gui;
+    private String name;
+    private float prevPosX;
+    private float prevPosY;
     private float dragOffsetX;
     private float dragOffsetY;
     private boolean isDragging;

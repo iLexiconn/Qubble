@@ -60,14 +60,14 @@ public class SelectionListComponent extends Gui implements IComponent<GuiScreen>
         int scaleFactor = resolution.getScaleFactor();
         GL11.glScissor((int) ((this.posX + offsetX) * scaleFactor), (int) ((gui.height - (this.posY + this.height + offsetY - 1)) * scaleFactor), this.width * scaleFactor, (this.height - 2) * scaleFactor);
         for (String entry : this.entries) {
-                int entryX = this.posX + 1;
-                int entryY = this.posY + y + 1;
-                int entryWidth = this.width - 16;
-                int entryHeight = 12;
-                boolean selected = this.isSelected(entryX, entryY, entryWidth, entryHeight, mouseX, mouseY);
-                this.drawGradientRect(entryX, entryY, entryX + entryWidth, entryY + entryHeight, primaryColor, selected ? secondaryColor : primaryColor);
+            int entryX = this.posX + 1;
+            int entryY = this.posY + y + 1;
+            int entryWidth = this.width - 16;
+            int entryHeight = 12;
+            boolean selected = this.isSelected(entryX, entryY, entryWidth, entryHeight, mouseX, mouseY);
+            this.drawGradientRect(entryX, entryY, entryX + entryWidth, entryY + entryHeight, primaryColor, selected ? secondaryColor : primaryColor);
             QubbleGUI.drawOutline(entryX, entryY, entryWidth, entryHeight, Qubble.CONFIG.getAccentColor(), 1);
-                fontRenderer.drawString(entry, entryX + 2, entryY + 2, QubbleGUI.getTextColor());
+            fontRenderer.drawString(entry, entryX + 2, entryY + 2, QubbleGUI.getTextColor());
             y += 13;
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);

@@ -51,6 +51,50 @@ public class QubbleGUI extends GuiScreen {
         this.mainMenu = mainMenu;
     }
 
+    public static void drawRectangle(double x, double y, double width, double height, int color) {
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        float a = (float) (color >> 24 & 0xFF) / 255.0F;
+        float r = (float) (color >> 16 & 0xFF) / 255.0F;
+        float g = (float) (color >> 8 & 0xFF) / 255.0F;
+        float b = (float) (color & 0xFF) / 255.0F;
+        Tessellator tessellator = Tessellator.getInstance();
+        VertexBuffer vertexBuffer = tessellator.getBuffer();
+        vertexBuffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        vertexBuffer.pos(x, y + height, 0.0).color(r, g, b, a).endVertex();
+        vertexBuffer.pos(x + width, y + height, 0.0).color(r, g, b, a).endVertex();
+        vertexBuffer.pos(x + width, y, 0.0).color(r, g, b, a).endVertex();
+        vertexBuffer.pos(x, y, 0.0).color(r, g, b, a).endVertex();
+        tessellator.draw();
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
+    }
+
+    public static void drawOutline(double x, double y, double width, double height, int color, int outlineSize) {
+        drawRectangle(x, y, width - outlineSize, outlineSize, color);
+        drawRectangle(x + width - outlineSize, y, outlineSize, height - outlineSize, color);
+        drawRectangle(x, y + height - outlineSize, width, outlineSize, color);
+        drawRectangle(x, y, outlineSize, height - outlineSize, color);
+    }
+
+    public static int getPrimaryColor() {
+        return Qubble.CONFIG.darkMode ? PRIMARY_COLOR_DARK : PRIMARY_COLOR_LIGHT;
+    }
+
+    public static int getSecondaryColor() {
+        return Qubble.CONFIG.darkMode ? SECONDARY_COLOR_DARK : SECONDARY_COLOR_LIGHT;
+    }
+
+    public static int getTextColor() {
+        return Qubble.CONFIG.darkMode ? TEXT_COLOR_DARK : TEXT_COLOR_LIGHT;
+    }
+
+    public static float interpolate(float prev, float current, float partialTicks) {
+        return prev + partialTicks * (current - prev);
+    }
+
     @Override
     public void initGui() {
         super.initGui();
@@ -145,34 +189,6 @@ public class QubbleGUI extends GuiScreen {
         GlStateManager.color(r * 0.8F, g * 0.8F, b * 0.8F, 1.0F);
         this.drawTexturedModalRect(0, 0, 0, 0, this.width, this.height);
         GlStateManager.enableTexture2D();
-    }
-
-    public static void drawRectangle(double x, double y, double width, double height, int color) {
-        GlStateManager.disableTexture2D();
-        GlStateManager.enableBlend();
-        GlStateManager.disableAlpha();
-        float a = (float) (color >> 24 & 0xFF) / 255.0F;
-        float r = (float) (color >> 16 & 0xFF) / 255.0F;
-        float g = (float) (color >> 8 & 0xFF) / 255.0F;
-        float b = (float) (color & 0xFF) / 255.0F;
-        Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexBuffer = tessellator.getBuffer();
-        vertexBuffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        vertexBuffer.pos(x, y + height, 0.0).color(r, g, b, a).endVertex();
-        vertexBuffer.pos(x + width, y + height, 0.0).color(r, g, b, a).endVertex();
-        vertexBuffer.pos(x + width, y, 0.0).color(r, g, b, a).endVertex();
-        vertexBuffer.pos(x, y, 0.0).color(r, g, b, a).endVertex();
-        tessellator.draw();
-        GlStateManager.disableBlend();
-        GlStateManager.enableAlpha();
-        GlStateManager.enableTexture2D();
-    }
-
-    public static void drawOutline(double x, double y, double width, double height, int color, int outlineSize) {
-        drawRectangle(x, y, width - outlineSize, outlineSize, color);
-        drawRectangle(x + width - outlineSize, y, outlineSize, height - outlineSize, color);
-        drawRectangle(x, y + height - outlineSize, width, outlineSize, color);
-        drawRectangle(x, y, outlineSize, height - outlineSize, color);
     }
 
     public QubbleModel getCurrentModel() {
@@ -292,21 +308,5 @@ public class QubbleGUI extends GuiScreen {
             }
         }
         return list;
-    }
-
-    public static int getPrimaryColor() {
-        return Qubble.CONFIG.darkMode ? PRIMARY_COLOR_DARK : PRIMARY_COLOR_LIGHT;
-    }
-
-    public static int getSecondaryColor() {
-        return Qubble.CONFIG.darkMode ? SECONDARY_COLOR_DARK : SECONDARY_COLOR_LIGHT;
-    }
-
-    public static int getTextColor() {
-        return Qubble.CONFIG.darkMode ? TEXT_COLOR_DARK : TEXT_COLOR_LIGHT;
-    }
-
-    public static float interpolate(float prev, float current, float partialTicks) {
-        return prev + partialTicks * (current - prev);
     }
 }

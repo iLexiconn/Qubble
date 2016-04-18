@@ -16,25 +16,19 @@ import org.lwjgl.util.glu.GLU;
 
 @SideOnly(Side.CLIENT)
 public class ModelViewComponent implements IComponent<QubbleGUI> {
+    public ResourceLocation texture;
     private float cameraOffsetX = 0.0F;
     private float cameraOffsetY = 0.0F;
-
     private float rotationYaw = 225.0F;
     private float rotationPitch = -15.0F;
-
     private float prevRotationYaw;
     private float prevRotationPitch;
-
     private float prevCameraOffsetX;
     private float prevCameraOffsetY;
-
     private float zoom = 1.0F;
     private float zoomVelocity;
-
     private QubbleModel currentModelContainer;
     private QubbleModelBase currentModel;
-    public ResourceLocation texture;
-
     private float prevMouseX;
     private float prevMouseY;
 

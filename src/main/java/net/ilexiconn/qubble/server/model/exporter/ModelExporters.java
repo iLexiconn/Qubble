@@ -15,10 +15,6 @@ public enum ModelExporters {
         this.modelExporter = modelExporter;
     }
 
-    public IModelExporter<?> getModelExporter() {
-        return modelExporter;
-    }
-
     public static IModelExporter<?> getBuiltinExporter(String name) {
         for (ModelExporters exporter : ModelExporters.VALUES) {
             if (exporter.getModelExporter().getName().equals(name)) {
@@ -26,5 +22,9 @@ public enum ModelExporters {
             }
         }
         return null;
+    }
+
+    public IModelExporter<?> getModelExporter() {
+        return modelExporter;
     }
 }

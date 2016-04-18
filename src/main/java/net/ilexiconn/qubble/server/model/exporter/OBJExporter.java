@@ -76,11 +76,11 @@ public class OBJExporter implements IModelExporter<OBJModel> {
 
     @Override
     public String[] getArgumentNames() {
-        return new String[] {};
+        return new String[]{};
     }
 
     @Override
     public String[] getDefaultArguments(QubbleModel model) {
-        return new String[] {};
+        return new String[]{};
     }
 }
