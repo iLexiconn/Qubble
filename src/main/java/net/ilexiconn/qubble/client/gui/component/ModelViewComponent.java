@@ -1,9 +1,9 @@
 package net.ilexiconn.qubble.client.gui.component;
 
+import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.model.QubbleModelBase;
-import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;

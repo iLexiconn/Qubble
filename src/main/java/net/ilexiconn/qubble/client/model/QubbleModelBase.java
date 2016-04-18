@@ -1,9 +1,9 @@
 package net.ilexiconn.qubble.client.model;
 
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.model.tools.AdvancedModelBase;
 import net.ilexiconn.llibrary.client.model.tools.AdvancedModelRenderer;
-import net.ilexiconn.qubble.server.model.qubble.QubbleCube;
-import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.fml.relauncher.Side;

@@ -1,9 +1,9 @@
 package net.ilexiconn.qubble.server.model.importer;
 
-import net.ilexiconn.qubble.server.model.qubble.QubbleCube;
-import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
-import net.ilexiconn.qubble.server.model.techne.TechneCube;
-import net.ilexiconn.qubble.server.model.techne.TechneModel;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
+import net.ilexiconn.llibrary.client.model.techne.TechneCube;
+import net.ilexiconn.llibrary.client.model.techne.TechneModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,15 +21,9 @@ public class TechneImporter implements IModelImporter<TechneModel> {
 
     @Override
     public QubbleModel getModel(String fileName, TechneModel model) {
-        QubbleModel qubble = new QubbleModel();
-        qubble.setName(model.getFileName());
-        qubble.setFileName(fileName);
-        qubble.setAuthor("Unknown");
-        qubble.setVersion(1);
-        qubble.setTexture(model.getTextureWidth(), model.getTextureHeight());
+        QubbleModel qubble = QubbleModel.create(model.getFileName(), null, model.getTextureWidth(), model.getTextureHeight());
         for (TechneCube cube : model.getCubes()) {
-            QubbleCube qubbleCube = new QubbleCube();
-            qubbleCube.setName(cube.getName());
+            QubbleCube qubbleCube = QubbleCube.create(cube.getName());
             qubbleCube.setDimensions(cube.getDimensionX(), cube.getDimensionY(), cube.getDimensionZ());
             qubbleCube.setPosition(cube.getPositionX(), cube.getPositionY(), cube.getPositionZ());
             qubbleCube.setOffset(cube.getOffsetX(), cube.getOffsetY(), cube.getOffsetZ());
@@ -45,6 +39,6 @@ public class TechneImporter implements IModelImporter<TechneModel> {
 
     @Override
     public TechneModel read(File file) throws IOException {
-        return new TechneModel(file);
+        return TechneModel.fromFile(file);
     }
 }

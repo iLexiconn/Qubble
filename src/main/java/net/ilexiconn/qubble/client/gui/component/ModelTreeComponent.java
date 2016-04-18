@@ -1,10 +1,10 @@
 package net.ilexiconn.qubble.client.gui.component;
 
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
-import net.ilexiconn.qubble.server.model.qubble.QubbleCube;
-import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;

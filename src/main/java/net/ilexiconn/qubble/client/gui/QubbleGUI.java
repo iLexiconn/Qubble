@@ -1,5 +1,6 @@
 package net.ilexiconn.qubble.client.gui;
 
+import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.component.*;
@@ -8,7 +9,6 @@ import net.ilexiconn.qubble.client.gui.dialog.DialogHandler;
 import net.ilexiconn.qubble.server.model.ModelHandler;
 import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
-import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
@@ -186,8 +186,7 @@ public class QubbleGUI extends GuiScreen {
             try {
                 QubbleModel model;
                 if (modelImporter == null) {
-                    model = new QubbleModel();
-                    model.deserializeNBT(CompressedStreamTools.readCompressed(new FileInputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, component.getSelected() + ".qbl"))));
+                    model = QubbleModel.deserialize(CompressedStreamTools.readCompressed(new FileInputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, component.getSelected() + ".qbl"))));
                 } else {
                     model = modelImporter.getModel(component.getSelected(), modelImporter.read(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, component.getSelected() + "." + modelImporter.getExtension())));
                 }

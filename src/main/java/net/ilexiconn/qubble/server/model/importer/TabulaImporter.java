@@ -1,11 +1,11 @@
 package net.ilexiconn.qubble.server.model.importer;
 
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.model.tabula.TabulaModelHandler;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaCubeContainer;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaCubeGroupContainer;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaModelContainer;
-import net.ilexiconn.qubble.server.model.qubble.QubbleCube;
-import net.ilexiconn.qubble.server.model.qubble.QubbleModel;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,7 +33,10 @@ public class TabulaImporter implements IModelImporter<TabulaModelContainer> {
         for (TabulaCubeGroupContainer cubeGroup : model.getCubeGroups()) {
             cubes.addAll(this.addChildrenFromGroup(null, cubeGroup));
         }
-        return new QubbleModel(model.getName(), fileName, model.getAuthor(), 1, model.getTextureWidth(), model.getTextureHeight(), cubes, new ArrayList<>());
+        QubbleModel qubble = QubbleModel.create(model.getName(), model.getAuthor(), model.getTextureWidth(), model.getTextureHeight());
+        qubble.getCubes().addAll(cubes);
+        qubble.setFileName(fileName);
+        return qubble;
     }
 
     @Override
@@ -52,7 +55,15 @@ public class TabulaImporter implements IModelImporter<TabulaModelContainer> {
     public List<QubbleCube> addChildren(QubbleCube parent, List<TabulaCubeContainer> cubes) {
         List<QubbleCube> list = new ArrayList<>();
         for (TabulaCubeContainer cube : cubes) {
-            QubbleCube qubble = new QubbleCube(cube.getName(), new ArrayList<>(), cube.getDimensions(), doubleToFloat(cube.getPosition()), doubleToFloat(cube.getOffset()), doubleToFloat(cube.getRotation()), doubleToFloat(cube.getScale()), cube.getTextureOffset(), cube.isTextureMirrorEnabled(), (float) cube.getOpacity());
+            QubbleCube qubble = QubbleCube.create(cube.getName());
+            qubble.setDimensions(cube.getDimensions()[0], cube.getDimensions()[1], cube.getDimensions()[2]);
+            qubble.setPosition((float) cube.getPosition()[0], (float) cube.getPosition()[1], (float) cube.getPosition()[2]);
+            qubble.setOffset((float) cube.getOffset()[0], (float) cube.getOffset()[1], (float) cube.getOffset()[2]);
+            qubble.setRotation((float) cube.getRotation()[0], (float) cube.getRotation()[1], (float) cube.getRotation()[2]);
+            qubble.setScale((float) cube.getScale()[0], (float) cube.getScale()[1], (float) cube.getScale()[2]);
+            qubble.setTexture(cube.getTextureOffset()[0], cube.getTextureOffset()[1]);
+            qubble.setTextureMirrored(cube.isTextureMirrorEnabled());
+            qubble.setOpacity((float) cube.getOpacity());
             if (parent == null) {
                 list.add(qubble);
             } else {
@@ -69,13 +80,5 @@ public class TabulaImporter implements IModelImporter<TabulaModelContainer> {
             list.addAll(this.addChildrenFromGroup(parent, group));
         }
         return list;
-    }
-
-    public float[] doubleToFloat(double[] doubleArray) {
-        float[] floatArray = new float[doubleArray.length];
-        for (int i = 0; i < doubleArray.length; i++) {
-            floatArray[i] = (float) doubleArray[i];
-        }
-        return floatArray;
     }
 }
