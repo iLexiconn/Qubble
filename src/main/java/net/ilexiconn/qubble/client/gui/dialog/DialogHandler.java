@@ -38,6 +38,15 @@ public enum DialogHandler {
         }
     }
 
+    public <T extends GuiScreen> void update(T gui) {
+        if (this.dialogMap.containsKey(gui)) {
+            List<Dialog<T>> dialogList = (List<Dialog<T>>) ((List<?>) this.dialogMap.get(gui));
+            for (Dialog<T> dialog : dialogList) {
+                dialog.update();
+            }
+        }
+    }
+
     public <T extends GuiScreen> boolean render(T gui, float mouseX, float mouseY, float partialTicks) {
         boolean flag = false;
         if (this.dialogMap.containsKey(gui)) {

@@ -50,6 +50,12 @@ public class Dialog<T extends GuiScreen> {
         this.components.add((IComponent<T>) component);
     }
 
+    public void update() {
+        for (IComponent<T> component : this.components) {
+            component.update(this.gui);
+        }
+    }
+
     public void render(float mouseX, float mouseY, float partialTicks) {
         double drawX = QubbleGUI.interpolate(this.prevPosX, this.posX, partialTicks);
         double drawY = QubbleGUI.interpolate(this.prevPosY, this.posY, partialTicks);

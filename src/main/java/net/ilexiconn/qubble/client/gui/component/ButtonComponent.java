@@ -50,6 +50,11 @@ public class ButtonComponent extends Gui implements IComponent<GuiScreen> {
     }
 
     @Override
+    public void update(GuiScreen gui) {
+
+    }
+
+    @Override
     public void render(GuiScreen gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
         boolean selected = this.isSelected(mouseX, mouseY);
         GlStateManager.disableTexture2D();

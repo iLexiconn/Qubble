@@ -50,6 +50,11 @@ public class SelectionListComponent extends Gui implements IComponent<GuiScreen>
     }
 
     @Override
+    public void update(GuiScreen gui) {
+
+    }
+
+    @Override
     public void render(GuiScreen gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
         int primaryColor = QubbleGUI.getPrimaryColor();
         int secondaryColor = QubbleGUI.getSecondaryColor();

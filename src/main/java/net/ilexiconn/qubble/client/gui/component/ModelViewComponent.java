@@ -44,6 +44,11 @@ public class ModelViewComponent implements IComponent<QubbleGUI> {
     private float partialTicks;
 
     @Override
+    public void update(QubbleGUI gui) {
+
+    }
+
+    @Override
     public void render(QubbleGUI gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
         GlStateManager.disableLighting();
         GlStateManager.disableTexture2D();

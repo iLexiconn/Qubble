@@ -32,6 +32,15 @@ public enum ComponentHandler {
         }
     }
 
+    public <T extends GuiScreen> void update(T gui) {
+        if (this.componentMap.containsKey(gui)) {
+            List<IComponent<T>> componentList = (List<IComponent<T>>) ((List<?>) this.componentMap.get(gui));
+            for (IComponent<T> component : componentList) {
+                component.update(gui);
+            }
+        }
+    }
+
     public <T extends GuiScreen> void render(T gui, float mouseX, float mouseY, float partialTicks) {
         if (this.componentMap.containsKey(gui)) {
             List<IComponent<T>> componentList = (List<IComponent<T>>) ((List<?>) this.componentMap.get(gui));

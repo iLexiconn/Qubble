@@ -6,6 +6,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public interface IComponent<T extends GuiScreen> {
+    void update(T gui);
+
     void render(T gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks);
 
     void renderAfter(T gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks);

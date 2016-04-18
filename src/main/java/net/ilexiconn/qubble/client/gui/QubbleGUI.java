@@ -123,6 +123,12 @@ public class QubbleGUI extends GuiScreen {
     }
 
     @Override
+    public void updateScreen() {
+        DialogHandler.INSTANCE.update(this);
+        ComponentHandler.INSTANCE.update(this);
+    }
+
+    @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
