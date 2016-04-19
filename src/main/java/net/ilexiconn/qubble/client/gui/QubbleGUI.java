@@ -5,7 +5,6 @@ import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.element.*;
-import net.ilexiconn.qubble.server.model.ModelHandler;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
@@ -30,7 +29,7 @@ public class QubbleGUI extends GuiScreen {
     private ScaledResolution resolution;
     private ToolbarElement toolbar;
     private ModelTreeElement modelTree;
-    private ModelViewElement viewElement;
+    private ModelViewElement modelView;
 
     private QubbleModel selectedModel;
     private QubbleCube selectedCube;
@@ -42,7 +41,7 @@ public class QubbleGUI extends GuiScreen {
     @Override
     public void initGui() {
         ElementHandler.INSTANCE.clearGUI(this);
-        ElementHandler.INSTANCE.addElement(this, this.viewElement = new ModelViewElement(this));
+        ElementHandler.INSTANCE.addElement(this, this.modelView = new ModelViewElement(this));
         ElementHandler.INSTANCE.addElement(this, this.toolbar = new ToolbarElement(this));
         ElementHandler.INSTANCE.addElement(this, this.modelTree = new ModelTreeElement(this));
         ElementHandler.INSTANCE.init(this);
@@ -176,7 +175,7 @@ public class QubbleGUI extends GuiScreen {
         return this.modelTree;
     }
 
-    public void openWindow(WindowElement window) {
-        ElementHandler.INSTANCE.insertElement(this, window);
+    public ModelViewElement getModelView() {
+        return this.modelView;
     }
 }

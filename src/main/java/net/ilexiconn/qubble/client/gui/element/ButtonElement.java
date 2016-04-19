@@ -15,7 +15,7 @@ public class ButtonElement extends Element<QubbleGUI> {
     private int secondaryColor = Qubble.CONFIG.getPrimaryColor();
     private IActionHandler<QubbleGUI, ButtonElement> actionHandler;
 
-    public ButtonElement(QubbleGUI gui, String text, float posX, float posY, float width, float height, IActionHandler<QubbleGUI, ButtonElement> actionHandler) {
+    public ButtonElement(QubbleGUI gui, String text, float posX, float posY, int width, int height, IActionHandler<QubbleGUI, ButtonElement> actionHandler) {
         super(gui, posX, posY, width, height);
         this.text = text;
         this.actionHandler = actionHandler;
@@ -29,7 +29,11 @@ public class ButtonElement extends Element<QubbleGUI> {
             this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), getHeight(), this.primaryColor);
         }
         FontRenderer fontRenderer = this.getGUI().mc.fontRendererObj;
-        fontRenderer.drawString(this.text, this.getPosX() + (this.getWidth() / 2) - (fontRenderer.getStringWidth(this.text) / 2), this.getPosY() + (this.getHeight() / 2) - (fontRenderer.FONT_HEIGHT / 2), Qubble.CONFIG.getTextColor(), false);
+        if (this.text.length() == 1) {
+            fontRenderer.drawString(this.text, this.getPosX() + (this.getWidth() / 2) - (fontRenderer.getStringWidth(this.text) / 2) + 0.0625F, this.getPosY() + (this.getHeight() / 2) - (fontRenderer.FONT_HEIGHT / 2) + 0.0625F, Qubble.CONFIG.getTextColor(), false);
+        } else {
+            fontRenderer.drawString(this.text, this.getPosX() + (this.getWidth() / 2) - (fontRenderer.getStringWidth(this.text) / 2), this.getPosY() + (this.getHeight() / 2) - (fontRenderer.FONT_HEIGHT / 2), Qubble.CONFIG.getTextColor(), false);
+        }
     }
 
     @Override

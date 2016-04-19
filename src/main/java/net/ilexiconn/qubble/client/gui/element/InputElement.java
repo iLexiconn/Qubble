@@ -23,7 +23,7 @@ public class InputElement extends Element<QubbleGUI> {
     private int selectionEnd;
     private int cursorCounter;
 
-    public InputElement(QubbleGUI gui, String text, float posX, float posY, float width) {
+    public InputElement(QubbleGUI gui, String text, float posX, float posY, int width) {
         super(gui, posX, posY, width, 14);
         this.text = text;
     }
@@ -38,7 +38,7 @@ public class InputElement extends Element<QubbleGUI> {
         this.getGUI().drawRectangle(this.getPosX() + 1, this.getPosY() + 1, this.getWidth() - 1, this.getHeight() - 1, Qubble.CONFIG.getSecondaryColor());
         int cursor = this.cursorPosition - this.lineScrollOffset;
         int cursorEnd = this.selectionEnd - this.lineScrollOffset;
-        String displayString = this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), (int) this.getWidth());
+        String displayString = this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
         boolean verticalCursor = cursor >= 0 && cursor <= displayString.length();
         boolean renderCursor = this.selected && this.cursorCounter / 6 % 2 == 0 && verticalCursor;
         float x = this.getPosX();
@@ -87,7 +87,7 @@ public class InputElement extends Element<QubbleGUI> {
         this.selected = this.isMouseSelecting(mouseX, mouseY);
         if (this.selected && button == 0) {
             int width = (int) (mouseX - this.getPosX() - 1);
-            String displayString = this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), (int) this.getWidth());
+            String displayString = this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
             this.setCursorPosition(this.getGUI().mc.fontRendererObj.trimStringToWidth(displayString, width).length() + this.lineScrollOffset);
         }
         return false;
@@ -320,11 +320,11 @@ public class InputElement extends Element<QubbleGUI> {
             this.lineScrollOffset = textLength;
         }
 
-        String displayText = this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), (int) this.getWidth());
+        String displayText = this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
         int offset = displayText.length() + this.lineScrollOffset;
 
         if (position == this.lineScrollOffset) {
-            this.lineScrollOffset -= this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text, (int) this.getWidth(), true).length();
+            this.lineScrollOffset -= this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text, this.getWidth(), true).length();
         }
 
         if (position > offset) {

@@ -24,7 +24,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
     private int entryCount;
 
     public ModelTreeElement(QubbleGUI gui) {
-        super(gui, 0.0F, 20.0F, 100.0F, gui.height - 20.0F);
+        super(gui, 0.0F, 20.0F, 100, gui.height - 20);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
         if (this.resizing) {
-            this.setWidth(Math.max(50.0F, Math.min(300.0F, mouseX - this.getPosX())));
+            this.setWidth((int) Math.max(50, Math.min(300, mouseX - this.getPosX())));
             return true;
         } else if (this.scrolling) {
             float maxDisplayEntries = (int) (this.getHeight() / 10.0F);

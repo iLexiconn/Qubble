@@ -25,7 +25,7 @@ public class ListElement extends Element<QubbleGUI> {
     private boolean scrolling;
     private float scrollPerEntry;
 
-    public ListElement(QubbleGUI gui, float posX, float posY, float width, float height, List<String> entries, IActionHandler<QubbleGUI, ListElement> actionHandler) {
+    public ListElement(QubbleGUI gui, float posX, float posY, int width, int height, List<String> entries, IActionHandler<QubbleGUI, ListElement> actionHandler) {
         super(gui, posX, posY, width, height);
         this.entries = entries;
         this.actionHandler = actionHandler;

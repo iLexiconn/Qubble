@@ -22,19 +22,15 @@ public enum ElementHandler {
         }
     }
 
-    public <T extends GuiScreen> void insertElement(T gui, Element<T> element) {
-        if (this.elementMap.containsKey(gui)) {
-            this.elementMap.get(gui).add(0, element);
-        } else {
-            List<Element<?>> elementList = new ArrayList<>();
-            elementList.add(element);
-            this.elementMap.put(gui, elementList);
-        }
-    }
-
     public <T extends GuiScreen> void addElement(T gui, Element<T> element) {
         if (this.elementMap.containsKey(gui)) {
-            this.elementMap.get(gui).add(element);
+            List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
+            if (element instanceof WindowElement) {
+                List<Element<T>> remove = new ArrayList<>();
+                elementList.stream().filter(e -> e instanceof WindowElement).forEach(remove::add);
+                elementList.removeAll(remove);
+            }
+            elementList.add(element);
         } else {
             List<Element<?>> elementList = new ArrayList<>();
             elementList.add(element);
@@ -70,7 +66,9 @@ public enum ElementHandler {
         if (this.elementMap.containsKey(gui)) {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
             for (Element<T> element : new ArrayList<>(elementList)) {
-                element.init();
+                if (element.isVisible()) {
+                    element.init();
+                }
             }
         }
     }
@@ -79,7 +77,9 @@ public enum ElementHandler {
         if (this.elementMap.containsKey(gui)) {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
             for (Element<T> element : elementList) {
-                element.update();
+                if (element.isVisible()) {
+                    element.update();
+                }
             }
         }
     }
@@ -89,12 +89,16 @@ public enum ElementHandler {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
             for (Element<T> element : elementList) {
                 if (!(element instanceof WindowElement)) {
-                    element.render(mouseX, mouseY, partialTicks);
+                    if (element.isVisible()) {
+                        element.render(mouseX, mouseY, partialTicks);
+                    }
                 }
             }
             for (Element<T> element : elementList) {
                 if (element instanceof WindowElement) {
-                    element.render(mouseX, mouseY, partialTicks);
+                    if (element.isVisible()) {
+                        element.render(mouseX, mouseY, partialTicks);
+                    }
                 }
             }
         }
@@ -105,12 +109,16 @@ public enum ElementHandler {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
             for (Element<T> element : elementList) {
                 if (!(element instanceof WindowElement)) {
-                    element.renderAfter(mouseX, mouseY, partialTicks);
+                    if (element.isVisible()) {
+                        element.renderAfter(mouseX, mouseY, partialTicks);
+                    }
                 }
             }
             for (Element<T> element : elementList) {
                 if (element instanceof WindowElement) {
-                    element.renderAfter(mouseX, mouseY, partialTicks);
+                    if (element.isVisible()) {
+                        element.renderAfter(mouseX, mouseY, partialTicks);
+                    }
                 }
             }
         }
@@ -119,9 +127,11 @@ public enum ElementHandler {
     public <T extends GuiScreen> void mouseClicked(T gui, float mouseX, float mouseY, int button) {
         if (this.elementMap.containsKey(gui)) {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
-            for (Element<T> element : elementList) {
-                if (element.mouseClicked(mouseX, mouseY, button)) {
-                    return;
+            for (Element<T> element : Lists.reverse(elementList)) {
+                if (element.isVisible()) {
+                    if (element.mouseClicked(mouseX, mouseY, button)) {
+                        return;
+                    }
                 }
             }
         }
@@ -130,9 +140,11 @@ public enum ElementHandler {
     public <T extends GuiScreen> void mouseDragged(T gui, float mouseX, float mouseY, int button, long timeSinceClick) {
         if (this.elementMap.containsKey(gui)) {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
-            for (Element<T> element : elementList) {
-                if (element.mouseDragged(mouseX, mouseY, button, timeSinceClick)) {
-                    return;
+            for (Element<T> element : Lists.reverse(elementList)) {
+                if (element.isVisible()) {
+                    if (element.mouseDragged(mouseX, mouseY, button, timeSinceClick)) {
+                        return;
+                    }
                 }
             }
         }
@@ -141,9 +153,11 @@ public enum ElementHandler {
     public <T extends GuiScreen> void mouseReleased(T gui, float mouseX, float mouseY, int button) {
         if (this.elementMap.containsKey(gui)) {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
-            for (Element<T> element : elementList) {
-                if (element.mouseReleased(mouseX, mouseY, button)) {
-                    return;
+            for (Element<T> element : Lists.reverse(elementList)) {
+                if (element.isVisible()) {
+                    if (element.mouseReleased(mouseX, mouseY, button)) {
+                        return;
+                    }
                 }
             }
         }
@@ -153,8 +167,10 @@ public enum ElementHandler {
         if (this.elementMap.containsKey(gui)) {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
             for (Element<T> element : Lists.reverse(elementList)) {
-                if (element.keyPressed(character, key)) {
-                    return;
+                if (element.isVisible()) {
+                    if (element.keyPressed(character, key)) {
+                        return;
+                    }
                 }
             }
         }
