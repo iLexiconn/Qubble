@@ -6,6 +6,15 @@ public enum ModelImporters {
     TECHNE(new TechneImporter());
 
     public static final ModelImporters[] VALUES = values();
+    public static final IModelImporter<?>[] IMPORTERS;
+
+    static {
+        IMPORTERS = new IModelImporter<?>[ModelImporters.VALUES.length];
+        for (int i = 0; i < ModelImporters.IMPORTERS.length; i++) {
+            ModelImporters.IMPORTERS[i] = ModelImporters.VALUES[i].getModelImporter();
+        }
+    }
+
     private IModelImporter<?> modelImporter;
 
     ModelImporters(IModelImporter<?> modelImporter) {

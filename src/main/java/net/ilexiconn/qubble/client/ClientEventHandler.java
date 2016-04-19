@@ -62,7 +62,7 @@ public enum ClientEventHandler {
     @SubscribeEvent
     public void onButtonPressPre(GuiScreenEvent.ActionPerformedEvent.Pre event) {
         if (event.getGui() instanceof GuiMainMenu && event.getButton().id == ClientProxy.QUBBLE_BUTTON_ID) {
-            ClientProxy.MINECRAFT.displayGuiScreen(new QubbleGUI((GuiMainMenu) event.getGui()));
+            ClientProxy.MINECRAFT.displayGuiScreen(new QubbleGUI(event.getGui()));
         }
     }
 }

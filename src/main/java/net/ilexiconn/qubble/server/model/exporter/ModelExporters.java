@@ -9,6 +9,15 @@ public enum ModelExporters {
     TABULA(new TabulaExporter());
 
     public static final ModelExporters[] VALUES = values();
+    public static final IModelExporter<?>[] EXPORTERS;
+
+    static {
+        EXPORTERS = new IModelExporter<?>[ModelExporters.VALUES.length];
+        for (int i = 0; i < ModelExporters.EXPORTERS.length; i++) {
+            ModelExporters.EXPORTERS[i] = ModelExporters.VALUES[i].getModelExporter();
+        }
+    }
+
     private IModelExporter<?> modelExporter;
 
     ModelExporters(IModelExporter<?> modelExporter) {

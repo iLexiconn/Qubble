@@ -1,9 +1,7 @@
-package net.ilexiconn.qubble.client.gui.component;
+package net.ilexiconn.qubble.client.gui.element;
 
 import net.ilexiconn.qubble.Qubble;
-import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -17,43 +15,35 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
+public class InputElement extends Element<QubbleGUI> {
     private String text;
-    private int posX;
-    private int posY;
-    private int width;
-    private int height;
     private boolean selected;
     private int lineScrollOffset;
     private int cursorPosition;
     private int selectionEnd;
     private int cursorCounter;
 
-    public TextBoxComponent(String defaultText, int posX, int posY, int width, int height) {
-        this.text = defaultText;
-        this.posX = posX;
-        this.posY = posY;
-        this.width = width;
-        this.height = height;
+    public InputElement(QubbleGUI gui, String text, float posX, float posY, float width) {
+        super(gui, posX, posY, width, 14);
+        this.text = text;
     }
 
     @Override
-    public void update(GuiScreen gui) {
+    public void update() {
         this.cursorCounter++;
     }
 
     @Override
-    public void render(GuiScreen gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
-        this.drawGradientRect(this.posX + 1, this.posY + 1, this.posX + this.width - 1, this.posY + this.height - 1, QubbleGUI.getPrimaryColor(), selected ? QubbleGUI.getSecondaryColor() : QubbleGUI.getPrimaryColor());
-        QubbleGUI.drawOutline(this.posX, this.posY, this.width, this.height, Qubble.CONFIG.getAccentColor(), 1);
+    public void render(float mouseX, float mouseY, float partialTicks) {
+        this.getGUI().drawRectangle(this.getPosX() + 1, this.getPosY() + 1, this.getWidth() - 1, this.getHeight() - 1, Qubble.CONFIG.getSecondaryColor());
         int cursor = this.cursorPosition - this.lineScrollOffset;
         int cursorEnd = this.selectionEnd - this.lineScrollOffset;
-        String displayString = gui.mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.width);
+        String displayString = this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), (int) this.getWidth());
         boolean verticalCursor = cursor >= 0 && cursor <= displayString.length();
         boolean renderCursor = this.selected && this.cursorCounter / 6 % 2 == 0 && verticalCursor;
-        int x = this.posX;
-        int y = this.posY;
-        int line = x;
+        float x = this.getPosX();
+        float y = this.getPosY();
+        float line = x;
 
         if (cursorEnd > displayString.length()) {
             cursorEnd = displayString.length();
@@ -61,64 +51,50 @@ public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
 
         if (!displayString.isEmpty()) {
             String s = verticalCursor ? displayString.substring(0, cursor) : displayString;
-            line = gui.mc.fontRendererObj.drawString(s, x + 3, y + height / 2 - gui.mc.fontRendererObj.FONT_HEIGHT / 2, QubbleGUI.getTextColor());
+            line = this.getGUI().mc.fontRendererObj.drawString(s, x + 3, y + 1 + getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2, Qubble.CONFIG.getTextColor(), false);
         }
 
         boolean renderVerticalCursor = this.cursorPosition < this.text.length();
-        int lineX = line;
+        float lineX = line;
 
         if (!verticalCursor) {
-            lineX = cursor > 0 ? x + this.width : x;
+            lineX = cursor > 0 ? x + this.getWidth() : x;
         } else if (renderVerticalCursor) {
             lineX = line - 1;
             --line;
         }
 
         if (!displayString.isEmpty() && verticalCursor && cursor < displayString.length()) {
-            gui.mc.fontRendererObj.drawString(displayString.substring(cursor), line + 1, y + this.height / 2 - gui.mc.fontRendererObj.FONT_HEIGHT / 2, QubbleGUI.getTextColor());
+            this.getGUI().mc.fontRendererObj.drawString(displayString.substring(cursor), line + 1, y + 1 + this.getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2, Qubble.CONFIG.getTextColor(), false);
         }
 
         if (renderCursor) {
             if (renderVerticalCursor) {
-                Gui.drawRect(lineX, y + 2, lineX + 1, y + this.height / 2 - gui.mc.fontRendererObj.FONT_HEIGHT / 2 + 1 + gui.mc.fontRendererObj.FONT_HEIGHT, Qubble.CONFIG.getAccentColor());
+                this.getGUI().drawRectangle(lineX, y + 1, 1, this.getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2 + 1 + this.getGUI().mc.fontRendererObj.FONT_HEIGHT, Qubble.CONFIG.getPrimaryColor());
             } else {
-                gui.mc.fontRendererObj.drawString("_", lineX, y + this.height / 2 - gui.mc.fontRendererObj.FONT_HEIGHT / 2, Qubble.CONFIG.getAccentColor());
+                this.getGUI().mc.fontRendererObj.drawString("_", cursor == 0 ? lineX + 3 : lineX, y + 1 + this.getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2, Qubble.CONFIG.getPrimaryColor(), false);
             }
         }
 
         if (cursorEnd != cursor) {
-            int selectionWidth = x + gui.mc.fontRendererObj.getStringWidth(displayString.substring(0, cursorEnd));
-            this.drawCursorVertical(lineX + (selectionEnd > cursorPosition ? 0 : 1), y + 1, selectionWidth + (selectionEnd < cursorPosition ? 2 : 3), y + height / 2 - gui.mc.fontRendererObj.FONT_HEIGHT / 2 + 2 + gui.mc.fontRendererObj.FONT_HEIGHT);
+            float selectionWidth = x + this.getGUI().mc.fontRendererObj.getStringWidth(displayString.substring(0, cursorEnd));
+            this.drawCursorVertical(lineX + (selectionEnd > cursorPosition ? 0 : 1), y + 1, selectionWidth + (selectionEnd < cursorPosition ? 2 : 3), y + getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2 + 2 + this.getGUI().mc.fontRendererObj.FONT_HEIGHT);
         }
     }
 
     @Override
-    public void renderAfter(GuiScreen gui, float mouseX, float mouseY, double offsetX, double offsetY, float partialTicks) {
-    }
-
-    @Override
-    public boolean mouseClicked(GuiScreen gui, float mouseX, float mouseY, int button) {
+    public boolean mouseClicked(float mouseX, float mouseY, int button) {
         this.selected = this.isMouseSelecting(mouseX, mouseY);
         if (this.selected && button == 0) {
-            int width = (int) (mouseX - this.posX - 1);
-            String displayString = gui.mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.width);
-            this.setCursorPosition(gui.mc.fontRendererObj.trimStringToWidth(displayString, width).length() + this.lineScrollOffset);
+            int width = (int) (mouseX - this.getPosX() - 1);
+            String displayString = this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), (int) this.getWidth());
+            this.setCursorPosition(this.getGUI().mc.fontRendererObj.trimStringToWidth(displayString, width).length() + this.lineScrollOffset);
         }
         return false;
     }
 
     @Override
-    public boolean mouseDragged(GuiScreen gui, float mouseX, float mouseY, int button, long timeSinceClick) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseReleased(GuiScreen gui, float mouseX, float mouseY, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean keyPressed(GuiScreen gui, char character, int key) {
+    public boolean keyPressed(char character, int key) {
         if (!this.selected) {
             return false;
         }
@@ -204,7 +180,7 @@ public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
     }
 
     private boolean isMouseSelecting(float mouseX, float mouseY) {
-        return mouseX >= this.posX && mouseX < this.posX + this.width && mouseY >= this.posY && mouseY < this.posY + this.height;
+        return mouseX >= this.getPosX() && mouseX < this.getPosX() + this.getWidth() && mouseY >= this.getPosY() && mouseY < this.getPosY() + this.getHeight();
     }
 
     public String getText() {
@@ -344,11 +320,11 @@ public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
             this.lineScrollOffset = textLength;
         }
 
-        String displayText = ClientProxy.MINECRAFT.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.width);
+        String displayText = this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), (int) this.getWidth());
         int offset = displayText.length() + this.lineScrollOffset;
 
         if (position == this.lineScrollOffset) {
-            this.lineScrollOffset -= ClientProxy.MINECRAFT.fontRendererObj.trimStringToWidth(this.text, this.width, true).length();
+            this.lineScrollOffset -= this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text, (int) this.getWidth(), true).length();
         }
 
         if (position > offset) {
@@ -360,25 +336,25 @@ public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
         this.lineScrollOffset = MathHelper.clamp_int(this.lineScrollOffset, 0, textLength);
     }
 
-    private void drawCursorVertical(int startX, int startY, int endX, int endY) {
+    private void drawCursorVertical(float startX, float startY, float endX, float endY) {
         if (startX < endX) {
-            int prevStartX = startX;
+            float prevStartX = startX;
             startX = endX;
             endX = prevStartX;
         }
 
         if (startY < endY) {
-            int prevStartY = startY;
+            float prevStartY = startY;
             startY = endY;
             endY = prevStartY;
         }
 
-        if (endX > this.posX + this.width) {
-            endX = this.posY + this.width;
+        if (endX > this.getPosX() + this.getWidth()) {
+            endX = this.getPosY() + this.getWidth();
         }
 
-        if (startX > this.posX + this.width) {
-            startX = this.posY + this.width;
+        if (startX > this.getPosX() + this.getWidth()) {
+            startX = this.getPosY() + this.getWidth();
         }
 
         Tessellator tessellator = Tessellator.getInstance();
