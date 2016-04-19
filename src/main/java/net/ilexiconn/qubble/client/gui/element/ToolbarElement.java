@@ -1,9 +1,11 @@
 package net.ilexiconn.qubble.client.gui.element;
 
 import com.google.common.collect.Lists;
+import net.ilexiconn.llibrary.server.config.ConfigEntry;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
+import net.ilexiconn.qubble.server.config.QubbleConfig;
 import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
 import net.ilexiconn.qubble.server.model.exporter.ModelExporters;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
@@ -79,7 +81,39 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
     public void openOptionsWindow() {
         WindowElement optionsWindow = new WindowElement(this.getGUI(), "Options", 200, 200);
-        optionsWindow.addElement(new ColorElement(this.getGUI(), 2, 16, 195, 82));
+        optionsWindow.addElement(new ColorElement(this.getGUI(), 2, 16, 195, 149, (gui, element) -> {
+            try {
+                String[] colors = QubbleConfig.class.getField("accentColor").getAnnotation(ConfigEntry.class).validValues();
+                Qubble.CONFIG.accentColor = colors[element.getColor()];
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            }
+        }));
+
+        final CheckboxElement dark = new CheckboxElement(this.getGUI(), 32.5F, 174.5F).withSelection(Qubble.CONFIG.mode.equals("dark"));
+        final CheckboxElement light = new CheckboxElement(this.getGUI(), 122.5F, 174.5F).withSelection(Qubble.CONFIG.mode.equals("light"));
+        optionsWindow.addElement(dark.withActionHandler((selected) -> {
+            if (!Qubble.CONFIG.mode.equals("dark")) {
+                Qubble.CONFIG.mode = "dark";
+                light.withSelection(false);
+                return true;
+            } else {
+                return false;
+            }
+        }));
+        optionsWindow.addElement(light.withActionHandler((selected) -> {
+            if (!Qubble.CONFIG.mode.equals("light")) {
+                Qubble.CONFIG.mode = "light";
+                dark.withSelection(false);
+                return true;
+            } else {
+                return false;
+            }
+        }));
+
+        optionsWindow.addElement(new TextElement(this.getGUI(), "Dark", 50, 178));
+        optionsWindow.addElement(new TextElement(this.getGUI(), "Light", 140, 178));
+
         ElementHandler.INSTANCE.addElement(this.getGUI(), optionsWindow);
     }
 

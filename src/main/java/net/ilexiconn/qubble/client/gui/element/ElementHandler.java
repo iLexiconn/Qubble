@@ -24,13 +24,7 @@ public enum ElementHandler {
 
     public <T extends GuiScreen> void addElement(T gui, Element<T> element) {
         if (this.elementMap.containsKey(gui)) {
-            List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
-            if (element instanceof WindowElement) {
-                List<Element<T>> remove = new ArrayList<>();
-                elementList.stream().filter(e -> e instanceof WindowElement).forEach(remove::add);
-                elementList.removeAll(remove);
-            }
-            elementList.add(element);
+            this.elementMap.get(gui).add(element);
         } else {
             List<Element<?>> elementList = new ArrayList<>();
             elementList.add(element);
