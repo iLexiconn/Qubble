@@ -4,9 +4,7 @@ import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
-import net.ilexiconn.qubble.client.gui.element.ElementHandler;
-import net.ilexiconn.qubble.client.gui.element.ModelTreeElement;
-import net.ilexiconn.qubble.client.gui.element.ToolbarElement;
+import net.ilexiconn.qubble.client.gui.element.*;
 import net.ilexiconn.qubble.server.model.ModelHandler;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.minecraft.client.gui.Gui;
@@ -32,6 +30,7 @@ public class QubbleGUI extends GuiScreen {
     private ScaledResolution resolution;
     private ToolbarElement toolbar;
     private ModelTreeElement modelTree;
+    private ModelViewElement viewElement;
 
     private QubbleModel selectedModel;
     private QubbleCube selectedCube;
@@ -43,6 +42,7 @@ public class QubbleGUI extends GuiScreen {
     @Override
     public void initGui() {
         ElementHandler.INSTANCE.clearGUI(this);
+        ElementHandler.INSTANCE.addElement(this, this.viewElement = new ModelViewElement(this));
         ElementHandler.INSTANCE.addElement(this, this.toolbar = new ToolbarElement(this));
         ElementHandler.INSTANCE.addElement(this, this.modelTree = new ModelTreeElement(this));
         ElementHandler.INSTANCE.init(this);
@@ -170,5 +170,13 @@ public class QubbleGUI extends GuiScreen {
 
     public QubbleCube getSelectedCube() {
         return this.selectedCube;
+    }
+
+    public ModelTreeElement getModelTree() {
+        return this.modelTree;
+    }
+
+    public void openWindow(WindowElement window) {
+        ElementHandler.INSTANCE.insertElement(this, window);
     }
 }

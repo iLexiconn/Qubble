@@ -43,10 +43,10 @@ public class ToolbarElement extends Element<QubbleGUI> {
         WindowElement exportWindow = new WindowElement(this.getGUI(), "Export", 100, 100);
         exportWindow.addElement(new ListElement(this.getGUI(), 2, 16, 96, 82, Lists.newArrayList(ModelExporters.EXPORTERS).stream().map(IModelExporter::getName).collect(Collectors.toList()), (gui, element) -> System.out.println(element.getSelected())));
 
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "Open", 0, 0, 30, 20, (g, e) -> ElementHandler.INSTANCE.addElement(g, openWindow)).withColorScheme(Qubble.CONFIG.getAccentColor(), Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.getAccentColor())));
+        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "Open", 0, 0, 30, 20, (g, e) -> g.openWindow(openWindow)).withColorScheme(Qubble.CONFIG.getAccentColor(), Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.getAccentColor())));
         ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "Save", 30, 0, 30, 20, (g, e) -> System.out.println(e.getText())).withColorScheme(Qubble.CONFIG.getAccentColor(), Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.getAccentColor())));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "Import", 60, 0, 40, 20, (g, e) -> ElementHandler.INSTANCE.addElement(g, importWindow)).withColorScheme(Qubble.CONFIG.getAccentColor(), Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.getAccentColor())));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "Export", 100, 0, 40, 20, (g, e) -> ElementHandler.INSTANCE.addElement(g, exportWindow)).withColorScheme(Qubble.CONFIG.getAccentColor(), Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.getAccentColor())));
+        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "Import", 60, 0, 40, 20, (g, e) -> g.openWindow(importWindow)).withColorScheme(Qubble.CONFIG.getAccentColor(), Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.getAccentColor())));
+        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "Export", 100, 0, 40, 20, (g, e) -> g.openWindow(exportWindow)).withColorScheme(Qubble.CONFIG.getAccentColor(), Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.getAccentColor())));
 
         ElementHandler.INSTANCE.addElement(this.getGUI(), this.modelButton = new ButtonElement(this.getGUI(), "Model", this.getGUI().width - 230, 0, 40, 20, (e, g) -> {
             this.modelButton.withColorScheme(Qubble.CONFIG.getPrimaryColor(), Qubble.CONFIG.getPrimaryColor());

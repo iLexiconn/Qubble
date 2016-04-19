@@ -22,6 +22,16 @@ public enum ElementHandler {
         }
     }
 
+    public <T extends GuiScreen> void insertElement(T gui, Element<T> element) {
+        if (this.elementMap.containsKey(gui)) {
+            this.elementMap.get(gui).add(0, element);
+        } else {
+            List<Element<?>> elementList = new ArrayList<>();
+            elementList.add(element);
+            this.elementMap.put(gui, elementList);
+        }
+    }
+
     public <T extends GuiScreen> void addElement(T gui, Element<T> element) {
         if (this.elementMap.containsKey(gui)) {
             this.elementMap.get(gui).add(element);
@@ -78,7 +88,14 @@ public enum ElementHandler {
         if (this.elementMap.containsKey(gui)) {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
             for (Element<T> element : elementList) {
-                element.render(mouseX, mouseY, partialTicks);
+                if (!(element instanceof WindowElement)) {
+                    element.render(mouseX, mouseY, partialTicks);
+                }
+            }
+            for (Element<T> element : elementList) {
+                if (element instanceof WindowElement) {
+                    element.render(mouseX, mouseY, partialTicks);
+                }
             }
         }
     }
@@ -87,7 +104,14 @@ public enum ElementHandler {
         if (this.elementMap.containsKey(gui)) {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
             for (Element<T> element : elementList) {
-                element.renderAfter(mouseX, mouseY, partialTicks);
+                if (!(element instanceof WindowElement)) {
+                    element.renderAfter(mouseX, mouseY, partialTicks);
+                }
+            }
+            for (Element<T> element : elementList) {
+                if (element instanceof WindowElement) {
+                    element.renderAfter(mouseX, mouseY, partialTicks);
+                }
             }
         }
     }
@@ -95,7 +119,7 @@ public enum ElementHandler {
     public <T extends GuiScreen> void mouseClicked(T gui, float mouseX, float mouseY, int button) {
         if (this.elementMap.containsKey(gui)) {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
-            for (Element<T> element : Lists.reverse(elementList)) {
+            for (Element<T> element : elementList) {
                 if (element.mouseClicked(mouseX, mouseY, button)) {
                     return;
                 }
@@ -106,7 +130,7 @@ public enum ElementHandler {
     public <T extends GuiScreen> void mouseDragged(T gui, float mouseX, float mouseY, int button, long timeSinceClick) {
         if (this.elementMap.containsKey(gui)) {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
-            for (Element<T> element : Lists.reverse(elementList)) {
+            for (Element<T> element : elementList) {
                 if (element.mouseDragged(mouseX, mouseY, button, timeSinceClick)) {
                     return;
                 }
@@ -117,7 +141,7 @@ public enum ElementHandler {
     public <T extends GuiScreen> void mouseReleased(T gui, float mouseX, float mouseY, int button) {
         if (this.elementMap.containsKey(gui)) {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
-            for (Element<T> element : Lists.reverse(elementList)) {
+            for (Element<T> element : elementList) {
                 if (element.mouseReleased(mouseX, mouseY, button)) {
                     return;
                 }

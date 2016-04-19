@@ -23,8 +23,9 @@ import java.util.Map;
 public class QubbleModelBase extends AdvancedModelBase {
     private QubbleModel model;
     private List<QubbleModelRenderer> rootCubes = new ArrayList<>();
+    private Map<Integer, QubbleCube> ids = new HashMap<>();
+    private Map<QubbleCube, QubbleModelRenderer> cubes = new HashMap<>();
     private int id;
-    private Map<Integer, QubbleModelRenderer> ids = new HashMap<>();
 
     public QubbleModelBase(QubbleModel model, boolean selection) {
         this.textureWidth = model.getTextureWidth();
@@ -54,7 +55,8 @@ public class QubbleModelBase extends AdvancedModelBase {
         box.rotateAngleX = (float) Math.toRadians(cube.getRotationX());
         box.rotateAngleY = (float) Math.toRadians(cube.getRotationY());
         box.rotateAngleZ = (float) Math.toRadians(cube.getRotationZ());
-        this.ids.put(this.id, box);
+        this.cubes.put(cube, box);
+        this.ids.put(this.id, cube);
         this.id++;
         return box;
     }
@@ -120,7 +122,11 @@ public class QubbleModelBase extends AdvancedModelBase {
         tessellator.draw();
     }
 
-    public QubbleModelRenderer getBox(int id) {
+    public QubbleCube getCube(int id) {
         return this.ids.get(id);
+    }
+
+    public QubbleModelRenderer getCube(QubbleCube cube) {
+        return this.cubes.get(cube);
     }
 }
