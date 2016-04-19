@@ -1,15 +1,14 @@
 package net.ilexiconn.qubble.client.gui.element;
 
 import com.google.common.collect.Lists;
-import net.ilexiconn.llibrary.server.config.ConfigEntry;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
-import net.ilexiconn.qubble.server.config.QubbleConfig;
 import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
 import net.ilexiconn.qubble.server.model.exporter.ModelExporters;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.ilexiconn.qubble.server.model.importer.ModelImporters;
+import net.ilexiconn.qubble.server.util.JSONUtil;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -77,13 +76,9 @@ public class ToolbarElement extends Element<QubbleGUI> {
     public void openOptionsWindow() {
         WindowElement optionsWindow = new WindowElement(this.getGUI(), "Options", 200, 200);
         optionsWindow.addElement(new ColorElement(this.getGUI(), 2, 16, 195, 149, (gui, element) -> {
-            try {
-                String[] colors = QubbleConfig.class.getField("accentColor").getAnnotation(ConfigEntry.class).validValues();
-                Qubble.CONFIG.accentColor = colors[element.getColor()];
-                this.setButtonColors(this.currentSelectedButton == 0, this.currentSelectedButton == 1, this.currentSelectedButton == 2);
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            }
+            Qubble.CONFIG.accentColor = element.getColor();
+            this.setButtonColors(this.currentSelectedButton == 0, this.currentSelectedButton == 1, this.currentSelectedButton == 2);
+            JSONUtil.saveConfig(Qubble.CONFIG, Qubble.CONFIG_FILE);
         }));
 
         final CheckboxElement dark = new CheckboxElement(this.getGUI(), 32.5F, 174.5F).withSelection(Qubble.CONFIG.mode.equals("dark"));
@@ -93,6 +88,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
                 Qubble.CONFIG.mode = "dark";
                 light.withSelection(false);
                 this.setButtonColors(this.currentSelectedButton == 0, this.currentSelectedButton == 1, this.currentSelectedButton == 2);
+                JSONUtil.saveConfig(Qubble.CONFIG, Qubble.CONFIG_FILE);
                 return true;
             } else {
                 return false;
@@ -103,6 +99,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
                 Qubble.CONFIG.mode = "light";
                 dark.withSelection(false);
                 this.setButtonColors(this.currentSelectedButton == 0, this.currentSelectedButton == 1, this.currentSelectedButton == 2);
+                JSONUtil.saveConfig(Qubble.CONFIG, Qubble.CONFIG_FILE);
                 return true;
             } else {
                 return false;
