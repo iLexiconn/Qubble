@@ -6,7 +6,6 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,9 +41,6 @@ public class WindowElement extends Element<QubbleGUI> {
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
         GlStateManager.pushMatrix();
-        GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        int scaleFactor = this.getGUI().getResolution().getScaleFactor();
-        GL11.glScissor((int) this.getPosX() * scaleFactor, (int) (this.getGUI().height - (getPosY() + (int) this.getHeight())) * scaleFactor + 1, (int) this.getWidth() * scaleFactor, (int) this.getHeight() * scaleFactor);
         this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), Qubble.CONFIG.getPrimaryColor());
         this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), 14, Qubble.CONFIG.getAccentColor());
         FontRenderer fontRenderer = this.getGUI().mc.fontRendererObj;
@@ -55,7 +51,6 @@ public class WindowElement extends Element<QubbleGUI> {
         for (Element<QubbleGUI> element : this.elementList) {
             element.render(mouseX, mouseY, partialTicks);
         }
-        GL11.glDisable(GL11.GL_SCISSOR_TEST);
         GlStateManager.popMatrix();
     }
 

@@ -6,10 +6,10 @@ import java.awt.*;
 
 public class QubbleConfig {
     @ConfigEntry(name = "Accent Color")
-    private String accentColor = "0x00746B";
+    public String accentColor = "0x00746B";
 
     @ConfigEntry(name = "Dark Mode")
-    private boolean darkMode = false;
+    public boolean darkMode = false;
 
     public int getPrimaryColor() {
         return this.darkMode ? 0xFF212121 : 0xFFCDCDCD;
