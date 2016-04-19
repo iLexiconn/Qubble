@@ -61,7 +61,6 @@ public class ModelViewElement extends Element<QubbleGUI> {
         GlStateManager.disableTexture2D();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         QubbleGUI gui = this.getGUI();
-        gui.drawOutline(0, 20, gui.width, gui.height - 20, Qubble.CONFIG.getPrimaryColor(), 1);
         ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         int scaleFactor = scaledResolution.getScaleFactor();
@@ -104,11 +103,11 @@ public class ModelViewElement extends Element<QubbleGUI> {
         if (selection) {
             GlStateManager.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
         } else {
-            int color = Qubble.CONFIG.getSecondaryColor();
+            int color = Qubble.CONFIG.getTertiaryColor();
             float r = (float) (color >> 16 & 0xFF) / 255.0F;
             float g = (float) (color >> 8 & 0xFF) / 255.0F;
             float b = (float) (color & 0xFF) / 255.0F;
-            GlStateManager.clearColor(r * 0.8F, g * 0.8F, b * 0.8F, 1.0F);
+            GlStateManager.clearColor(r, g, b, 1.0F);
             GlStateManager.enableLighting();
             RenderHelper.enableGUIStandardItemLighting();
         }
