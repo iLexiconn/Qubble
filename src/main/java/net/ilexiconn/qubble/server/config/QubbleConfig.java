@@ -23,6 +23,14 @@ public class QubbleConfig {
         return this.darkMode ? 0xFF464646 : 0xFFECECEC;
     }
 
+    public int getPrimarySubcolor() {
+        return this.darkMode ? 0xFF212121 : 0xFFCDCDCD;
+    }
+
+    public int getSecondarySubcolor() {
+        return this.darkMode ? 0xFF1F1F1F : 0xFFC2C2C2;
+    }
+
     public int getTextColor() {
         return this.darkMode ? 0xFFFFFFFF : 0xFF000000;
     }

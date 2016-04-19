@@ -38,13 +38,13 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         float scaleFactor = gui.getResolution().getScaleFactor();
         GL11.glScissor((int) (posX * scaleFactor), (int) ((gui.height - (posY + height)) * scaleFactor), (int) (width * scaleFactor), (int) (height * scaleFactor));
-        gui.drawRectangle(posX, posY, width, 15.0F, Qubble.CONFIG.getPrimaryColor());
+        gui.drawRectangle(posX, posY, width, 15.0F, Qubble.CONFIG.getPrimarySubcolor());
 
         float scrollPerEntry = (float) this.entryCount / (this.getHeight() - 17.0F);
         int i = 0;
         float offset = this.scroll * scrollPerEntry * 10;
         for (float y = 15.0F - offset; y < height + offset; y += 10.0F) {
-            gui.drawRectangle(posX, posY + y, width, 10.0F, i % 2 == 0 ? Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.getSecondaryColor()) : Qubble.CONFIG.getPrimaryColor());
+            gui.drawRectangle(posX, posY + y, width, 10.0F, i % 2 == 0 ? Qubble.CONFIG.getSecondarySubcolor() : Qubble.CONFIG.getPrimarySubcolor());
             i++;
         }
 
@@ -148,7 +148,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         boolean expanded = this.isExpanded(cube);
         if (expanded) {
             for (QubbleCube child : cube.getChildren()) {
-                this.mouseDetectionCubeEntry(child, xOffset + 3, mouseX, mouseY, scrollPerEntry);
+                this.mouseDetectionCubeEntry(child, xOffset + 6, mouseX, mouseY, scrollPerEntry);
             }
         }
         if (cube.getChildren().size() > 0) {
@@ -172,13 +172,24 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         fontRenderer.drawString(name, entryX + 10, entryY, this.getGUI().getSelectedCube() == cube ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTextColor(), false);
         this.cubeY++;
         boolean expanded = this.isExpanded(cube);
+        int prevCubeY = this.cubeY;
+        int size = 0;
         if (expanded) {
+            int i = 0;
             for (QubbleCube child : cube.getChildren()) {
-                this.drawCubeEntry(child, xOffset + 3, scrollPerEntry);
+                if (i == cube.getChildren().size() - 1) {
+                    size = (this.cubeY + 1) - prevCubeY;
+                }
+                this.drawCubeEntry(child, xOffset + 6, scrollPerEntry);
+                i++;
             }
         }
+        int outlineColor = Qubble.CONFIG.getDarkerColor(0xFFACACAC);
+        this.getGUI().drawRectangle(entryX + 1 - 6, entryY + 3.5, 11, 0.75, outlineColor);
         if (cube.getChildren().size() > 0) {
-            int outlineColor = Qubble.CONFIG.getDarkerColor(0xFFACACAC);
+            if (expanded) {
+                this.getGUI().drawRectangle(entryX + 1, entryY + 3.5, 0.75, (size) * 10.0F, outlineColor);
+            }
             this.getGUI().drawRectangle(entryX + 2, entryY + 2, 4, 4, 0xFF464646);
             this.getGUI().drawRectangle(entryX + 3, entryY + 3.5, 2, 0.75, outlineColor);
             if (!expanded) {
