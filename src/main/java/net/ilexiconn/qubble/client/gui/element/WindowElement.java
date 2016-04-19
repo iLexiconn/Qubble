@@ -26,7 +26,7 @@ public class WindowElement extends Element<QubbleGUI> {
     public WindowElement(QubbleGUI gui, String name, int width, int height, int posX, int posY) {
         super(gui, posX, posY, width, height);
         this.name = name;
-        this.addElement(new ButtonElement(gui, "x", this.getWidth() - 14, 0, 14, 14, (g, c) -> ElementHandler.INSTANCE.removeElement(g, this)).withColorScheme(Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.getAccentColor()), 0xFFE04747));
+        this.addElement(new ButtonElement(gui, "x", this.getWidth() - 14, 0, 14, 14, (g, c) -> ElementHandler.INSTANCE.removeElement(g, this)).withReverseColors(true).withColorScheme(-1, 0xFFE04747));
     }
 
     public void addElement(Element<QubbleGUI> element) {

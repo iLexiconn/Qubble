@@ -11,9 +11,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class ButtonElement extends Element<QubbleGUI> {
     private String text;
-    private int primaryColor = Qubble.CONFIG.getSecondaryColor();
-    private int secondaryColor = Qubble.CONFIG.getPrimaryColor();
+    private int primaryColor = -1;
+    private int secondaryColor = -1;
     private IActionHandler<QubbleGUI, ButtonElement> actionHandler;
+    private boolean reverseColors = false;
 
     public ButtonElement(QubbleGUI gui, String text, float posX, float posY, int width, int height, IActionHandler<QubbleGUI, ButtonElement> actionHandler) {
         super(gui, posX, posY, width, height);
@@ -24,9 +25,9 @@ public class ButtonElement extends Element<QubbleGUI> {
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
         if (this.isSelected(mouseX, mouseY)) {
-            this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), getHeight(), this.secondaryColor);
+            this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), getHeight(), this.secondaryColor == -1 ? this.reverseColors ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.getAccentColor()) : this.secondaryColor);
         } else {
-            this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), getHeight(), this.primaryColor);
+            this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), getHeight(), this.primaryColor == -1 ? this.reverseColors ? Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.getAccentColor()) : Qubble.CONFIG.getAccentColor() : this.primaryColor);
         }
         FontRenderer fontRenderer = this.getGUI().mc.fontRendererObj;
         if (this.text.length() == 1) {
@@ -54,6 +55,11 @@ public class ButtonElement extends Element<QubbleGUI> {
     public ButtonElement withColorScheme(int primaryColor, int secondaryColor) {
         this.primaryColor = primaryColor;
         this.secondaryColor = secondaryColor;
+        return this;
+    }
+
+    public ButtonElement withReverseColors(boolean reverseColors) {
+        this.reverseColors = reverseColors;
         return this;
     }
 
