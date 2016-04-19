@@ -1,34 +1,12 @@
 package net.ilexiconn.qubble.server.config;
 
+import net.ilexiconn.qubble.server.mode.ColorModes;
+
 import java.awt.*;
 
 public class QubbleConfig {
     public String accentColor = "0x038288";
-    public String mode = "dark";
-
-    public int getPrimaryColor() {
-        return this.mode.equals("dark") ? 0xFF212121 : 0xFFCDCDCD;
-    }
-
-    public int getSecondaryColor() {
-        return this.mode.equals("dark") ? 0xFF363636 : 0xFFACACAC;
-    }
-
-    public int getTertiaryColor() {
-        return this.mode.equals("dark") ? 0xFF464646 : 0xFFECECEC;
-    }
-
-    public int getPrimarySubcolor() {
-        return this.mode.equals("dark") ? 0xFF212121 : 0xFFCDCDCD;
-    }
-
-    public int getSecondarySubcolor() {
-        return this.mode.equals("dark") ? 0xFF1F1F1F : 0xFFC2C2C2;
-    }
-
-    public int getTextColor() {
-        return this.mode.equals("dark") ? 0xFFFFFFFF : 0xFF000000;
-    }
+    public ColorModes colorMode = ColorModes.DARK;
 
     public int getAccentColor() {
         if (this.accentColor.startsWith("0x")) {

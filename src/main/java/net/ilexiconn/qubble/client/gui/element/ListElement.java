@@ -29,22 +29,22 @@ public class ListElement extends Element<QubbleGUI> {
         super(gui, posX, posY, width, height);
         this.entries = entries;
         this.actionHandler = actionHandler;
-        this.maxDisplayEntries = (int) (this.getHeight() / 12);
+        this.maxDisplayEntries = this.getHeight() / 12;
         this.maxScroll = Math.max(0, this.entries.size() - this.maxDisplayEntries);
         this.scrollPerEntry = (float) (this.entries.size()) / (this.getHeight() - 2);
     }
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), Qubble.CONFIG.getSecondaryColor());
+        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), Qubble.CONFIG.colorMode.getSecondaryColor());
         FontRenderer fontRenderer = this.getGUI().mc.fontRendererObj;
         int y = (int) (-this.scroll * this.scrollPerEntry * 12);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         int scaleFactor = this.getGUI().getResolution().getScaleFactor();
         if (this.getParent() != null) {
-            GL11.glScissor((int) ((this.getPosX() + this.getParent().getPosX()) * scaleFactor), (int) ((this.getGUI().height - (this.getPosY() + (int) this.getHeight() + this.getParent().getPosY()) + 2) * scaleFactor), (int) this.getWidth() * scaleFactor, ((int) this.getHeight() - 4) * scaleFactor);
+            GL11.glScissor((int) ((this.getPosX() + this.getParent().getPosX()) * scaleFactor), (int) ((this.getGUI().height - (this.getPosY() + this.getHeight() + this.getParent().getPosY()) + 2) * scaleFactor), this.getWidth() * scaleFactor, (this.getHeight() - 4) * scaleFactor);
         } else {
-            GL11.glScissor((int) (this.getPosX() * scaleFactor), (int) ((this.getGUI().height - (this.getPosY() + (int) this.getHeight()) + 2) * scaleFactor), (int) this.getWidth() * scaleFactor, ((int) this.getHeight() - 4) * scaleFactor);
+            GL11.glScissor((int) (this.getPosX() * scaleFactor), (int) ((this.getGUI().height - (this.getPosY() + this.getHeight()) + 2) * scaleFactor), this.getWidth() * scaleFactor, (this.getHeight() - 4) * scaleFactor);
         }
         for (String entry : this.entries) {
             float entryX = this.getPosX() + 2;
@@ -52,8 +52,8 @@ public class ListElement extends Element<QubbleGUI> {
             float entryWidth = this.getWidth() - 4;
             int entryHeight = 11;
             boolean selected = this.isSelected(entryX, entryY - 1, entryWidth, entryHeight + 1, mouseX, mouseY) && mouseX < entryWidth - 4 && !scrolling;
-            this.getGUI().drawRectangle(entryX, entryY, entryWidth, entryHeight + 1, selected ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getSecondaryColor());
-            fontRenderer.drawString(entry, entryX + 2, entryY + 2, Qubble.CONFIG.getTextColor(), false);
+            this.getGUI().drawRectangle(entryX, entryY, entryWidth, entryHeight + 1, selected ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.colorMode.getSecondaryColor());
+            fontRenderer.drawString(entry, entryX + 2, entryY + 2, Qubble.CONFIG.colorMode.getTextColor(), false);
             y += 13;
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
@@ -61,9 +61,9 @@ public class ListElement extends Element<QubbleGUI> {
             float scrollX = this.getPosX() + this.getWidth() - 8;
             float scrollY = this.getPosY() + this.scroll + 2;
             int height = (int) ((this.getHeight() - 2) / ((float) this.entries.size() / (float) this.maxDisplayEntries)) - 2;
-            this.getGUI().drawRectangle(scrollX, scrollY, 6, height, this.scrolling ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getPrimaryColor());
+            this.getGUI().drawRectangle(scrollX, scrollY, 6, height, this.scrolling ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.colorMode.getPrimaryColor());
         } else {
-            this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 8, this.getPosY() + 2, 6, this.getHeight() - 4, Qubble.CONFIG.getPrimaryColor());
+            this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 8, this.getPosY() + 2, 6, this.getHeight() - 4, Qubble.CONFIG.colorMode.getPrimaryColor());
         }
     }
 

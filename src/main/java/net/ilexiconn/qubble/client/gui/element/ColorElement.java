@@ -23,7 +23,7 @@ public class ColorElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        this.getGUI().drawRectangle(this.getPosX() + 1, this.getPosY() + 1, this.getWidth() - 1, this.getHeight() - 1, Qubble.CONFIG.getSecondaryColor());
+        this.getGUI().drawRectangle(this.getPosX() + 1, this.getPosY() + 1, this.getWidth() - 1, this.getHeight() - 1, Qubble.CONFIG.colorMode.getSecondaryColor());
         float offsetX = this.getWidth() / 2 - (this.horizontalRows * 23 + 4) / 2;
         float offsetY = this.getHeight() / 2 - (this.colors.length / this.horizontalRows * 23 + 4) / 2;
         for (int i = 0; i < this.colors.length; i++) {
@@ -35,7 +35,7 @@ public class ColorElement extends Element<QubbleGUI> {
                 if (selectedColor == -1) {
                     selectedColor = i;
                 }
-                this.getGUI().drawOutline(this.getPosX() + x + offsetX, this.getPosY() + y + offsetY, 20, 20, Qubble.CONFIG.getTextColor(), 2);
+                this.getGUI().drawOutline(this.getPosX() + x + offsetX, this.getPosY() + y + offsetY, 20, 20, Qubble.CONFIG.colorMode.getTextColor(), 2);
             }
         }
     }

@@ -103,7 +103,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
         if (selection) {
             GlStateManager.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
         } else {
-            int color = Qubble.CONFIG.getTertiaryColor();
+            int color = Qubble.CONFIG.colorMode.getTertiaryColor();
             float r = (float) (color >> 16 & 0xFF) / 255.0F;
             float g = (float) (color >> 8 & 0xFF) / 255.0F;
             float b = (float) (color & 0xFF) / 255.0F;

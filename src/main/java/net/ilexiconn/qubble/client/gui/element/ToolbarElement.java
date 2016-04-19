@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
+import net.ilexiconn.qubble.server.mode.ColorModes;
 import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
 import net.ilexiconn.qubble.server.model.exporter.ModelExporters;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
@@ -38,7 +39,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
         ElementHandler.INSTANCE.addElement(this.getGUI(), this.modelButton = new ButtonElement(this.getGUI(), "Model", this.getGUI().width - 230, 0, 40, 20, (e, g) -> {
             this.setButtonColors(true, false, false);
             this.getGUI().getModelView().setVisible(true);
-        }).withColorScheme(Qubble.CONFIG.getPrimaryColor(), Qubble.CONFIG.getPrimaryColor()));
+        }).withColorScheme(Qubble.CONFIG.colorMode.getPrimaryColor(), Qubble.CONFIG.colorMode.getPrimaryColor()));
         ElementHandler.INSTANCE.addElement(this.getGUI(), this.textureButton = new ButtonElement(this.getGUI(), "Texture", this.getGUI().width - 190, 0, 50, 20, (e, g) -> {
             this.setButtonColors(false, true, false);
             this.getGUI().getModelView().setVisible(false);
@@ -81,11 +82,11 @@ public class ToolbarElement extends Element<QubbleGUI> {
             JSONUtil.saveConfig(Qubble.CONFIG, Qubble.CONFIG_FILE);
         }));
 
-        final CheckboxElement dark = new CheckboxElement(this.getGUI(), 32.5F, 174.5F).withSelection(Qubble.CONFIG.mode.equals("dark"));
-        final CheckboxElement light = new CheckboxElement(this.getGUI(), 122.5F, 174.5F).withSelection(Qubble.CONFIG.mode.equals("light"));
+        final CheckboxElement dark = new CheckboxElement(this.getGUI(), 32.5F, 174.5F).withSelection(Qubble.CONFIG.colorMode == ColorModes.DARK);
+        final CheckboxElement light = new CheckboxElement(this.getGUI(), 122.5F, 174.5F).withSelection(Qubble.CONFIG.colorMode == ColorModes.LIGHT);
         optionsWindow.addElement(dark.withActionHandler((selected) -> {
-            if (!Qubble.CONFIG.mode.equals("dark")) {
-                Qubble.CONFIG.mode = "dark";
+            if (Qubble.CONFIG.colorMode != ColorModes.DARK) {
+                Qubble.CONFIG.colorMode = ColorModes.DARK;
                 light.withSelection(false);
                 this.setButtonColors(this.currentSelectedButton == 0, this.currentSelectedButton == 1, this.currentSelectedButton == 2);
                 JSONUtil.saveConfig(Qubble.CONFIG, Qubble.CONFIG_FILE);
@@ -95,8 +96,8 @@ public class ToolbarElement extends Element<QubbleGUI> {
             }
         }));
         optionsWindow.addElement(light.withActionHandler((selected) -> {
-            if (!Qubble.CONFIG.mode.equals("light")) {
-                Qubble.CONFIG.mode = "light";
+            if (Qubble.CONFIG.colorMode != ColorModes.LIGHT) {
+                Qubble.CONFIG.colorMode = ColorModes.LIGHT;
                 dark.withSelection(false);
                 this.setButtonColors(this.currentSelectedButton == 0, this.currentSelectedButton == 1, this.currentSelectedButton == 2);
                 JSONUtil.saveConfig(Qubble.CONFIG, Qubble.CONFIG_FILE);
@@ -136,7 +137,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
     }
 
     private void setButtonColors(boolean model, boolean texture, boolean animation) {
-        int primary = Qubble.CONFIG.getPrimaryColor();
+        int primary = Qubble.CONFIG.colorMode.getPrimaryColor();
         int accent = Qubble.CONFIG.getAccentColor();
         int accentDark = Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.getAccentColor());
         this.modelButton.withColorScheme(model ? primary : accent, model ? primary : accentDark);
