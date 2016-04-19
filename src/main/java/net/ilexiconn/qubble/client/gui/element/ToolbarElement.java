@@ -1,6 +1,7 @@
 package net.ilexiconn.qubble.client.gui.element;
 
 import com.google.common.collect.Lists;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
@@ -8,10 +9,12 @@ import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
 import net.ilexiconn.qubble.server.model.exporter.ModelExporters;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.ilexiconn.qubble.server.model.importer.ModelImporters;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +32,10 @@ public class ToolbarElement extends Element<QubbleGUI> {
     @Override
     public void init() {
         WindowElement openWindow = new WindowElement(this.getGUI(), "Open", 100, 100);
-        openWindow.addElement(new ListElement(this.getGUI(), 2, 16, 96, 82, this.getModels(null), (gui, element) -> System.out.println(element.getSelected())));
+        openWindow.addElement(new ListElement(this.getGUI(), 2, 16, 96, 82, this.getModels(null), (gui, element) -> {
+            gui.selectModel(element.getSelected(), null);
+            ElementHandler.INSTANCE.removeElement(this.getGUI(), openWindow);
+        }));
 
         WindowElement importWindow = new WindowElement(this.getGUI(), "Import", 100, 100);
         importWindow.addElement(new ListElement(this.getGUI(), 2, 16, 96, 82, Lists.newArrayList(ModelImporters.IMPORTERS).stream().map(IModelImporter::getName).collect(Collectors.toList()), (gui, element) -> System.out.println(element.getSelected())));

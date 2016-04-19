@@ -1,8 +1,14 @@
 package net.ilexiconn.qubble.client.gui;
 
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.Qubble;
+import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.element.ElementHandler;
+import net.ilexiconn.qubble.client.gui.element.ModelTreeElement;
 import net.ilexiconn.qubble.client.gui.element.ToolbarElement;
+import net.ilexiconn.qubble.server.model.ModelHandler;
+import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
@@ -10,11 +16,14 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 @SideOnly(Side.CLIENT)
@@ -22,6 +31,10 @@ public class QubbleGUI extends GuiScreen {
     private GuiScreen parent;
     private ScaledResolution resolution;
     private ToolbarElement toolbar;
+    private ModelTreeElement modelTree;
+
+    private QubbleModel selectedModel;
+    private QubbleCube selectedCube;
 
     public QubbleGUI(GuiScreen parent) {
         this.parent = parent;
@@ -31,6 +44,7 @@ public class QubbleGUI extends GuiScreen {
     public void initGui() {
         ElementHandler.INSTANCE.clearGUI(this);
         ElementHandler.INSTANCE.addElement(this, this.toolbar = new ToolbarElement(this));
+        ElementHandler.INSTANCE.addElement(this, this.modelTree = new ModelTreeElement(this));
         ElementHandler.INSTANCE.init(this);
     }
 
@@ -123,5 +137,38 @@ public class QubbleGUI extends GuiScreen {
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
         GlStateManager.enableTexture2D();
+    }
+
+    public void drawOutline(double x, double y, double width, double height, int color, double outlineSize) {
+        this.drawRectangle(x, y, width - outlineSize, outlineSize, color);
+        this.drawRectangle(x + width - outlineSize, y, outlineSize, height - outlineSize, color);
+        this.drawRectangle(x, y + height - outlineSize, width, outlineSize, color);
+        this.drawRectangle(x, y, outlineSize, height - outlineSize, color);
+    }
+
+    public void selectModel(String name, IModelImporter importer) {
+        try {
+            QubbleModel model;
+            if (importer == null) {
+                model = QubbleModel.deserialize(CompressedStreamTools.readCompressed(new FileInputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, name + ".qbl"))));
+            } else {
+                model = importer.getModel(name, importer.read(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, name + "." + importer.getExtension())));
+            }
+            this.selectedModel = model;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public QubbleModel getSelectedModel() {
+        return this.selectedModel;
+    }
+
+    public void setSelectedCube(QubbleCube selectedCube) {
+        this.selectedCube = selectedCube;
+    }
+
+    public QubbleCube getSelectedCube() {
+        return this.selectedCube;
     }
 }
