@@ -69,24 +69,6 @@ public class ListElement extends Element<QubbleGUI> {
 
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
-        boolean flag = false;
-        int y = (int) (-this.scroll * this.scrollPerEntry * 12);
-        for (String entry : this.entries) {
-            if (y + 13 < this.getHeight() && y >= 0) {
-                float entryX = this.getPosX() + 2;
-                float entryY = this.getPosY() + y + 1;
-                float entryWidth = this.getWidth() - 12;
-                int entryHeight = 12;
-                if (this.isSelected(entryX, entryY, entryWidth, entryHeight, mouseX, mouseY)) {
-                    this.selected = entry;
-                    this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
-                    this.actionHandler.onAction(this.getGUI(), this);
-                    flag = true;
-                    break;
-                }
-            }
-            y += 13;
-        }
         if (this.maxScroll > 0) {
             float scrollX = this.getPosX() + this.getWidth() - 8;
             float scrollY = this.getPosY() + (this.scroll);
@@ -94,10 +76,10 @@ public class ListElement extends Element<QubbleGUI> {
             if (mouseX >= scrollX && mouseX < scrollX + 6 && mouseY >= scrollY + 1 && mouseY < scrollY + height) {
                 this.scrolling = true;
                 this.scrollYOffset = (int) (mouseY - scrollY);
-                flag = true;
+                return true;
             }
         }
-        return flag;
+        return false;
     }
 
     @Override
@@ -111,6 +93,22 @@ public class ListElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseReleased(float mouseX, float mouseY, int button) {
         this.scrolling = false;
+        int y = (int) (-this.scroll * this.scrollPerEntry * 12);
+        for (String entry : this.entries) {
+            if (y + 13 < this.getHeight() && y >= 0) {
+                float entryX = this.getPosX() + 2;
+                float entryY = this.getPosY() + y + 1;
+                float entryWidth = this.getWidth() - 12;
+                int entryHeight = 12;
+                if (this.isSelected(entryX, entryY, entryWidth, entryHeight, mouseX, mouseY)) {
+                    this.selected = entry;
+                    this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
+                    this.actionHandler.onAction(this.getGUI(), this);
+                    return true;
+                }
+            }
+            y += 13;
+        }
         return false;
     }
 

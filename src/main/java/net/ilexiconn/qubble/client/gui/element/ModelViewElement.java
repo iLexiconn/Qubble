@@ -65,10 +65,11 @@ public class ModelViewElement extends Element<QubbleGUI> {
         ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         int scaleFactor = scaledResolution.getScaleFactor();
-        GL11.glScissor(0, 0, gui.width * scaleFactor, (gui.height - 21) * scaleFactor);
+        GL11.glScissor(0, 0, gui.width * scaleFactor, (gui.height - gui.getToolbar().getHeight()) * scaleFactor);
         if (gui.getSelectedModel() != null) {
             this.renderModel(partialTicks, scaledResolution, false);
         }
+        GL11.glDisable(GL11.GL_SCISSOR_TEST);
         GlStateManager.enableTexture2D();
         this.prevMouseX = mouseX;
         this.prevMouseY = mouseY;
@@ -160,7 +161,6 @@ public class ModelViewElement extends Element<QubbleGUI> {
         GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
         RenderHelper.disableStandardItemLighting();
         GlStateManager.popMatrix();
-        GL11.glDisable(GL11.GL_SCISSOR_TEST);
         GlStateManager.matrixMode(GL11.GL_PROJECTION);
         GlStateManager.loadIdentity();
         GlStateManager.ortho(0.0, scaledResolution.getScaledWidth_double(), scaledResolution.getScaledHeight_double(), 0.0, -5000.0D, 5000.0D);

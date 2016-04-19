@@ -154,6 +154,7 @@ public class QubbleGUI extends GuiScreen {
                 model = importer.getModel(name, importer.read(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, name + "." + importer.getExtension())));
             }
             this.selectedModel = model;
+            this.selectedCube = null;
         } catch (IOException e) {
             e.printStackTrace();
         }
