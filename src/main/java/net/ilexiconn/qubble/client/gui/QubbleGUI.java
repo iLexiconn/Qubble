@@ -30,6 +30,7 @@ public class QubbleGUI extends GuiScreen {
     private ToolbarElement toolbar;
     private ModelTreeElement modelTree;
     private ModelViewElement modelView;
+    private SidebarElement sidebar;
 
     private QubbleModel selectedModel;
     private QubbleCube selectedCube;
@@ -44,6 +45,7 @@ public class QubbleGUI extends GuiScreen {
         ElementHandler.INSTANCE.addElement(this, this.modelView = new ModelViewElement(this));
         ElementHandler.INSTANCE.addElement(this, this.toolbar = new ToolbarElement(this));
         ElementHandler.INSTANCE.addElement(this, this.modelTree = new ModelTreeElement(this));
+        ElementHandler.INSTANCE.addElement(this, this.sidebar = new SidebarElement(this));
         ElementHandler.INSTANCE.init(this);
     }
 
@@ -174,6 +176,10 @@ public class QubbleGUI extends GuiScreen {
 
     public ModelTreeElement getModelTree() {
         return this.modelTree;
+    }
+
+    public SidebarElement getSidebar() {
+        return this.sidebar;
     }
 
     public ModelViewElement getModelView() {

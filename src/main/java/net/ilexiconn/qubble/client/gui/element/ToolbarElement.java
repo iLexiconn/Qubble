@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class ToolbarElement extends Element<QubbleGUI> {
     private ButtonElement modelButton;
     private ButtonElement textureButton;
-    private ButtonElement animationButton;
+    private ButtonElement animateButton;
     private int currentSelectedButton = 0;
 
     public ToolbarElement(QubbleGUI gui) {
@@ -39,12 +39,13 @@ public class ToolbarElement extends Element<QubbleGUI> {
         ElementHandler.INSTANCE.addElement(this.getGUI(), this.modelButton = new ButtonElement(this.getGUI(), "Model", this.getGUI().width - 230, 0, 40, 20, (e, g) -> {
             this.setButtonColors(true, false, false);
             this.getGUI().getModelView().setVisible(true);
+
         }).withColorScheme(Qubble.CONFIG.colorMode.getPrimaryColor(), Qubble.CONFIG.colorMode.getPrimaryColor()));
         ElementHandler.INSTANCE.addElement(this.getGUI(), this.textureButton = new ButtonElement(this.getGUI(), "Texture", this.getGUI().width - 190, 0, 50, 20, (e, g) -> {
             this.setButtonColors(false, true, false);
             this.getGUI().getModelView().setVisible(false);
         }));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), this.animationButton = new ButtonElement(this.getGUI(), "Animation", this.getGUI().width - 140, 0, 50, 20, (e, g) -> {
+        ElementHandler.INSTANCE.addElement(this.getGUI(), this.animateButton = new ButtonElement(this.getGUI(), "Animate", this.getGUI().width - 140, 0, 50, 20, (e, g) -> {
             this.setButtonColors(false, false, true);
             this.getGUI().getModelView().setVisible(false);
         }));
@@ -142,7 +143,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
         int accentDark = Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.getAccentColor());
         this.modelButton.withColorScheme(model ? primary : accent, model ? primary : accentDark);
         this.textureButton.withColorScheme(texture ? primary : accent, texture ? primary : accentDark);
-        this.animationButton.withColorScheme(animation ? primary : accent, animation ? primary : accentDark);
+        this.animateButton.withColorScheme(animation ? primary : accent, animation ? primary : accentDark);
         this.currentSelectedButton = model ? 0 : texture ? 1 : 2;
     }
 }
