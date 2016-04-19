@@ -1,8 +1,8 @@
 package net.ilexiconn.qubble.client.gui.component;
 
 import net.ilexiconn.qubble.Qubble;
+import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -13,6 +13,8 @@ import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
@@ -46,19 +48,19 @@ public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
         QubbleGUI.drawOutline(this.posX, this.posY, this.width, this.height, Qubble.CONFIG.getAccentColor(), 1);
         int cursor = this.cursorPosition - this.lineScrollOffset;
         int cursorEnd = this.selectionEnd - this.lineScrollOffset;
-        String string = gui.mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.width);
-        boolean verticalCursor = cursor >= 0 && cursor <= string.length();
+        String displayString = gui.mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.width);
+        boolean verticalCursor = cursor >= 0 && cursor <= displayString.length();
         boolean renderCursor = this.selected && this.cursorCounter / 6 % 2 == 0 && verticalCursor;
         int x = this.posX;
         int y = this.posY;
         int line = x;
 
-        if (cursorEnd > string.length()) {
-            cursorEnd = string.length();
+        if (cursorEnd > displayString.length()) {
+            cursorEnd = displayString.length();
         }
 
-        if (!string.isEmpty()) {
-            String s = verticalCursor ? string.substring(0, cursor) : string;
+        if (!displayString.isEmpty()) {
+            String s = verticalCursor ? displayString.substring(0, cursor) : displayString;
             line = gui.mc.fontRendererObj.drawString(s, x + 3, y + height / 2 - gui.mc.fontRendererObj.FONT_HEIGHT / 2, QubbleGUI.getTextColor());
         }
 
@@ -72,21 +74,21 @@ public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
             --line;
         }
 
-        if (!string.isEmpty() && verticalCursor && cursor < string.length()) {
-            gui.mc.fontRendererObj.drawString(string.substring(cursor), line + 1, y + height / 2 - gui.mc.fontRendererObj.FONT_HEIGHT / 2, QubbleGUI.getTextColor());
+        if (!displayString.isEmpty() && verticalCursor && cursor < displayString.length()) {
+            gui.mc.fontRendererObj.drawString(displayString.substring(cursor), line + 1, y + this.height / 2 - gui.mc.fontRendererObj.FONT_HEIGHT / 2, QubbleGUI.getTextColor());
         }
 
         if (renderCursor) {
             if (renderVerticalCursor) {
-                Gui.drawRect(lineX, y + 2, lineX + 1, y + height / 2 - gui.mc.fontRendererObj.FONT_HEIGHT / 2 + 1 + gui.mc.fontRendererObj.FONT_HEIGHT, Qubble.CONFIG.getAccentColor());
+                Gui.drawRect(lineX, y + 2, lineX + 1, y + this.height / 2 - gui.mc.fontRendererObj.FONT_HEIGHT / 2 + 1 + gui.mc.fontRendererObj.FONT_HEIGHT, Qubble.CONFIG.getAccentColor());
             } else {
-                gui.mc.fontRendererObj.drawString("_", lineX, y + height / 2 - gui.mc.fontRendererObj.FONT_HEIGHT / 2, Qubble.CONFIG.getAccentColor());
+                gui.mc.fontRendererObj.drawString("_", lineX, y + this.height / 2 - gui.mc.fontRendererObj.FONT_HEIGHT / 2, Qubble.CONFIG.getAccentColor());
             }
         }
 
         if (cursorEnd != cursor) {
-            int l1 = x + gui.mc.fontRendererObj.getStringWidth(string.substring(0, cursorEnd));
-            this.drawCursorVertical(lineX + (selectionEnd > cursorPosition ? 0 : 1), y + 1, l1 + (selectionEnd < cursorPosition ? 2 : 3), y + height / 2 - gui.mc.fontRendererObj.FONT_HEIGHT / 2 + 2 + gui.mc.fontRendererObj.FONT_HEIGHT);
+            int selectionWidth = x + gui.mc.fontRendererObj.getStringWidth(displayString.substring(0, cursorEnd));
+            this.drawCursorVertical(lineX + (selectionEnd > cursorPosition ? 0 : 1), y + 1, selectionWidth + (selectionEnd < cursorPosition ? 2 : 3), y + height / 2 - gui.mc.fontRendererObj.FONT_HEIGHT / 2 + 2 + gui.mc.fontRendererObj.FONT_HEIGHT);
         }
     }
 
@@ -98,9 +100,9 @@ public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
     public boolean mouseClicked(GuiScreen gui, float mouseX, float mouseY, int button) {
         this.selected = this.isMouseSelecting(mouseX, mouseY);
         if (this.selected && button == 0) {
-            int i = (int) (mouseX - this.posX - 1);
-            String s = gui.mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.width);
-            this.setCursorPosition(gui.mc.fontRendererObj.trimStringToWidth(s, i).length() + this.lineScrollOffset);
+            int width = (int) (mouseX - this.posX - 1);
+            String displayString = gui.mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.width);
+            this.setCursorPosition(gui.mc.fontRendererObj.trimStringToWidth(displayString, width).length() + this.lineScrollOffset);
         }
         return false;
     }
@@ -119,7 +121,8 @@ public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
     public boolean keyPressed(GuiScreen gui, char character, int key) {
         if (!this.selected) {
             return false;
-        } else if (GuiScreen.isKeyComboCtrlA(key)) {
+        }
+        if (GuiScreen.isKeyComboCtrlA(key)) {
             this.setCursorPositionEnd();
             this.setSelectionPos(0);
             return true;
@@ -135,21 +138,21 @@ public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
             return true;
         } else {
             switch (key) {
-                case 14:
+                case Keyboard.KEY_BACK:
                     if (GuiScreen.isCtrlKeyDown()) {
                         this.deleteWords(-1);
                     } else {
                         this.deleteFromCursor(-1);
                     }
                     return true;
-                case 199:
+                case Keyboard.KEY_HOME:
                     if (GuiScreen.isShiftKeyDown()) {
                         this.setSelectionPos(0);
                     } else {
                         this.setCursorPositionZero();
                     }
                     return true;
-                case 203:
+                case Keyboard.KEY_LEFT:
                     if (GuiScreen.isShiftKeyDown()) {
                         if (GuiScreen.isCtrlKeyDown()) {
                             this.setSelectionPos(this.getNthWordFromPos(-1, this.selectionEnd));
@@ -162,7 +165,7 @@ public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
                         this.moveCursorBy(-1);
                     }
                     return true;
-                case 205:
+                case Keyboard.KEY_RIGHT:
                     if (GuiScreen.isShiftKeyDown()) {
                         if (GuiScreen.isCtrlKeyDown()) {
                             this.setSelectionPos(this.getNthWordFromPos(1, this.selectionEnd));
@@ -175,14 +178,14 @@ public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
                         this.moveCursorBy(1);
                     }
                     return true;
-                case 207:
+                case Keyboard.KEY_END:
                     if (GuiScreen.isShiftKeyDown()) {
                         this.setSelectionPos(this.text.length());
                     } else {
                         this.setCursorPositionEnd();
                     }
                     return true;
-                case 211:
+                case Keyboard.KEY_DELETE:
                     if (GuiScreen.isCtrlKeyDown()) {
                         this.deleteWords(1);
                     } else {
@@ -209,65 +212,63 @@ public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
     }
 
     public String getSelectedText() {
-        int i = this.cursorPosition < this.selectionEnd ? this.cursorPosition : this.selectionEnd;
-        int j = this.cursorPosition < this.selectionEnd ? this.selectionEnd : this.cursorPosition;
-        return this.text.substring(i, j);
+        int start = this.cursorPosition < this.selectionEnd ? this.cursorPosition : this.selectionEnd;
+        int end = this.cursorPosition < this.selectionEnd ? this.selectionEnd : this.cursorPosition;
+        return this.text.substring(start, end);
     }
 
     public void writeText(String text) {
-        String s = "";
-        String s1 = ChatAllowedCharacters.filterAllowedCharacters(text);
-        int i = this.cursorPosition < this.selectionEnd ? this.cursorPosition : this.selectionEnd;
-        int j = this.cursorPosition < this.selectionEnd ? this.selectionEnd : this.cursorPosition;
-        int l;
+        String newText = "";
+        String allowedText = ChatAllowedCharacters.filterAllowedCharacters(text);
+        int start = this.cursorPosition < this.selectionEnd ? this.cursorPosition : this.selectionEnd;
+        int end = this.cursorPosition < this.selectionEnd ? this.selectionEnd : this.cursorPosition;
 
         if (!this.text.isEmpty()) {
-            s = s + this.text.substring(0, i);
+            newText = newText + this.text.substring(0, start);
         }
 
-        s = s + s1;
-        l = s1.length();
+        newText = newText + allowedText;
 
-        if (!this.text.isEmpty() && j < this.text.length()) {
-            s = s + this.text.substring(j);
+        if (!this.text.isEmpty() && end < this.text.length()) {
+            newText = newText + this.text.substring(end);
         }
 
-        this.text = s;
-        this.moveCursorBy(i - this.selectionEnd + l);
+        this.text = newText;
+        this.moveCursorBy(start - this.selectionEnd + allowedText.length());
     }
 
-    public void deleteWords(int num) {
+    public void deleteWords(int amount) {
         if (!this.text.isEmpty()) {
             if (this.selectionEnd != this.cursorPosition) {
                 this.writeText("");
             } else {
-                this.deleteFromCursor(this.getNthWordFromCursor(num) - this.cursorPosition);
+                this.deleteFromCursor(this.getNthWordFromCursor(amount) - this.cursorPosition);
             }
         }
     }
 
-    public void deleteFromCursor(int num) {
+    public void deleteFromCursor(int amount) {
         if (!this.text.isEmpty()) {
             if (this.selectionEnd != this.cursorPosition) {
                 this.writeText("");
             } else {
-                boolean flag = num < 0;
-                int i = flag ? this.cursorPosition + num : this.cursorPosition;
-                int j = flag ? this.cursorPosition : this.cursorPosition + num;
-                String s = "";
+                boolean delete = amount < 0;
+                int start = delete ? this.cursorPosition + amount : this.cursorPosition;
+                int end = delete ? this.cursorPosition : this.cursorPosition + amount;
+                String nextText = "";
 
-                if (i >= 0) {
-                    s = this.text.substring(0, i);
+                if (start >= 0) {
+                    nextText = this.text.substring(0, start);
                 }
 
-                if (j < this.text.length()) {
-                    s = s + this.text.substring(j);
+                if (end < this.text.length()) {
+                    nextText = nextText + this.text.substring(end);
                 }
 
-                this.text = s;
+                this.text = nextText;
 
-                if (flag) {
-                    this.moveCursorBy(num);
+                if (delete) {
+                    this.moveCursorBy(amount);
                 }
             }
         }
@@ -277,49 +278,46 @@ public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
         return this.getNthWordFromPos(numWords, this.cursorPosition);
     }
 
-    public int getNthWordFromPos(int n, int pos) {
-        return this.getNthWordFromPosWS(n, pos, true);
+    public int getNthWordFromPos(int n, int position) {
+        return this.getNthWordFromPosWhitespace(n, position, true);
     }
 
-    public int getNthWordFromPosWS(int n, int pos, boolean skipWs) {
-        int i = pos;
+    public int getNthWordFromPosWhitespace(int n, int position, boolean skipWhitespace) {
+        int currentPos = position;
         boolean flag = n < 0;
         int j = Math.abs(n);
-
         for (int k = 0; k < j; ++k) {
             if (!flag) {
                 int l = this.text.length();
-                i = this.text.indexOf(32, i);
-
-                if (i == -1) {
-                    i = l;
+                currentPos = this.text.indexOf(32, currentPos);
+                if (currentPos == -1) {
+                    currentPos = l;
                 } else {
-                    while (skipWs && i < l && this.text.charAt(i) == 32) {
-                        ++i;
+                    while (skipWhitespace && currentPos < l && this.text.charAt(currentPos) == 32) {
+                        ++currentPos;
                     }
                 }
             } else {
-                while (skipWs && i > 0 && this.text.charAt(i - 1) == 32) {
-                    --i;
+                while (skipWhitespace && currentPos > 0 && this.text.charAt(currentPos - 1) == 32) {
+                    --currentPos;
                 }
 
-                while (i > 0 && this.text.charAt(i - 1) != 32) {
-                    --i;
+                while (currentPos > 0 && this.text.charAt(currentPos - 1) != 32) {
+                    --currentPos;
                 }
             }
         }
 
-        return i;
+        return currentPos;
     }
 
-    public void moveCursorBy(int num) {
-        this.setCursorPosition(this.selectionEnd + num);
+    public void moveCursorBy(int amount) {
+        this.setCursorPosition(this.selectionEnd + amount);
     }
 
-    public void setCursorPosition(int pos) {
-        this.cursorPosition = pos;
-        int i = this.text.length();
-        this.cursorPosition = MathHelper.clamp_int(this.cursorPosition, 0, i);
+    public void setCursorPosition(int position) {
+        this.cursorPosition = position;
+        this.cursorPosition = MathHelper.clamp_int(this.cursorPosition, 0, this.text.length());
         this.setSelectionPos(this.cursorPosition);
     }
 
@@ -332,50 +330,47 @@ public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
     }
 
     public void setSelectionPos(int position) {
-        int i = this.text.length();
+        int textLength = this.text.length();
 
-        if (position > i) {
-            position = i;
-        }
-
-        if (position < 0) {
+        if (position > textLength) {
+            position = textLength;
+        } else if (position < 0) {
             position = 0;
         }
 
         this.selectionEnd = position;
 
-        if (this.lineScrollOffset > i) {
-            this.lineScrollOffset = i;
+        if (this.lineScrollOffset > textLength) {
+            this.lineScrollOffset = textLength;
         }
 
-        int j = this.width;
-        String s = Minecraft.getMinecraft().fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), j);
-        int k = s.length() + this.lineScrollOffset;
+        String displayText = ClientProxy.MINECRAFT.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.width);
+        int offset = displayText.length() + this.lineScrollOffset;
 
         if (position == this.lineScrollOffset) {
-            this.lineScrollOffset -= Minecraft.getMinecraft().fontRendererObj.trimStringToWidth(this.text, j, true).length();
+            this.lineScrollOffset -= ClientProxy.MINECRAFT.fontRendererObj.trimStringToWidth(this.text, this.width, true).length();
         }
 
-        if (position > k) {
-            this.lineScrollOffset += position - k;
+        if (position > offset) {
+            this.lineScrollOffset += position - offset;
         } else if (position <= this.lineScrollOffset) {
             this.lineScrollOffset -= this.lineScrollOffset - position;
         }
 
-        this.lineScrollOffset = MathHelper.clamp_int(this.lineScrollOffset, 0, i);
+        this.lineScrollOffset = MathHelper.clamp_int(this.lineScrollOffset, 0, textLength);
     }
 
     private void drawCursorVertical(int startX, int startY, int endX, int endY) {
         if (startX < endX) {
-            int i = startX;
+            int prevStartX = startX;
             startX = endX;
-            endX = i;
+            endX = prevStartX;
         }
 
         if (startY < endY) {
-            int j = startY;
+            int prevStartY = startY;
             startY = endY;
-            endY = j;
+            endY = prevStartY;
         }
 
         if (endX > this.posX + this.width) {
@@ -387,16 +382,16 @@ public class TextBoxComponent extends Gui implements IComponent<GuiScreen> {
         }
 
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexbuffer = tessellator.getBuffer();
+        VertexBuffer buffer = tessellator.getBuffer();
         GlStateManager.color(0.0F, 0.0F, 255.0F, 255.0F);
         GlStateManager.disableTexture2D();
         GlStateManager.enableColorLogic();
         GlStateManager.colorLogicOp(GlStateManager.LogicOp.OR_REVERSE);
-        vertexbuffer.begin(7, DefaultVertexFormats.POSITION);
-        vertexbuffer.pos((double) startX, (double) endY, 0.0D).endVertex();
-        vertexbuffer.pos((double) endX, (double) endY, 0.0D).endVertex();
-        vertexbuffer.pos((double) endX, (double) startY, 0.0D).endVertex();
-        vertexbuffer.pos((double) startX, (double) startY, 0.0D).endVertex();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+        buffer.pos((double) startX, (double) endY, 0.0D).endVertex();
+        buffer.pos((double) endX, (double) endY, 0.0D).endVertex();
+        buffer.pos((double) endX, (double) startY, 0.0D).endVertex();
+        buffer.pos((double) startX, (double) startY, 0.0D).endVertex();
         tessellator.draw();
         GlStateManager.disableColorLogic();
         GlStateManager.enableTexture2D();
