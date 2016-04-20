@@ -198,7 +198,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
 
     @Override
     public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
-        if (this.isSelecting(mouseX, mouseY)) {
+        if (this.isSelected(mouseX, mouseY)) {
             float xMovement = mouseX - this.prevMouseX;
             float yMovement = mouseY - this.prevMouseY;
             if (button == 0) {
@@ -220,7 +220,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseReleased(float mouseX, float mouseY, int button) {
         if (button == 0) {
-            if (!this.dragged && this.currentModel != null && isSelecting(mouseX, mouseY)) {
+            if (!this.dragged && this.currentModel != null && this.isSelected(mouseX, mouseY)) {
                 ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
                 this.renderModel(this.partialTicks, scaledResolution, true);
                 FloatBuffer buffer = BufferUtils.createFloatBuffer(3);
@@ -246,10 +246,11 @@ public class ModelViewElement extends Element<QubbleGUI> {
         return false;
     }
 
-    private boolean isSelecting(float mouseX, float mouseY) {
+    @Override
+    protected boolean isSelected(float mouseX, float mouseY) {
         ModelTreeElement modelTree = this.getGUI().getModelTree();
         ToolbarElement toolbar = this.getGUI().getToolbar();
         ProjectBarElement projectBar = this.getGUI().getProjectBar();
-        return mouseX > modelTree.getPosX() + modelTree.getWidth() && mouseY >= toolbar.getPosY() + toolbar.getHeight() + (projectBar.isVisible() ? projectBar.getHeight() : 0);
+        return ElementHandler.INSTANCE.isOnTop(this.getGUI(), this, mouseX, mouseY) && mouseX > modelTree.getPosX() + modelTree.getWidth() && mouseY >= toolbar.getPosY() + toolbar.getHeight() + (projectBar.isVisible() ? projectBar.getHeight() : 0);
     }
 }

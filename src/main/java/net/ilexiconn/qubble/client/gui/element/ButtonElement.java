@@ -47,10 +47,6 @@ public class ButtonElement extends Element<QubbleGUI> {
         }
     }
 
-    private boolean isSelected(float mouseX, float mouseY) {
-        return ElementHandler.INSTANCE.isOnTop(this.getGUI(), this, mouseX, mouseY) && mouseX >= this.getPosX() && mouseY >= this.getPosY() && mouseX <= this.getPosX() + this.getWidth() && mouseY <= this.getPosY() + this.getHeight();
-    }
-
     public ButtonElement withColorScheme(ColorScheme colorScheme) {
         this.colorScheme = colorScheme;
         return this;

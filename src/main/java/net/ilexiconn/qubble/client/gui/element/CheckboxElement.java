@@ -33,7 +33,7 @@ public class CheckboxElement extends Element<QubbleGUI> {
 
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
-        if (button == 0 && mouseX >= this.getPosX() && mouseX <= this.getPosX() + this.getWidth() && mouseY >= this.getPosY() && mouseY <= this.getPosY() + this.getHeight()) {
+        if (button == 0 && super.isSelected(mouseX, mouseY)) {
             if (this.actionHandler != null && this.actionHandler.apply(!this.selected)) {
                 this.selected = !this.selected;
                 this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));

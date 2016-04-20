@@ -125,9 +125,6 @@ public class ModelTreeElement extends Element<QubbleGUI> {
             float maxDisplayEntries = (int) (this.getHeight() / 10.0F);
             float maxScroll = Math.max(0, this.entryCount - maxDisplayEntries);
             float scrollPerEntry = (float) this.entryCount / (this.getHeight() - 17.0F);
-//            float maxDisplayEntries = this.getHeight() / 10.0F;
-//            float maxScroll = Math.max(0, this.entryCount - maxDisplayEntries);
-//            float scrollPerEntry = (this.getHeight() - 15.0F) / (float) this.entryCount;
             this.scroll = (int) Math.max(0, Math.min(maxScroll / scrollPerEntry, mouseY - this.getPosY() - 2 - this.scrollYOffset));
             return true;
         }

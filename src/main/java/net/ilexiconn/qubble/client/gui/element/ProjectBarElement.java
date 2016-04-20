@@ -65,11 +65,9 @@ public class ProjectBarElement extends Element<QubbleGUI> {
         if (button == 0) {
             QubbleGUI gui = this.getGUI();
             float posX = this.getPosX();
-            float posY = this.getPosY();
             int width = this.getWidth();
-            int height = this.getHeight();
             FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
-            if (mouseX >= posX && mouseY >= posY && mouseX < posX + width && mouseY < posY + height) {
+            if (this.isSelected(mouseX, mouseY)) {
                 float projectX = -this.scroll;
                 List<QubbleModel> openProjects = gui.getOpenProjects();
                 boolean selected = false;

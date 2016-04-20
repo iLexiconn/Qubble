@@ -40,15 +40,15 @@ public class Element<T extends GuiScreen> extends Gui {
     }
 
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
-        return false;
+        return this.isSelected(mouseX, mouseY);
     }
 
     public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
-        return false;
+        return this.isSelected(mouseX, mouseY);
     }
 
     public boolean mouseReleased(float mouseX, float mouseY, int button) {
-        return false;
+        return this.isSelected(mouseX, mouseY);
     }
 
     public boolean keyPressed(char character, int key) {
@@ -110,5 +110,9 @@ public class Element<T extends GuiScreen> extends Gui {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    protected boolean isSelected(float mouseX, float mouseY) {
+        return ElementHandler.INSTANCE.isOnTop(this.getGUI(), this, mouseX, mouseY) && mouseX >= this.getPosX() && mouseY >= this.getPosY() && mouseX < this.getPosX() + this.getWidth() && mouseY < this.getPosY() + this.getHeight();
     }
 }
