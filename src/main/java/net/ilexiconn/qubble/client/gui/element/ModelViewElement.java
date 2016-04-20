@@ -73,13 +73,13 @@ public class ModelViewElement extends Element<QubbleGUI> {
         GlStateManager.enableTexture2D();
         this.prevMouseX = mouseX;
         this.prevMouseY = mouseY;
+        int scroll = Mouse.getDWheel();
+        this.zoomVelocity += (scroll / 120.0F) * 0.05F;
+        this.zoom += this.zoomVelocity;
         this.prevCameraOffsetX = this.cameraOffsetX;
         this.prevCameraOffsetY = this.cameraOffsetY;
         this.prevRotationYaw = this.rotationYaw;
         this.prevRotationPitch = this.rotationPitch;
-        int scroll = Mouse.getDWheel();
-        this.zoomVelocity += (scroll / 120.0F) * 0.05F;
-        this.zoom += this.zoomVelocity;
         this.zoomVelocity *= 0.6F;
         if (this.zoom < 0.5F) {
             this.zoom = 0.5F;
@@ -121,14 +121,11 @@ public class ModelViewElement extends Element<QubbleGUI> {
             this.currentModelContainer = newModel;
         }
         GlStateManager.translate(0.0F, -1.0F, 0.0F);
-        int displayList = 0;
         QubbleCube selectedCube = this.getGUI().getSelectedCube();
         QubbleModelRenderer selectedBox = this.currentModel.getCube(selectedCube);
-        if (!selection && selectedBox != null) {
-            displayList = GLAllocation.generateDisplayLists(1);
-            GlStateManager.glNewList(displayList, GL11.GL_COMPILE);
-            this.currentModel.renderSelectedOutline(selectedBox, 0.0625F);
-            GlStateManager.glEndList();
+        GlStateManager.enableBlend();
+        if (selectedBox != null && !selection) {
+            GlStateManager.color(0.7F, 0.7F, 0.7F, 1.0F);
         }
         if (!selection) {
             if (this.texture != null) {
@@ -139,13 +136,13 @@ public class ModelViewElement extends Element<QubbleGUI> {
         } else {
             this.currentModelSelection.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
         }
+        GlStateManager.disableBlend();
         if (selectedBox != null && !selection) {
             GlStateManager.disableTexture2D();
             GlStateManager.disableLighting();
-            GlStateManager.disableDepth();
-            GlStateManager.callList(displayList);
-            GLAllocation.deleteDisplayLists(displayList);
-            GlStateManager.enableDepth();
+            GlStateManager.depthMask(false);
+            this.currentModel.renderSelectedOutline(selectedBox, 0.0625F);
+            GlStateManager.depthMask(true);
             GlStateManager.enableLighting();
             GlStateManager.pushMatrix();
             if (this.texture != null) {
@@ -199,19 +196,21 @@ public class ModelViewElement extends Element<QubbleGUI> {
 
     @Override
     public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
-        float xMovement = mouseX - this.prevMouseX;
-        float yMovement = mouseY - this.prevMouseY;
-        if (button == 0) {
-            this.rotationYaw += xMovement / this.zoom;
-            if ((this.rotationPitch > -90.0F || yMovement < 0.0F) && (this.rotationPitch < 90.0F || yMovement > 0.0F)) {
-                this.rotationPitch -= yMovement / this.zoom;
+        if (this.isSelecting(mouseX, mouseY)) {
+            float xMovement = mouseX - this.prevMouseX;
+            float yMovement = mouseY - this.prevMouseY;
+            if (button == 0) {
+                this.rotationYaw += xMovement / this.zoom;
+                if ((this.rotationPitch > -90.0F || yMovement < 0.0F) && (this.rotationPitch < 90.0F || yMovement > 0.0F)) {
+                    this.rotationPitch -= yMovement / this.zoom;
+                }
+                this.dragged = true;
+                return true;
+            } else if (button == 1) {
+                this.cameraOffsetX = this.cameraOffsetX + (xMovement / this.zoom) * 0.016F;
+                this.cameraOffsetY = this.cameraOffsetY + (yMovement / this.zoom) * 0.016F;
+                return true;
             }
-            this.dragged = true;
-            return true;
-        } else if (button == 1) {
-            this.cameraOffsetX = this.cameraOffsetX + (xMovement / this.zoom) * 0.016F;
-            this.cameraOffsetY = this.cameraOffsetY + (yMovement / this.zoom) * 0.016F;
-            return true;
         }
         return false;
     }
@@ -219,9 +218,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseReleased(float mouseX, float mouseY, int button) {
         if (button == 0) {
-            ModelTreeElement modelTree = this.getGUI().getModelTree();
-            ToolbarElement toolbar = this.getGUI().getToolbar();
-            if (!this.dragged && this.currentModel != null && mouseX > modelTree.getPosX() + modelTree.getWidth() && mouseY >= toolbar.getPosY() + toolbar.getHeight()) {
+            if (!this.dragged && this.currentModel != null && isSelecting(mouseX, mouseY)) {
                 ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
                 this.renderModel(this.partialTicks, scaledResolution, true);
                 FloatBuffer buffer = BufferUtils.createFloatBuffer(3);
@@ -245,5 +242,11 @@ public class ModelViewElement extends Element<QubbleGUI> {
         }
         this.dragged = false;
         return false;
+    }
+
+    private boolean isSelecting(float mouseX, float mouseY) {
+        ModelTreeElement modelTree = this.getGUI().getModelTree();
+        ToolbarElement toolbar = this.getGUI().getToolbar();
+        return mouseX > modelTree.getPosX() + modelTree.getWidth() && mouseY >= toolbar.getPosY() + toolbar.getHeight();
     }
 }

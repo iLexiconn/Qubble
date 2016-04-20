@@ -88,7 +88,7 @@ public class QubbleModelBase extends AdvancedModelBase {
     private void renderOutline(QubbleModelRenderer modelRenderer) {
         ModelBox box = modelRenderer.cubeList.get(0);
         Tessellator tessellator = Tessellator.getInstance();
-        GlStateManager.glLineWidth(8.0F);
+        GlStateManager.glLineWidth(16.0F);
         VertexBuffer buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
         buffer.pos(box.posX1, box.posY1, box.posZ1).endVertex();
