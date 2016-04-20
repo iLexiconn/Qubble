@@ -113,6 +113,14 @@ public class Element<T extends GuiScreen> extends Gui {
     }
 
     protected boolean isSelected(float mouseX, float mouseY) {
-        return ElementHandler.INSTANCE.isOnTop(this.getGUI(), this, mouseX, mouseY) && mouseX >= this.getPosX() && mouseY >= this.getPosY() && mouseX < this.getPosX() + this.getWidth() && mouseY < this.getPosY() + this.getHeight();
+        return ElementHandler.INSTANCE.isOnTop(this.getGUI(), this, mouseX, mouseY) && mouseX >= this.getActualPosX() && mouseY >= this.getActualPosY() && mouseX < this.getActualPosX() + this.getWidth() && mouseY < this.getActualPosY() + this.getHeight();
+    }
+
+    public float getActualPosX() {
+        return this.posX + (this.getParent() != null ? this.getParent().getPosX() : 0);
+    }
+
+    public float getActualPosY() {
+        return this.posY + (this.getParent() != null ? this.getParent().getPosY() : 0);
     }
 }

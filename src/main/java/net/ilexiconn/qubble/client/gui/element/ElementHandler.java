@@ -41,19 +41,15 @@ public enum ElementHandler {
     public <T extends GuiScreen> boolean isOnTop(T gui, Element<T> element, float mouseX, float mouseY) {
         if (this.elementMap.containsKey(gui)) {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
-            boolean aboveWindow = true;
-            boolean inList = false;
             for (Element<T> e : Lists.reverse(elementList)) {
-                if (e == element) {
-                    inList = true;
-                } else if (e instanceof WindowElement && mouseX >= e.getPosX() && mouseY >= e.getPosY() && mouseX <= e.getPosX() + e.getWidth() && mouseY <= e.getPosY() + e.getHeight()) {
-                    aboveWindow = false;
+                if (mouseX >= e.getActualPosX() && mouseY >= e.getActualPosY() && mouseX < e.getActualPosX() + e.getWidth() && mouseY < e.getActualPosY() + e.getHeight()) {
+                    return element == e || (element.getParent() != null && element.getParent() == e);
                 }
             }
-            return !inList || aboveWindow;
         } else {
             return true;
         }
+        return false;
     }
 
     public <T extends GuiScreen> void init(T gui) {

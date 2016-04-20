@@ -51,8 +51,6 @@ public class WindowElement extends Element<QubbleGUI> {
         this.getGUI().drawRectangle(renderX, renderY, this.getWidth(), 14, Qubble.CONFIG.getAccentColor());
         FontRenderer fontRenderer = this.getGUI().mc.fontRendererObj;
         fontRenderer.drawString(this.name, renderX + 2.0F, renderY + 3.0F, Qubble.CONFIG.getTextColor(), false);
-        mouseX -= renderX;
-        mouseY -= renderY;
         GlStateManager.translate(renderX, renderY, 0.0);
         for (Element<QubbleGUI> element : this.elementList) {
             element.render(mouseX, mouseY, partialTicks);
@@ -64,16 +62,16 @@ public class WindowElement extends Element<QubbleGUI> {
 
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
-        if (button != 0 || mouseX < this.getPosX() || mouseX > this.getPosX() + this.getWidth() || mouseY < this.getPosY() || mouseY > this.getPosY() + this.getHeight()) {
+        if (button != 0 || !this.isSelected(mouseX, mouseY)) {
             return false;
         }
         if (mouseY < this.getPosY() + 14) {
             this.dragOffsetX = mouseX - this.getPosX();
             this.dragOffsetY = mouseY - this.getPosY();
             this.isDragging = true;
+            ElementHandler.INSTANCE.removeElement(this.getGUI(), this);
+            ElementHandler.INSTANCE.addElement(this.getGUI(), this);
         }
-        mouseX -= this.getPosX();
-        mouseY -= this.getPosY();
         for (Element<QubbleGUI> element : this.elementList) {
             if (element.mouseClicked(mouseX, mouseY, button)) {
                 return true;
@@ -89,8 +87,6 @@ public class WindowElement extends Element<QubbleGUI> {
             this.setPosY(Math.min(Math.max(mouseY - this.dragOffsetY, 0), this.getGUI().height - this.getHeight()));
             return true;
         }
-        mouseX -= this.getPosX();
-        mouseY -= this.getPosY();
         for (Element<QubbleGUI> element : this.elementList) {
             if (element.mouseDragged(mouseX, mouseY, button, timeSinceClick)) {
                 return true;
@@ -102,8 +98,6 @@ public class WindowElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseReleased(float mouseX, float mouseY, int button) {
         this.isDragging = false;
-        mouseX -= this.getPosX();
-        mouseY -= this.getPosY();
         for (Element<QubbleGUI> element : this.elementList) {
             if (element.mouseReleased(mouseX, mouseY, button)) {
                 return true;

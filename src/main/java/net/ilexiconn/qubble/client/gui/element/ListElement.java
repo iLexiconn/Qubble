@@ -51,7 +51,7 @@ public class ListElement extends Element<QubbleGUI> {
             float entryY = this.getPosY() + y + 2;
             float entryWidth = this.getWidth() - 4;
             int entryHeight = 11;
-            boolean selected = this.isSelected(entryX, entryY - 1, entryWidth, entryHeight + 1, mouseX, mouseY) && mouseX < entryWidth - 4 && !scrolling;
+            boolean selected = this.isSelected(this.getActualPosX() + 2, this.getActualPosY() + y + 1, entryWidth, entryHeight + 1, mouseX, mouseY) && !this.scrolling;
             this.getGUI().drawRectangle(entryX, entryY, entryWidth, entryHeight + 1, selected ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getSecondaryColor());
             fontRenderer.drawString(entry, entryX + 2, entryY + 2, Qubble.CONFIG.getTextColor(), false);
             y += 13;
@@ -70,8 +70,8 @@ public class ListElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
         if (this.maxScroll > 0) {
-            float scrollX = this.getPosX() + this.getWidth() - 8;
-            float scrollY = this.getPosY() + (this.scroll);
+            float scrollX = this.getActualPosX() + this.getWidth() - 8;
+            float scrollY = this.getActualPosY() + (this.scroll);
             int height = (int) ((this.getHeight() - 2) / ((float) this.entries.size() / (float) this.maxDisplayEntries));
             if (mouseX >= scrollX && mouseX < scrollX + 6 && mouseY >= scrollY + 1 && mouseY < scrollY + height) {
                 this.scrolling = true;
@@ -96,8 +96,8 @@ public class ListElement extends Element<QubbleGUI> {
         int y = (int) (-this.scroll * this.scrollPerEntry * 12);
         for (String entry : this.entries) {
             if (y + 13 < this.getHeight() && y >= 0) {
-                float entryX = this.getPosX() + 2;
-                float entryY = this.getPosY() + y + 1;
+                float entryX = this.getActualPosX() + 2;
+                float entryY = this.getActualPosY() + y + 1;
                 float entryWidth = this.getWidth() - 12;
                 int entryHeight = 12;
                 if (this.isSelected(entryX, entryY, entryWidth, entryHeight, mouseX, mouseY)) {
@@ -113,7 +113,7 @@ public class ListElement extends Element<QubbleGUI> {
     }
 
     private boolean isSelected(float entryX, float entryY, float entryWidth, float entryHeight, float mouseX, float mouseY) {
-        return mouseX > entryX && mouseX < entryX + entryWidth && mouseY > entryY && mouseY < entryY + entryHeight;
+        return ElementHandler.INSTANCE.isOnTop(this.getGUI(), this, mouseX, mouseY) && mouseX > entryX && mouseX < entryX + entryWidth && mouseY > entryY && mouseY < entryY + entryHeight;
     }
 
     public String getSelected() {
