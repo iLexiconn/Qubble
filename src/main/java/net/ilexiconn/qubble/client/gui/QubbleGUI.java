@@ -56,7 +56,7 @@ public class QubbleGUI extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        Gui.drawRect(0, 0, this.width, this.height, Qubble.CONFIG.colorMode.getTertiaryColor());
+        Gui.drawRect(0, 0, this.width, this.height, Qubble.CONFIG.getTertiaryColor());
         this.resolution = new ScaledResolution(this.mc);
         float preciseMouseX = this.getPreciseMouseX();
         float preciseMouseY = this.getPreciseMouseY();

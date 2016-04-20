@@ -104,7 +104,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
         if (selection) {
             GlStateManager.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
         } else {
-            int color = Qubble.CONFIG.colorMode.getTertiaryColor();
+            int color = Qubble.CONFIG.getTertiaryColor();
             float r = (float) (color >> 16 & 0xFF) / 255.0F;
             float g = (float) (color >> 8 & 0xFF) / 255.0F;
             float b = (float) (color & 0xFF) / 255.0F;
@@ -166,8 +166,8 @@ public class ModelViewElement extends Element<QubbleGUI> {
         VertexBuffer buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         float gridY = 24.0F * 0.0625F;
-        float size = 5.0F;
-        float maxUV = 1.0F + (1.0F / 128.0F);
+        float size = 36.0F * 0.0625F;
+        float maxUV = 1.0F + (1.0F / 512.0F);
         buffer.pos(-size, gridY, -size).tex(0.0F, 0.0F).endVertex();
         buffer.pos(-size, gridY, size).tex(0.0F, maxUV).endVertex();
         buffer.pos(size, gridY, size).tex(maxUV, maxUV).endVertex();

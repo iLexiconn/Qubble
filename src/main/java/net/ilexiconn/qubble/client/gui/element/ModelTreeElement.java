@@ -38,13 +38,13 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         float scaleFactor = gui.getResolution().getScaleFactor();
         GL11.glScissor((int) (posX * scaleFactor), (int) ((gui.height - (posY + height)) * scaleFactor), (int) (width * scaleFactor), (int) (height * scaleFactor));
-        gui.drawRectangle(posX, posY, width, 15.0F, Qubble.CONFIG.colorMode.getPrimarySubcolor());
+        gui.drawRectangle(posX, posY, width, 15.0F, Qubble.CONFIG.getPrimarySubcolor());
 
         float scrollPerEntry = (float) this.entryCount / (this.getHeight() - 17.0F);
         int i = 0;
         float offset = this.scroll * scrollPerEntry * 10;
         for (float y = 15.0F - offset; y < height + offset; y += 10.0F) {
-            gui.drawRectangle(posX, posY + y, width, 10.0F, i % 2 == 0 ? Qubble.CONFIG.colorMode.getSecondarySubcolor() : Qubble.CONFIG.colorMode.getPrimarySubcolor());
+            gui.drawRectangle(posX, posY + y, width, 10.0F, i % 2 == 0 ? Qubble.CONFIG.getSecondarySubcolor() : Qubble.CONFIG.getPrimarySubcolor());
             i++;
         }
 
@@ -60,7 +60,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
 
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
 
-        fontRenderer.drawString("Model Tree", posX + 4, posY + 4, Qubble.CONFIG.colorMode.getTextColor(), false);
+        fontRenderer.drawString("Model Tree", posX + 4, posY + 4, Qubble.CONFIG.getTextColor(), false);
 
         gui.drawRectangle(posX + width - 2, posY, 2, height, Qubble.CONFIG.getAccentColor());
 
@@ -73,9 +73,9 @@ public class ModelTreeElement extends Element<QubbleGUI> {
             float scrollX = posX + width - 10;
             float scrollY = posY + this.scroll + 2;
             float scrollerHeight = (this.getHeight() - 2) / (this.entryCount / maxDisplayEntries) - 2;
-            this.getGUI().drawRectangle(scrollX, scrollY, 6, scrollerHeight, this.scrolling ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.colorMode.getSecondaryColor());
+            this.getGUI().drawRectangle(scrollX, scrollY, 6, scrollerHeight, this.scrolling ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getSecondaryColor());
         } else {
-            this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 10, this.getPosY() + 2, 6, this.getHeight() - 4, Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.colorMode.getPrimaryColor()));
+            this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 10, this.getPosY() + 2, 6, this.getHeight() - 4, Qubble.CONFIG.getPrimaryColor());
         }
     }
 
@@ -169,7 +169,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         String name = cube.getName();
         float entryX = this.getPosX() + xOffset;
         float entryY = (this.getPosY() + (this.cubeY * 10.0F) + 16.0F) - (this.scroll * scrollPerEntry * 10);
-        fontRenderer.drawString(name, entryX + 10, entryY, this.getGUI().getSelectedCube() == cube ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.colorMode.getTextColor(), false);
+        fontRenderer.drawString(name, entryX + 10, entryY, this.getGUI().getSelectedCube() == cube ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTextColor(), false);
         this.cubeY++;
         boolean expanded = this.isExpanded(cube);
         int prevCubeY = this.cubeY;
@@ -184,7 +184,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
                 i++;
             }
         }
-        int outlineColor = Qubble.CONFIG.getDarkerColor(0xFFACACAC);
+        int outlineColor = 0xFF9E9E9E;
         this.getGUI().drawRectangle(entryX + 1 - 6, entryY + 3.5, 11, 0.75, outlineColor);
         if (cube.getChildren().size() > 0) {
             if (expanded) {

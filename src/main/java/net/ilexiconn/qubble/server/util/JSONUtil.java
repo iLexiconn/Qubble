@@ -2,13 +2,14 @@ package net.ilexiconn.qubble.server.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.ilexiconn.qubble.server.config.QubbleConfig;
+import net.ilexiconn.qubble.server.config.QubbleConfigAdapter;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 
 public class JSONUtil {
-    public static final Gson GSON = new Gson();
-    public static final Gson GSON_PRETTY = new GsonBuilder().setPrettyPrinting().create();
+    public static final Gson GSON = new GsonBuilder().registerTypeAdapter(QubbleConfig.class, new QubbleConfigAdapter()).create();
 
     public static <T> T loadConfig(File f, Class<T> t) {
         if (!f.exists()) {
@@ -29,7 +30,7 @@ public class JSONUtil {
     }
 
     public static <T> T saveConfig(T t, File f) {
-        String json = JSONUtil.GSON_PRETTY.toJson(t);
+        String json = JSONUtil.GSON.toJson(t);
         try {
             if (!f.exists()) {
                 f.createNewFile();

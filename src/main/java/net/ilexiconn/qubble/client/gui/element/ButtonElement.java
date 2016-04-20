@@ -2,6 +2,7 @@ package net.ilexiconn.qubble.client.gui.element;
 
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
+import net.ilexiconn.qubble.server.color.ColorScheme;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.init.SoundEvents;
@@ -11,10 +12,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class ButtonElement extends Element<QubbleGUI> {
     private String text;
-    private int primaryColor = -1;
-    private int secondaryColor = -1;
+    private ColorScheme colorScheme = ColorScheme.DEFAULT;
     private IActionHandler<QubbleGUI, ButtonElement> actionHandler;
-    private boolean reverseColors = false;
 
     public ButtonElement(QubbleGUI gui, String text, float posX, float posY, int width, int height, IActionHandler<QubbleGUI, ButtonElement> actionHandler) {
         super(gui, posX, posY, width, height);
@@ -25,15 +24,15 @@ public class ButtonElement extends Element<QubbleGUI> {
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
         if (this.isSelected(mouseX, mouseY)) {
-            this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), getHeight(), this.secondaryColor == -1 ? this.reverseColors ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.getAccentColor()) : this.secondaryColor);
+            this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), getHeight(), this.colorScheme.getSecondaryColor());
         } else {
-            this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), getHeight(), this.primaryColor == -1 ? this.reverseColors ? Qubble.CONFIG.getDarkerColor(Qubble.CONFIG.getAccentColor()) : Qubble.CONFIG.getAccentColor() : this.primaryColor);
+            this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), getHeight(), this.colorScheme.getPrimaryColor());
         }
         FontRenderer fontRenderer = this.getGUI().mc.fontRendererObj;
         if (this.text.length() == 1) {
-            fontRenderer.drawString(this.text, this.getPosX() + (this.getWidth() / 2) - (fontRenderer.getStringWidth(this.text) / 2) + 0.0625F, this.getPosY() + (this.getHeight() / 2) - (fontRenderer.FONT_HEIGHT / 2) + 0.0625F, Qubble.CONFIG.colorMode.getTextColor(), false);
+            fontRenderer.drawString(this.text, this.getPosX() + (this.getWidth() / 2) - (fontRenderer.getStringWidth(this.text) / 2) + 0.0625F, this.getPosY() + (this.getHeight() / 2) - (fontRenderer.FONT_HEIGHT / 2) + 0.0625F, Qubble.CONFIG.getTextColor(), false);
         } else {
-            fontRenderer.drawString(this.text, this.getPosX() + (this.getWidth() / 2) - (fontRenderer.getStringWidth(this.text) / 2), this.getPosY() + (this.getHeight() / 2) - (fontRenderer.FONT_HEIGHT / 2), Qubble.CONFIG.colorMode.getTextColor(), false);
+            fontRenderer.drawString(this.text, this.getPosX() + (this.getWidth() / 2) - (fontRenderer.getStringWidth(this.text) / 2), this.getPosY() + (this.getHeight() / 2) - (fontRenderer.FONT_HEIGHT / 2), Qubble.CONFIG.getTextColor(), false);
         }
     }
 
@@ -52,14 +51,8 @@ public class ButtonElement extends Element<QubbleGUI> {
         return ElementHandler.INSTANCE.isOnTop(this.getGUI(), this, mouseX, mouseY) && mouseX >= this.getPosX() && mouseY >= this.getPosY() && mouseX <= this.getPosX() + this.getWidth() && mouseY <= this.getPosY() + this.getHeight();
     }
 
-    public ButtonElement withColorScheme(int primaryColor, int secondaryColor) {
-        this.primaryColor = primaryColor;
-        this.secondaryColor = secondaryColor;
-        return this;
-    }
-
-    public ButtonElement withReverseColors(boolean reverseColors) {
-        this.reverseColors = reverseColors;
+    public ButtonElement withColorScheme(ColorScheme colorScheme) {
+        this.colorScheme = colorScheme;
         return this;
     }
 

@@ -13,7 +13,7 @@ public class SidebarElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), Qubble.CONFIG.colorMode.getPrimaryColor());
+        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), Qubble.CONFIG.getPrimaryColor());
         this.getGUI().drawRectangle(this.getPosX() - 2, this.getPosY(), 2, this.getHeight(), Qubble.CONFIG.getAccentColor());
     }
 }

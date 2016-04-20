@@ -2,6 +2,7 @@ package net.ilexiconn.qubble.client.gui.element;
 
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
+import net.ilexiconn.qubble.server.color.ColorScheme;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.relauncher.Side;
@@ -26,7 +27,7 @@ public class WindowElement extends Element<QubbleGUI> {
     public WindowElement(QubbleGUI gui, String name, int width, int height, int posX, int posY) {
         super(gui, posX, posY, width, height);
         this.name = name;
-        this.addElement(new ButtonElement(gui, "x", this.getWidth() - 14, 0, 14, 14, (g, c) -> ElementHandler.INSTANCE.removeElement(g, this)).withReverseColors(true).withColorScheme(-1, 0xFFE04747));
+        this.addElement(new ButtonElement(gui, "x", this.getWidth() - 14, 0, 14, 14, (g, c) -> ElementHandler.INSTANCE.removeElement(g, this)).withColorScheme(ColorScheme.CLOSE));
     }
 
     public void addElement(Element<QubbleGUI> element) {
@@ -41,10 +42,10 @@ public class WindowElement extends Element<QubbleGUI> {
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
         GlStateManager.pushMatrix();
-        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), Qubble.CONFIG.colorMode.getPrimaryColor());
+        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), Qubble.CONFIG.getPrimaryColor());
         this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), 14, Qubble.CONFIG.getAccentColor());
         FontRenderer fontRenderer = this.getGUI().mc.fontRendererObj;
-        fontRenderer.drawString(this.name, this.getPosX() + 2.0F, this.getPosY() + 3.0F, Qubble.CONFIG.colorMode.getTextColor(), false);
+        fontRenderer.drawString(this.name, this.getPosX() + 2.0F, this.getPosY() + 3.0F, Qubble.CONFIG.getTextColor(), false);
         mouseX -= this.getPosX();
         mouseY -= this.getPosY();
         GlStateManager.translate(this.getPosX(), this.getPosY(), 0.0);

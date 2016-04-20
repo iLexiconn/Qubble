@@ -16,6 +16,6 @@ public class TextElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        this.getGUI().mc.fontRendererObj.drawString(this.text, this.getPosX(), this.getPosY(), Qubble.CONFIG.colorMode.getTextColor(), false);
+        this.getGUI().mc.fontRendererObj.drawString(this.text, this.getPosX(), this.getPosY(), Qubble.CONFIG.getTextColor(), false);
     }
 }

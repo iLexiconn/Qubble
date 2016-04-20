@@ -35,7 +35,7 @@ public class InputElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        this.getGUI().drawRectangle(this.getPosX() + 1, this.getPosY() + 1, this.getWidth() - 1, this.getHeight() - 1, Qubble.CONFIG.colorMode.getSecondaryColor());
+        this.getGUI().drawRectangle(this.getPosX() + 1, this.getPosY() + 1, this.getWidth() - 1, this.getHeight() - 1, Qubble.CONFIG.getSecondaryColor());
         int cursor = this.cursorPosition - this.lineScrollOffset;
         int cursorEnd = this.selectionEnd - this.lineScrollOffset;
         String displayString = this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
@@ -51,7 +51,7 @@ public class InputElement extends Element<QubbleGUI> {
 
         if (!displayString.isEmpty()) {
             String s = verticalCursor ? displayString.substring(0, cursor) : displayString;
-            line = this.getGUI().mc.fontRendererObj.drawString(s, x + 3, y + 1 + getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2, Qubble.CONFIG.colorMode.getTextColor(), false);
+            line = this.getGUI().mc.fontRendererObj.drawString(s, x + 3, y + 1 + getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2, Qubble.CONFIG.getTextColor(), false);
         }
 
         boolean renderVerticalCursor = this.cursorPosition < this.text.length();
@@ -65,14 +65,14 @@ public class InputElement extends Element<QubbleGUI> {
         }
 
         if (!displayString.isEmpty() && verticalCursor && cursor < displayString.length()) {
-            this.getGUI().mc.fontRendererObj.drawString(displayString.substring(cursor), line + 1, y + 1 + this.getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2, Qubble.CONFIG.colorMode.getTextColor(), false);
+            this.getGUI().mc.fontRendererObj.drawString(displayString.substring(cursor), line + 1, y + 1 + this.getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2, Qubble.CONFIG.getTextColor(), false);
         }
 
         if (renderCursor) {
             if (renderVerticalCursor) {
-                this.getGUI().drawRectangle(lineX, y + 1, 1, this.getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2 + 1 + this.getGUI().mc.fontRendererObj.FONT_HEIGHT, Qubble.CONFIG.colorMode.getPrimaryColor());
+                this.getGUI().drawRectangle(lineX, y + 1, 1, this.getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2 + 1 + this.getGUI().mc.fontRendererObj.FONT_HEIGHT, Qubble.CONFIG.getPrimaryColor());
             } else {
-                this.getGUI().mc.fontRendererObj.drawString("_", cursor == 0 ? lineX + 3 : lineX, y + 1 + this.getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2, Qubble.CONFIG.colorMode.getPrimaryColor(), false);
+                this.getGUI().mc.fontRendererObj.drawString("_", cursor == 0 ? lineX + 3 : lineX, y + 1 + this.getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2, Qubble.CONFIG.getPrimaryColor(), false);
             }
         }
 
