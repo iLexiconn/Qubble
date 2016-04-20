@@ -26,7 +26,7 @@ public class ProjectBarElement extends Element<QubbleGUI> {
         ModelTreeElement modelTree = this.getGUI().getModelTree();
         SidebarElement sideBar = this.getGUI().getSidebar();
         this.setPosX(modelTree.getWidth());
-        this.setWidth(this.getGUI().width - modelTree.getWidth() - sideBar.getWidth());
+        this.setWidth(this.getGUI().width - modelTree.getWidth() - sideBar.getWidth() - 2);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ProjectBarElement extends Element<QubbleGUI> {
         for (int projectIndex = 0; projectIndex < openProjects.size(); projectIndex++) {
             QubbleModel model = openProjects.get(projectIndex);
             float projectWidth = fontRenderer.getStringWidth(model.getName()) + 15.0F;
-            boolean hover = mouseX >= posX + projectX + projectWidth - 12 && mouseX <= posX + projectX + projectWidth && mouseY >= posY && mouseY < posY + height;
+            boolean hover = this.isSelected(mouseX, mouseY) && mouseX >= posX + projectX + projectWidth - 12 && mouseX <= posX + projectX + projectWidth;
             if (projectIndex == gui.getSelectedProject()) {
                 gui.drawRectangle(posX + projectX, posY, projectWidth, height, Qubble.CONFIG.getTertiaryColor());
                 gui.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : Qubble.CONFIG.getTertiaryColor());

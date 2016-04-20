@@ -22,10 +22,16 @@ public class InputElement extends Element<QubbleGUI> {
     private int cursorPosition;
     private int selectionEnd;
     private int cursorCounter;
+    private boolean editable;
 
     public InputElement(QubbleGUI gui, String text, float posX, float posY, int width) {
+        this(gui, text, posX, posY, width, true);
+    }
+
+    public InputElement(QubbleGUI gui, String text, float posX, float posY, int width, boolean editable) {
         super(gui, posX, posY, width, 14);
         this.text = text;
+        this.editable = editable;
     }
 
     @Override
@@ -35,7 +41,7 @@ public class InputElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        this.getGUI().drawRectangle(this.getPosX() + 1, this.getPosY() + 1, this.getWidth() - 1, this.getHeight() - 1, Qubble.CONFIG.getSecondaryColor());
+        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), Qubble.CONFIG.getSecondaryColor());
         int cursor = this.cursorPosition - this.lineScrollOffset;
         int cursorEnd = this.selectionEnd - this.lineScrollOffset;
         String displayString = this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
@@ -85,7 +91,7 @@ public class InputElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
         this.selected = this.isMouseSelecting(mouseX, mouseY);
-        if (this.selected && button == 0) {
+        if (this.selected && button == 0 && this.editable) {
             int width = (int) (mouseX - this.getPosX() - 1);
             String displayString = this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
             this.setCursorPosition(this.getGUI().mc.fontRendererObj.trimStringToWidth(displayString, width).length() + this.lineScrollOffset);

@@ -13,13 +13,13 @@ public class SidebarElement extends Element<QubbleGUI> {
     private List<Element<QubbleGUI>> elementList = new ArrayList<>();
 
     public SidebarElement(QubbleGUI gui) {
-        super(gui, gui.width - 90, 20, 90, gui.height - 20);
+        super(gui, gui.width - 120, 20, 120, gui.height - 20);
     }
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
         this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), Qubble.CONFIG.getPrimaryColor());
-        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), 2, this.getHeight(), Qubble.CONFIG.getAccentColor());
+        this.getGUI().drawRectangle(this.getPosX() - 2, this.getPosY(), 2, this.getHeight(), Qubble.CONFIG.getAccentColor());
         for (Element<QubbleGUI> element : this.elementList) {
             element.render(mouseX, mouseY, partialTicks);
         }
@@ -71,8 +71,25 @@ public class SidebarElement extends Element<QubbleGUI> {
 
     public void initModelView() {
         this.elementList.clear();
-        this.addElement(new TextElement(this.getGUI(), "Cube", 4, 2));
-        this.addElement(new InputElement(this.getGUI(), "", 3, 10, 85));
+        this.addElement(new TextElement(this.getGUI(), "Selected cube", 2, 10));
+        this.addElement(new InputElement(this.getGUI(), "", 2, 19, 116));
+        this.addElement(new TextElement(this.getGUI(), "Dimensions", 2, 44));
+        this.addElement(new SliderElement(this.getGUI(), 2, 53, true, value -> true));
+        this.addElement(new SliderElement(this.getGUI(), 41, 53, true, value -> true));
+        this.addElement(new SliderElement(this.getGUI(), 80, 53, true, value -> true));
+        this.addElement(new TextElement(this.getGUI(), "Position", 2, 69));
+        this.addElement(new SliderElement(this.getGUI(), 2, 78, value -> true));
+        this.addElement(new SliderElement(this.getGUI(), 41, 78, value -> true));
+        this.addElement(new SliderElement(this.getGUI(), 80, 78, value -> true));
+        this.addElement(new TextElement(this.getGUI(), "Offset", 2, 94));
+        this.addElement(new SliderElement(this.getGUI(), 2, 103, value -> true));
+        this.addElement(new SliderElement(this.getGUI(), 41, 103, value -> true));
+        this.addElement(new SliderElement(this.getGUI(), 80, 103, value -> true));
+        this.addElement(new TextElement(this.getGUI(), "Scale", 2, 119));
+        this.addElement(new SliderElement(this.getGUI(), 2, 128, value -> true));
+        this.addElement(new SliderElement(this.getGUI(), 41, 128, value -> true));
+        this.addElement(new SliderElement(this.getGUI(), 80, 128, value -> true));
+        this.addElement(new TextElement(this.getGUI(), "Rotation", 2, 144));
     }
 
     public void initTextureView() {
