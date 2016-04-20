@@ -9,9 +9,8 @@ import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.model.QubbleModelBase;
 import net.ilexiconn.qubble.client.model.QubbleModelRenderer;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -44,6 +43,8 @@ public class ModelViewElement extends Element<QubbleGUI> {
     private boolean dragged;
 
     private float partialTicks;
+
+    private static final ResourceLocation GRID = new ResourceLocation(Qubble.MODID, "/textures/grid.png");
 
     public ModelViewElement(QubbleGUI gui) {
         super(gui, 0.0F, 0.0F, gui.width, gui.height);
@@ -157,6 +158,24 @@ public class ModelViewElement extends Element<QubbleGUI> {
             GlStateManager.popMatrix();
         }
         GlStateManager.enableTexture2D();
+        GlStateManager.pushMatrix();
+        GlStateManager.enableBlend();
+        GlStateManager.disableLighting();
+        ClientProxy.MINECRAFT.getTextureManager().bindTexture(GRID);
+        Tessellator tessellator = Tessellator.getInstance();
+        VertexBuffer buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        float gridY = 24.0F * 0.0625F;
+        float size = 5.0F;
+        float maxUV = 1.0F + (1.0F / 128.0F);
+        buffer.pos(-size, gridY, -size).tex(0.0F, 0.0F).endVertex();
+        buffer.pos(-size, gridY, size).tex(0.0F, maxUV).endVertex();
+        buffer.pos(size, gridY, size).tex(maxUV, maxUV).endVertex();
+        buffer.pos(size, gridY, -size).tex(maxUV, 0.0F).endVertex();
+        tessellator.draw();
+        GlStateManager.disableBlend();
+        GlStateManager.enableLighting();
+        GlStateManager.popMatrix();
         GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
         RenderHelper.disableStandardItemLighting();
         GlStateManager.popMatrix();
