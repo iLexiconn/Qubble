@@ -49,11 +49,13 @@ public class ProjectBarElement extends Element<QubbleGUI> {
             boolean hover = mouseX >= posX + projectX + projectWidth - 12 && mouseX <= posX + projectX + projectWidth && mouseY >= posY && mouseY < posY + height;
             if (projectIndex == gui.getSelectedProject()) {
                 gui.drawRectangle(posX + projectX, posY, projectWidth, height, Qubble.CONFIG.getTertiaryColor());
+                gui.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : Qubble.CONFIG.getTertiaryColor());
+            } else {
+                gui.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : Qubble.CONFIG.getPrimaryColor());
             }
-            gui.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : Qubble.CONFIG.getTertiaryColor());
             fontRenderer.drawString("x", posX + projectX + projectWidth - 9, posY + 2, Qubble.CONFIG.getTextColor(), false);
             fontRenderer.drawString(model.getName(), posX + projectX + 2, posY + 2, Qubble.CONFIG.getTextColor(), false);
-            projectX += projectWidth + 1.0F;
+            projectX += projectWidth;
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
