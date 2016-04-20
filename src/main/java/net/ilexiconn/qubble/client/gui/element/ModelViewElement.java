@@ -115,12 +115,12 @@ public class ModelViewElement extends Element<QubbleGUI> {
         GlStateManager.clear(GL11.GL_COLOR_BUFFER_BIT);
         this.setupCamera(10.0F, partialTicks);
         QubbleModel newModel = this.getGUI().getSelectedModel();
-        if (this.currentModelContainer != newModel) {
+        if (this.currentModelContainer != newModel && newModel != null) {
             this.currentModel = new QubbleModelBase(newModel, false);
             this.currentModelSelection = new QubbleModelBase(newModel, true);
             this.currentModelContainer = newModel;
         }
-        GlStateManager.translate(0.0F, -1.0F, 0.0F);
+        GlStateManager.translate(0.0F, -1.5F, 0.0F);
         QubbleCube selectedCube = this.getGUI().getSelectedCube();
         QubbleModelRenderer selectedBox = this.currentModel.getCube(selectedCube);
         GlStateManager.enableBlend();
@@ -155,24 +155,26 @@ public class ModelViewElement extends Element<QubbleGUI> {
             GlStateManager.popMatrix();
         }
         GlStateManager.enableTexture2D();
-        GlStateManager.pushMatrix();
-        GlStateManager.enableBlend();
-        GlStateManager.disableLighting();
-        ClientProxy.MINECRAFT.getTextureManager().bindTexture(GRID);
-        Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        float gridY = 24.0F * 0.0625F;
-        float size = 36.0F * 0.0625F;
-        float maxUV = 1.0F + (1.0F / 512.0F);
-        buffer.pos(-size, gridY, -size).tex(0.0F, 0.0F).endVertex();
-        buffer.pos(-size, gridY, size).tex(0.0F, maxUV).endVertex();
-        buffer.pos(size, gridY, size).tex(maxUV, maxUV).endVertex();
-        buffer.pos(size, gridY, -size).tex(maxUV, 0.0F).endVertex();
-        tessellator.draw();
-        GlStateManager.disableBlend();
-        GlStateManager.enableLighting();
-        GlStateManager.popMatrix();
+        if (!selection) {
+            GlStateManager.pushMatrix();
+            GlStateManager.enableBlend();
+            GlStateManager.disableLighting();
+            ClientProxy.MINECRAFT.getTextureManager().bindTexture(GRID);
+            Tessellator tessellator = Tessellator.getInstance();
+            VertexBuffer buffer = tessellator.getBuffer();
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+            float gridY = 24.0F * 0.0625F;
+            float size = 36.0F * 0.0625F;
+            float maxUV = 1.0F + (1.0F / 512.0F);
+            buffer.pos(-size, gridY, -size).tex(0.0F, 0.0F).endVertex();
+            buffer.pos(-size, gridY, size).tex(0.0F, maxUV).endVertex();
+            buffer.pos(size, gridY, size).tex(maxUV, maxUV).endVertex();
+            buffer.pos(size, gridY, -size).tex(maxUV, 0.0F).endVertex();
+            tessellator.draw();
+            GlStateManager.disableBlend();
+            GlStateManager.enableLighting();
+            GlStateManager.popMatrix();
+        }
         GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
         RenderHelper.disableStandardItemLighting();
         GlStateManager.popMatrix();
@@ -247,6 +249,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
     private boolean isSelecting(float mouseX, float mouseY) {
         ModelTreeElement modelTree = this.getGUI().getModelTree();
         ToolbarElement toolbar = this.getGUI().getToolbar();
-        return mouseX > modelTree.getPosX() + modelTree.getWidth() && mouseY >= toolbar.getPosY() + toolbar.getHeight();
+        ProjectBarElement projectBar = this.getGUI().getProjectBar();
+        return mouseX > modelTree.getPosX() + modelTree.getWidth() && mouseY >= toolbar.getPosY() + toolbar.getHeight() + (projectBar.isVisible() ? projectBar.getHeight() : 0);
     }
 }

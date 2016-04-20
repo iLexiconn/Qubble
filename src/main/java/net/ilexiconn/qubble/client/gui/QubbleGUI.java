@@ -22,6 +22,8 @@ import org.lwjgl.opengl.GL11;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class QubbleGUI extends GuiScreen {
@@ -31,8 +33,10 @@ public class QubbleGUI extends GuiScreen {
     private ModelTreeElement modelTree;
     private ModelViewElement modelView;
     private SidebarElement sidebar;
+    private ProjectBarElement projectBar;
 
-    private QubbleModel selectedModel;
+    private List<QubbleModel> openProjects = new ArrayList<>();
+    private int selectedProject;
     private QubbleCube selectedCube;
 
     public QubbleGUI(GuiScreen parent) {
@@ -46,6 +50,7 @@ public class QubbleGUI extends GuiScreen {
         ElementHandler.INSTANCE.addElement(this, this.toolbar = new ToolbarElement(this));
         ElementHandler.INSTANCE.addElement(this, this.modelTree = new ModelTreeElement(this));
         ElementHandler.INSTANCE.addElement(this, this.sidebar = new SidebarElement(this));
+        ElementHandler.INSTANCE.addElement(this, this.projectBar = new ProjectBarElement(this));
         ElementHandler.INSTANCE.init(this);
     }
 
@@ -155,15 +160,30 @@ public class QubbleGUI extends GuiScreen {
             } else {
                 model = importer.getModel(name, importer.read(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, name + "." + importer.getExtension())));
             }
-            this.selectedModel = model;
+            this.selectedProject = this.openProjects.size();
+            this.openProjects.add(model);
             this.selectedCube = null;
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public void selectModel(int index) {
+        this.selectedProject = Math.max(0, Math.min(this.openProjects.size() - 1, index));
+        this.selectedCube = null;
+    }
+
+    public void closeModel(int index) {
+        this.openProjects.remove(index);
+        this.selectedProject = Math.max(0, Math.min(this.openProjects.size() - 1, selectedProject));
+    }
+
     public QubbleModel getSelectedModel() {
-        return this.selectedModel;
+        return this.openProjects.size() > this.selectedProject ? this.openProjects.get(this.selectedProject) : null;
+    }
+
+    public int getSelectedProject() {
+        return this.selectedProject;
     }
 
     public void setSelectedCube(QubbleCube selectedCube) {
@@ -184,5 +204,13 @@ public class QubbleGUI extends GuiScreen {
 
     public ModelViewElement getModelView() {
         return this.modelView;
+    }
+
+    public ProjectBarElement getProjectBar() {
+        return this.projectBar;
+    }
+
+    public List<QubbleModel> getOpenProjects() {
+        return this.openProjects;
     }
 }
