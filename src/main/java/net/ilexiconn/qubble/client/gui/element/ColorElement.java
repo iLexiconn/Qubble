@@ -44,8 +44,8 @@ public class ColorElement extends Element<QubbleGUI> {
         float offsetX = this.getWidth() / 2 - (this.horizontalRows * 23 + 4) / 2;
         float offsetY = this.getHeight() / 2 - (this.colors.length / this.horizontalRows * 23 + 4) / 2;
         for (int i = 0; i < this.colors.length; i++) {
-            float x = this.getActualPosX() + i % this.horizontalRows * 23 + 4 + offsetX;
-            float y = this.getActualPosY() + i / this.horizontalRows * 23 + 4 + offsetY;
+            float x = this.getPosX() + i % this.horizontalRows * 23 + 4 + offsetX;
+            float y = this.getPosY() + i / this.horizontalRows * 23 + 4 + offsetY;
             if (button == 0 && mouseX >= x && mouseX <= x + 20 && mouseY >= y && mouseY <= y + 20) {
                 this.selectedColor = this.colors[i];
                 this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));

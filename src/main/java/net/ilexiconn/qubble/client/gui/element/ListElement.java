@@ -41,17 +41,13 @@ public class ListElement extends Element<QubbleGUI> {
         int y = (int) (-this.scroll * this.scrollPerEntry * 12);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         int scaleFactor = this.getGUI().getResolution().getScaleFactor();
-        if (this.getParent() != null) {
-            GL11.glScissor((int) ((this.getPosX() + this.getParent().getPosX()) * scaleFactor), (int) ((this.getGUI().height - (this.getPosY() + this.getHeight() + this.getParent().getPosY()) + 2) * scaleFactor), this.getWidth() * scaleFactor, (this.getHeight() - 4) * scaleFactor);
-        } else {
-            GL11.glScissor((int) (this.getPosX() * scaleFactor), (int) ((this.getGUI().height - (this.getPosY() + this.getHeight()) + 2) * scaleFactor), this.getWidth() * scaleFactor, (this.getHeight() - 4) * scaleFactor);
-        }
+        GL11.glScissor((int) (this.getPosX() * scaleFactor), (int) ((this.getGUI().height - (this.getPosY() + this.getHeight()) + 2) * scaleFactor), this.getWidth() * scaleFactor, (this.getHeight() - 4) * scaleFactor);
         for (String entry : this.entries) {
             float entryX = this.getPosX() + 2;
             float entryY = this.getPosY() + y + 2;
             float entryWidth = this.getWidth() - 4;
             int entryHeight = 11;
-            boolean selected = this.isSelected(this.getActualPosX() + 2, this.getActualPosY() + y + 1, entryWidth, entryHeight + 1, mouseX, mouseY) && !this.scrolling;
+            boolean selected = this.isSelected(this.getPosX() + 2, this.getPosY() + y + 1, entryWidth, entryHeight + 1, mouseX, mouseY) && !this.scrolling;
             this.getGUI().drawRectangle(entryX, entryY, entryWidth, entryHeight + 1, selected ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getSecondaryColor());
             fontRenderer.drawString(entry, entryX + 2, entryY + 2, Qubble.CONFIG.getTextColor(), false);
             y += 13;
@@ -70,8 +66,8 @@ public class ListElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
         if (this.maxScroll > 0) {
-            float scrollX = this.getActualPosX() + this.getWidth() - 8;
-            float scrollY = this.getActualPosY() + (this.scroll);
+            float scrollX = this.getPosX() + this.getWidth() - 8;
+            float scrollY = this.getPosY() + (this.scroll);
             int height = (int) ((this.getHeight() - 2) / ((float) this.entries.size() / (float) this.maxDisplayEntries));
             if (mouseX >= scrollX && mouseX < scrollX + 6 && mouseY >= scrollY + 1 && mouseY < scrollY + height) {
                 this.scrolling = true;
@@ -96,8 +92,8 @@ public class ListElement extends Element<QubbleGUI> {
         int y = (int) (-this.scroll * this.scrollPerEntry * 12);
         for (String entry : this.entries) {
             if (y + 13 < this.getHeight() && y >= 0) {
-                float entryX = this.getActualPosX() + 2;
-                float entryY = this.getActualPosY() + y + 1;
+                float entryX = this.getPosX() + 2;
+                float entryY = this.getPosY() + y + 1;
                 float entryWidth = this.getWidth() - 12;
                 int entryHeight = 12;
                 if (this.isSelected(entryX, entryY, entryWidth, entryHeight, mouseX, mouseY)) {

@@ -1,9 +1,12 @@
 package net.ilexiconn.qubble.client.gui.element;
 
+import net.ilexiconn.qubble.client.ClientProxy;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class Element<T extends GuiScreen> extends Gui {
@@ -59,20 +62,20 @@ public class Element<T extends GuiScreen> extends Gui {
         return gui;
     }
 
-    public float getPosX() {
-        return posX;
-    }
-
-    public float getPosY() {
-        return posY;
-    }
-
     public int getWidth() {
         return width;
     }
 
     public int getHeight() {
         return height;
+    }
+
+    public float getPosX() {
+        return this.posX + (this.getParent() != null ? this.getParent().getPosX() : 0);
+    }
+
+    public float getPosY() {
+        return this.posY + (this.getParent() != null ? this.getParent().getPosY() : 0);
     }
 
     public void setPosX(float posX) {
@@ -113,14 +116,16 @@ public class Element<T extends GuiScreen> extends Gui {
     }
 
     protected boolean isSelected(float mouseX, float mouseY) {
-        return ElementHandler.INSTANCE.isOnTop(this.getGUI(), this, mouseX, mouseY) && mouseX >= this.getActualPosX() && mouseY >= this.getActualPosY() && mouseX < this.getActualPosX() + this.getWidth() && mouseY < this.getActualPosY() + this.getHeight();
+        return ElementHandler.INSTANCE.isOnTop(this.getGUI(), this, mouseX, mouseY) && mouseX >= this.getPosX() && mouseY >= this.getPosY() && mouseX < this.getPosX() + this.getWidth() && mouseY < this.getPosY() + this.getHeight();
     }
 
-    public float getActualPosX() {
-        return this.posX + (this.getParent() != null ? this.getParent().getPosX() : 0);
+    protected void startScissor() {
+        GL11.glEnable(GL11.GL_SCISSOR_TEST);
+        float scaleFactor = new ScaledResolution(ClientProxy.MINECRAFT).getScaleFactor();
+        GL11.glScissor((int) (this.posX * scaleFactor), (int) ((this.gui.height - (this.posY + this.height)) * scaleFactor), (int) (this.width * scaleFactor), (int) (this.height * scaleFactor));
     }
 
-    public float getActualPosY() {
-        return this.posY + (this.getParent() != null ? this.getParent().getPosY() : 0);
+    protected void endScissor() {
+        GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
 }

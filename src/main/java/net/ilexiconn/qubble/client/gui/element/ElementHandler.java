@@ -42,7 +42,7 @@ public enum ElementHandler {
         if (this.elementMap.containsKey(gui)) {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
             for (Element<T> e : Lists.reverse(elementList)) {
-                if (mouseX >= e.getActualPosX() && mouseY >= e.getActualPosY() && mouseX < e.getActualPosX() + e.getWidth() && mouseY < e.getActualPosY() + e.getHeight()) {
+                if (mouseX >= e.getPosX() && mouseY >= e.getPosY() && mouseX < e.getPosX() + e.getWidth() && mouseY < e.getPosY() + e.getHeight()) {
                     return element == e || (element.getParent() != null && element.getParent() == e);
                 }
             }

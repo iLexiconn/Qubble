@@ -45,19 +45,20 @@ public class WindowElement extends Element<QubbleGUI> {
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
         GlStateManager.pushMatrix();
+        this.startScissor();
         float renderX = ClientUtils.interpolate(this.prevPosX, this.getPosX(), partialTicks);
         float renderY = ClientUtils.interpolate(this.prevPosY, this.getPosY(), partialTicks);
         this.getGUI().drawRectangle(renderX, renderY, this.getWidth(), this.getHeight(), Qubble.CONFIG.getPrimaryColor());
         this.getGUI().drawRectangle(renderX, renderY, this.getWidth(), 14, Qubble.CONFIG.getAccentColor());
         FontRenderer fontRenderer = this.getGUI().mc.fontRendererObj;
         fontRenderer.drawString(this.name, renderX + 2.0F, renderY + 3.0F, Qubble.CONFIG.getTextColor(), false);
-        GlStateManager.translate(renderX, renderY, 0.0);
         for (Element<QubbleGUI> element : this.elementList) {
             element.render(mouseX, mouseY, partialTicks);
         }
         GlStateManager.popMatrix();
         this.prevPosX = this.getPosX();
         this.prevPosY = this.getPosY();
+        this.endScissor();
     }
 
     @Override
