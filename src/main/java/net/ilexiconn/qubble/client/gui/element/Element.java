@@ -15,7 +15,7 @@ public class Element<T extends GuiScreen> extends Gui {
     private float posY;
     private int width;
     private int height;
-    private WindowElement parent;
+    private Element<T> parent;
     private boolean visible = true;
 
     public Element(T gui, float posX, float posY, int width, int height) {
@@ -94,17 +94,13 @@ public class Element<T extends GuiScreen> extends Gui {
         this.height = height;
     }
 
-    public Element<T> withParent(WindowElement parent) {
+    public Element<T> withParent(Element<T> parent) {
         this.parent = parent;
         return this;
     }
 
-    public WindowElement getParent() {
+    public Element<T> getParent() {
         return parent;
-    }
-
-    public void setParent(WindowElement parent) {
-        this.parent = parent;
     }
 
     public boolean isVisible() {

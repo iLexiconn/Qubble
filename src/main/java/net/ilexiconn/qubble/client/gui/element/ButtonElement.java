@@ -9,16 +9,18 @@ import net.minecraft.init.SoundEvents;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.function.Function;
+
 @SideOnly(Side.CLIENT)
 public class ButtonElement extends Element<QubbleGUI> {
     private String text;
     private ColorScheme colorScheme = ColorScheme.DEFAULT;
-    private IActionHandler<QubbleGUI, ButtonElement> actionHandler;
+    private Function<Void, Boolean> function;
 
-    public ButtonElement(QubbleGUI gui, String text, float posX, float posY, int width, int height, IActionHandler<QubbleGUI, ButtonElement> actionHandler) {
+    public ButtonElement(QubbleGUI gui, String text, float posX, float posY, int width, int height, Function<Void, Boolean> function) {
         super(gui, posX, posY, width, height);
         this.text = text;
-        this.actionHandler = actionHandler;
+        this.function = function;
     }
 
     @Override
@@ -39,8 +41,9 @@ public class ButtonElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
         if (this.isSelected(mouseX, mouseY)) {
-            this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
-            this.actionHandler.onAction(this.getGUI(), this);
+            if (this.function.apply(null)) {
+                this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
+            }
             return true;
         } else {
             return false;
@@ -52,7 +55,7 @@ public class ButtonElement extends Element<QubbleGUI> {
         return this;
     }
 
-    public String getText() {
-        return text;
+    public ColorScheme getColorScheme() {
+        return colorScheme;
     }
 }

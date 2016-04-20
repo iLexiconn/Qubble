@@ -30,7 +30,10 @@ public class WindowElement extends Element<QubbleGUI> {
     public WindowElement(QubbleGUI gui, String name, int width, int height, int posX, int posY) {
         super(gui, posX, posY, width, height);
         this.name = name;
-        this.addElement(new ButtonElement(gui, "x", this.getWidth() - 14, 0, 14, 14, (g, c) -> ElementHandler.INSTANCE.removeElement(g, this)).withColorScheme(ColorScheme.CLOSE));
+        this.addElement(new ButtonElement(gui, "x", this.getWidth() - 14, 0, 14, 14, (v) -> {
+            ElementHandler.INSTANCE.removeElement(this.getGUI(), this);
+            return true;
+        }).withColorScheme(ColorScheme.CLOSE));
     }
 
     public void addElement(Element<QubbleGUI> element) {

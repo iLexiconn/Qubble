@@ -10,13 +10,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
+import java.util.function.Function;
 
 @SideOnly(Side.CLIENT)
 public class ListElement extends Element<QubbleGUI> {
     private List<String> entries;
-    private IActionHandler<QubbleGUI, ListElement> actionHandler;
-
-    private String selected;
+    private Function<String, Boolean> function;
 
     private int scroll;
     private int maxDisplayEntries;
@@ -25,10 +24,10 @@ public class ListElement extends Element<QubbleGUI> {
     private boolean scrolling;
     private float scrollPerEntry;
 
-    public ListElement(QubbleGUI gui, float posX, float posY, int width, int height, List<String> entries, IActionHandler<QubbleGUI, ListElement> actionHandler) {
+    public ListElement(QubbleGUI gui, float posX, float posY, int width, int height, List<String> entries, Function<String, Boolean> function) {
         super(gui, posX, posY, width, height);
         this.entries = entries;
-        this.actionHandler = actionHandler;
+        this.function = function;
         this.maxDisplayEntries = this.getHeight() / 12;
         this.maxScroll = Math.max(0, this.entries.size() - this.maxDisplayEntries);
         this.scrollPerEntry = (float) (this.entries.size()) / (this.getHeight() - 2);
@@ -97,9 +96,9 @@ public class ListElement extends Element<QubbleGUI> {
                 float entryWidth = this.getWidth() - 12;
                 int entryHeight = 12;
                 if (this.isSelected(entryX, entryY, entryWidth, entryHeight, mouseX, mouseY)) {
-                    this.selected = entry;
-                    this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
-                    this.actionHandler.onAction(this.getGUI(), this);
+                    if (this.function.apply(entry)) {
+                        this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
+                    }
                     return true;
                 }
             }
@@ -110,9 +109,5 @@ public class ListElement extends Element<QubbleGUI> {
 
     private boolean isSelected(float entryX, float entryY, float entryWidth, float entryHeight, float mouseX, float mouseY) {
         return ElementHandler.INSTANCE.isOnTop(this.getGUI(), this, mouseX, mouseY) && mouseX > entryX && mouseX < entryX + entryWidth && mouseY > entryY && mouseY < entryY + entryHeight;
-    }
-
-    public String getSelected() {
-        return this.selected;
     }
 }

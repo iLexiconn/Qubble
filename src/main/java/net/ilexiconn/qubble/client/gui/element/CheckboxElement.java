@@ -12,15 +12,15 @@ import java.util.function.Function;
 @SideOnly(Side.CLIENT)
 public class CheckboxElement extends Element<QubbleGUI> {
     private boolean selected;
-    private Function<Boolean, Boolean> actionHandler;
+    private Function<Boolean, Boolean> function;
 
     public CheckboxElement(QubbleGUI gui, float posX, float posY) {
         this(gui, posX, posY, null);
     }
 
-    public CheckboxElement(QubbleGUI gui, float posX, float posY, Function<Boolean, Boolean> actionHandler) {
+    public CheckboxElement(QubbleGUI gui, float posX, float posY, Function<Boolean, Boolean> function) {
         super(gui, posX, posY, 14, 14);
-        this.actionHandler = actionHandler;
+        this.function = function;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class CheckboxElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
         if (button == 0 && super.isSelected(mouseX, mouseY)) {
-            if (this.actionHandler != null && this.actionHandler.apply(!this.selected)) {
+            if (this.function != null && this.function.apply(!this.selected)) {
                 this.selected = !this.selected;
                 this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
             }
@@ -44,7 +44,7 @@ public class CheckboxElement extends Element<QubbleGUI> {
     }
 
     public CheckboxElement withActionHandler(Function<Boolean, Boolean> actionHandler) {
-        this.actionHandler = actionHandler;
+        this.function = actionHandler;
         return this;
     }
 
