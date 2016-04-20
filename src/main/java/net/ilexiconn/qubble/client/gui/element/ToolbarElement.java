@@ -94,22 +94,20 @@ public class ToolbarElement extends Element<QubbleGUI> {
     }
 
     private void openModelExportWindow(IModelExporter modelExporter) {
-        int argumentY = 20;
+        int argumentY = 18;
         String[] argumentNames = modelExporter.getArgumentNames();
         String[] defaultArguments = modelExporter.getDefaultArguments(this.getGUI().getSelectedModel());
         InputElement[] argumentTextBoxes = new InputElement[argumentNames.length];
-        boolean compact = argumentNames.length == 0;
-        int width = compact ? 200 : 400;
-        int height = compact ? 60 : 200;
-        WindowElement window = new WindowElement(this.getGUI(), "Export " + this.getGUI().getSelectedModel().getName() + " to " + modelExporter.getName(), width, height);
+        int height = argumentNames.length * 28 + 32;
+        WindowElement window = new WindowElement(this.getGUI(), "Export " + modelExporter.getName(), 100, height);
         for (int argumentIndex = 0; argumentIndex < argumentNames.length; argumentIndex++) {
-            window.addElement(new TextElement(this.getGUI(), argumentNames[argumentIndex], 200, argumentY));
-            InputElement input = new InputElement(this.getGUI(), defaultArguments[argumentIndex], 40, argumentY + 10, 320);
+            window.addElement(new TextElement(this.getGUI(), argumentNames[argumentIndex], 2, argumentY));
+            InputElement input = new InputElement(this.getGUI(), defaultArguments[argumentIndex], 1, argumentY + 9, 97);
             window.addElement(input);
             argumentTextBoxes[argumentIndex] = input;
-            argumentY += 40;
+            argumentY += 28;
         }
-        window.addElement(new ButtonElement(this.getGUI(), "Export", width / 2 - 50, height - 35, 100, 20, (gui, component) -> {
+        window.addElement(new ButtonElement(this.getGUI(), "Export", 48, height - 16, 50, 14, (gui, component) -> {
             String[] arguments = new String[argumentNames.length];
             for (int i = 0; i < argumentTextBoxes.length; i++) {
                 arguments[i] = argumentTextBoxes[i].getText();
@@ -121,7 +119,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
                 e.printStackTrace();
             }
             ElementHandler.INSTANCE.removeElement(this.getGUI(), window);
-        }));
+        }).withColorScheme(ColorScheme.WINDOW));
         ElementHandler.INSTANCE.addElement(this.getGUI(), window);
     }
 
