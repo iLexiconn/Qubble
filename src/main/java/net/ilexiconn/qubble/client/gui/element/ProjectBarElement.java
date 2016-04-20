@@ -45,12 +45,14 @@ public class ProjectBarElement extends Element<QubbleGUI> {
         List<QubbleModel> openProjects = gui.getOpenProjects();
         for (int projectIndex = 0; projectIndex < openProjects.size(); projectIndex++) {
             QubbleModel model = openProjects.get(projectIndex);
-            String name = model.getName() + " x";
-            float projectWidth = fontRenderer.getStringWidth(name) + 3.0F;
+            float projectWidth = fontRenderer.getStringWidth(model.getName()) + 15.0F;
+            boolean hover = mouseX >= posX + projectX + projectWidth - 12 && mouseX <= posX + projectX + projectWidth && mouseY >= posY && mouseY < posY + height;
             if (projectIndex == gui.getSelectedProject()) {
                 gui.drawRectangle(posX + projectX, posY, projectWidth, height, Qubble.CONFIG.getTertiaryColor());
             }
-            fontRenderer.drawString(name, posX + projectX + 2, posY + 2, Qubble.CONFIG.getTextColor(), false);
+            gui.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : Qubble.CONFIG.getTertiaryColor());
+            fontRenderer.drawString("x", posX + projectX + projectWidth - 9, posY + 2, Qubble.CONFIG.getTextColor(), false);
+            fontRenderer.drawString(model.getName(), posX + projectX + 2, posY + 2, Qubble.CONFIG.getTextColor(), false);
             projectX += projectWidth + 1.0F;
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
@@ -74,7 +76,7 @@ public class ProjectBarElement extends Element<QubbleGUI> {
                     String name = model.getName() + " x";
                     float projectWidth = fontRenderer.getStringWidth(name) + 3.0F;
                     if (mouseX >= posX + projectX && mouseX < posX + projectX + projectWidth) {
-                        if (mouseX >+ posX + projectX + projectWidth - 8) {
+                        if (mouseX > posX + projectX + projectWidth - 12) {
                             gui.closeModel(projectIndex);
                         } else {
                             gui.selectModel(projectIndex);
