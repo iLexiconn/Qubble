@@ -1,6 +1,5 @@
 package net.ilexiconn.qubble.client.gui.element;
 
-import net.ilexiconn.llibrary.client.util.ClientUtils;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.server.color.ColorScheme;
@@ -18,8 +17,6 @@ public class WindowElement extends Element<QubbleGUI> {
     private float dragOffsetX;
     private float dragOffsetY;
     private boolean isDragging;
-    private float prevPosX;
-    private float prevPosY;
 
     private List<Element<QubbleGUI>> elementList = new ArrayList<>();
 
@@ -49,18 +46,14 @@ public class WindowElement extends Element<QubbleGUI> {
     public void render(float mouseX, float mouseY, float partialTicks) {
         GlStateManager.pushMatrix();
         this.startScissor();
-        float renderX = ClientUtils.interpolate(this.prevPosX, this.getPosX(), partialTicks);
-        float renderY = ClientUtils.interpolate(this.prevPosY, this.getPosY(), partialTicks);
-        this.getGUI().drawRectangle(renderX, renderY, this.getWidth(), this.getHeight(), Qubble.CONFIG.getPrimaryColor());
-        this.getGUI().drawRectangle(renderX, renderY, this.getWidth(), 14, Qubble.CONFIG.getAccentColor());
+        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), Qubble.CONFIG.getPrimaryColor());
+        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), 14, Qubble.CONFIG.getAccentColor());
         FontRenderer fontRenderer = this.getGUI().mc.fontRendererObj;
-        fontRenderer.drawString(this.name, renderX + 2.0F, renderY + 3.0F, Qubble.CONFIG.getTextColor(), false);
+        fontRenderer.drawString(this.name, this.getPosX() + 2.0F, this.getPosY() + 3.0F, Qubble.CONFIG.getTextColor(), false);
         for (Element<QubbleGUI> element : this.elementList) {
             element.render(mouseX, mouseY, partialTicks);
         }
         GlStateManager.popMatrix();
-        this.prevPosX = this.getPosX();
-        this.prevPosY = this.getPosY();
         this.endScissor();
     }
 
