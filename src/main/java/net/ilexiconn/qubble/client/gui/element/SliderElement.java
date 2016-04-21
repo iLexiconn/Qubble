@@ -18,7 +18,7 @@ public class SliderElement extends Element<QubbleGUI> {
     private Function<Float, Boolean> function;
     private boolean intValue;
     private DecimalFormat decimalFormat;
-    private boolean editable;
+    private boolean editable = true;
 
     public SliderElement(QubbleGUI gui, float posX, float posY, Function<Float, Boolean> function) {
         this(gui, posX, posY, false, function);
@@ -33,25 +33,29 @@ public class SliderElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), this.editable ? Qubble.CONFIG.getSecondaryColor() : Qubble.CONFIG.getSecondarySubcolor());
-        boolean upperSelected = this.editable && this.isSelected(mouseX, mouseY) && mouseX >= this.getPosX() + this.getWidth() - 11 && mouseY < this.getPosY() + 6;
-        boolean lowerSelected = this.editable && this.isSelected(mouseX, mouseY) && mouseX >= this.getPosX() + this.getWidth() - 11 && mouseY > this.getPosY() + 6;
-        this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 11, this.getPosY(), 11, 6, this.editable ? upperSelected ? Qubble.CONFIG.getDarkAccentColor() : Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTertiaryColor());
-        this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 11, this.getPosY() + 6, 11, 6, this.editable ? lowerSelected ? Qubble.CONFIG.getDarkAccentColor() : Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTertiaryColor());
-        this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 8, this.getPosY() + 4, 5, 1, Qubble.CONFIG.getTextColor());
-        this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 7, this.getPosY() + 3, 3, 1, Qubble.CONFIG.getTextColor());
-        this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 6, this.getPosY() + 2, 1, 1, Qubble.CONFIG.getTextColor());
-        this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 8, this.getPosY() + 7, 5, 1, Qubble.CONFIG.getTextColor());
-        this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 7, this.getPosY() + 8, 3, 1, Qubble.CONFIG.getTextColor());
-        this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 6, this.getPosY() + 9, 1, 1, Qubble.CONFIG.getTextColor()); //who needs good code, amirite?
+        QubbleGUI gui = this.getGUI();
+        float posX = this.getPosX();
+        float posY = this.getPosY();
+        int width = this.getWidth();
+        int height = this.getHeight();
+        gui.drawRectangle(posX, posY, width, height, this.editable ? Qubble.CONFIG.getSecondaryColor() : Qubble.CONFIG.getSecondarySubcolor());
+        boolean selected = this.isSelected(mouseX, mouseY);
+        boolean upperSelected = this.editable && selected && mouseX >= posX + width - 11 && mouseY < posY + 6;
+        boolean lowerSelected = this.editable && selected && mouseX >= posX + width - 11 && mouseY > posY + 6;
+        gui.drawRectangle(posX + width - 11, posY, 11, 6, this.editable ? upperSelected ? Qubble.CONFIG.getDarkAccentColor() : Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTertiaryColor());
+        gui.drawRectangle(posX + width - 11, posY + 6, 11, 6, this.editable ? lowerSelected ? Qubble.CONFIG.getDarkAccentColor() : Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTertiaryColor());
+        int textColor = Qubble.CONFIG.getTextColor();
+        gui.drawRectangle(posX + width - 8, posY + 4, 5, 1, textColor);
+        gui.drawRectangle(posX + width - 7, posY + 3, 3, 1, textColor);
+        gui.drawRectangle(posX + width - 6, posY + 2, 1, 1, textColor);
+        gui.drawRectangle(posX + width - 8, posY + 7, 5, 1, textColor);
+        gui.drawRectangle(posX + width - 7, posY + 8, 3, 1, textColor);
+        gui.drawRectangle(posX + width - 6, posY + 9, 1, 1, textColor); //who needs good code, amirite?
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        float scaleFactor = this.getGUI().getResolution().getScaleFactor();
-        GL11.glScissor((int) (this.getPosX() * scaleFactor), (int) ((this.getGUI().height - (this.getPosY() + this.getHeight())) * scaleFactor), (int) ((this.getWidth() - 11) * scaleFactor), (int) (this.getHeight() * scaleFactor));
-        String string = this.intValue ? String.valueOf(this.value).split("\\.")[0] : this.decimalFormat.format(this.value);
-        if (string.equals("-0")) { //.-.
-            string = "0";
-        }
-        this.getGUI().mc.fontRendererObj.drawString(string, this.getPosX() + 2, this.getPosY() + 3.0F, Qubble.CONFIG.getTextColor(), false);
+        float scaleFactor = gui.getResolution().getScaleFactor();
+        GL11.glScissor((int) (posX * scaleFactor), (int) ((gui.height - (posY + height)) * scaleFactor), (int) ((width - 11) * scaleFactor), (int) (height * scaleFactor));
+        String text = this.intValue ? String.valueOf((int) this.value) : this.decimalFormat.format(this.value);
+        gui.mc.fontRendererObj.drawString(text, posX + 2, posY + 3.0F, textColor, false);
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
 

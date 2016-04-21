@@ -243,11 +243,8 @@ public class ModelViewElement extends Element<QubbleGUI> {
                 this.getGUI().setSelectedCube(newCube);
                 if (newCube != null) {
                     this.currentModel.getCube(newCube).setSelected(true);
-                    this.getGUI().getSidebar().populateFields(newCube);
                     this.currentSelected = newCube;
                     return true;
-                } else {
-                    this.getGUI().getSidebar().clearFields();
                 }
                 return false;
             }

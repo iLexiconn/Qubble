@@ -13,6 +13,12 @@ import java.util.List;
 public class SidebarElement extends Element<QubbleGUI> {
     private List<Element<QubbleGUI>> elementList = new ArrayList<>();
 
+    private InputElement nameInput;
+    private SliderElement dimensionX, dimensionY, dimensionZ;
+    private SliderElement positionX, positionY, positionZ;
+    private SliderElement offsetX, offsetY, offsetZ;
+    private SliderElement scaleX, scaleY, scaleZ;
+
     public SidebarElement(QubbleGUI gui) {
         super(gui, gui.width - 122, 20, 122, gui.height - 20);
     }
@@ -87,33 +93,33 @@ public class SidebarElement extends Element<QubbleGUI> {
     public void populateFields(QubbleCube cube) {
         switch (this.getGUI().getMode()) {
             case MODEL: {
-                this.getElement(InputElement.class, 0).clearText();
-                this.getElement(InputElement.class, 0).writeText(cube.getName());
-                this.getElement(InputElement.class, 0).setEditable(true);
-                this.getElement(SliderElement.class, 0).setValue(cube.getDimensionX());
-                this.getElement(SliderElement.class, 0).setEditable(true);
-                this.getElement(SliderElement.class, 1).setValue(cube.getDimensionY());
-                this.getElement(SliderElement.class, 1).setEditable(true);
-                this.getElement(SliderElement.class, 2).setValue(cube.getDimensionZ());
-                this.getElement(SliderElement.class, 2).setEditable(true);
-                this.getElement(SliderElement.class, 3).setValue(cube.getPositionX());
-                this.getElement(SliderElement.class, 3).setEditable(true);
-                this.getElement(SliderElement.class, 4).setValue(cube.getPositionY());
-                this.getElement(SliderElement.class, 4).setEditable(true);
-                this.getElement(SliderElement.class, 5).setValue(cube.getPositionZ());
-                this.getElement(SliderElement.class, 5).setEditable(true);
-                this.getElement(SliderElement.class, 6).setValue(cube.getOffsetX());
-                this.getElement(SliderElement.class, 6).setEditable(true);
-                this.getElement(SliderElement.class, 7).setValue(cube.getOffsetY());
-                this.getElement(SliderElement.class, 7).setEditable(true);
-                this.getElement(SliderElement.class, 8).setValue(cube.getOffsetZ());
-                this.getElement(SliderElement.class, 8).setEditable(true);
-                this.getElement(SliderElement.class, 9).setValue(cube.getScaleX());
-                this.getElement(SliderElement.class, 9).setEditable(true);
-                this.getElement(SliderElement.class, 10).setValue(cube.getScaleY());
-                this.getElement(SliderElement.class, 10).setEditable(true);
-                this.getElement(SliderElement.class, 11).setValue(cube.getScaleZ());
-                this.getElement(SliderElement.class, 11).setEditable(true);
+                this.nameInput.clearText();
+                this.nameInput.writeText(cube.getName());
+                this.nameInput.setEditable(true);
+                this.dimensionX.setValue(cube.getDimensionX());
+                this.dimensionX.setEditable(true);
+                this.dimensionY.setValue(cube.getDimensionY());
+                this.dimensionY.setEditable(true);
+                this.dimensionZ.setValue(cube.getDimensionZ());
+                this.dimensionZ.setEditable(true);
+                this.positionX.setValue(cube.getPositionX());
+                this.positionX.setEditable(true);
+                this.positionY.setValue(cube.getPositionY());
+                this.positionY.setEditable(true);
+                this.positionZ.setValue(cube.getPositionZ());
+                this.positionZ.setEditable(true);
+                this.offsetX.setValue(cube.getOffsetX());
+                this.offsetX.setEditable(true);
+                this.offsetY.setValue(cube.getOffsetY());
+                this.offsetY.setEditable(true);
+                this.offsetZ.setValue(cube.getOffsetZ());
+                this.offsetZ.setEditable(true);
+                this.scaleX.setValue(cube.getScaleX());
+                this.scaleX.setEditable(true);
+                this.scaleY.setValue(cube.getScaleY());
+                this.scaleY.setEditable(true);
+                this.scaleZ.setValue(cube.getScaleZ());
+                this.scaleZ.setEditable(true);
                 break;
             }
             case TEXTURE: {
@@ -148,23 +154,23 @@ public class SidebarElement extends Element<QubbleGUI> {
     public void initModelView() {
         this.elementList.clear();
         this.addElement(new TextElement(this.getGUI(), "Selected cube", 4, 10));
-        this.addElement(new InputElement(this.getGUI(), "", 4, 19, 116));
+        this.addElement(this.nameInput = new InputElement(this.getGUI(), "", 4, 19, 116));
         this.addElement(new TextElement(this.getGUI(), "Dimensions", 4, 44));
-        this.addElement(new SliderElement(this.getGUI(), 4, 53, true, value -> true));
-        this.addElement(new SliderElement(this.getGUI(), 43, 53, true, value -> true));
-        this.addElement(new SliderElement(this.getGUI(), 82, 53, true, value -> true));
+        this.addElement(this.dimensionX = new SliderElement(this.getGUI(), 4, 53, true, value -> true));
+        this.addElement(this.dimensionY = new SliderElement(this.getGUI(), 43, 53, true, value -> true));
+        this.addElement(this.dimensionZ = new SliderElement(this.getGUI(), 82, 53, true, value -> true));
         this.addElement(new TextElement(this.getGUI(), "Position", 4, 69));
-        this.addElement(new SliderElement(this.getGUI(), 4, 78, value -> true));
-        this.addElement(new SliderElement(this.getGUI(), 43, 78, value -> true));
-        this.addElement(new SliderElement(this.getGUI(), 82, 78, value -> true));
+        this.addElement(this.positionX = new SliderElement(this.getGUI(), 4, 78, value -> true));
+        this.addElement(this.positionY = new SliderElement(this.getGUI(), 43, 78, value -> true));
+        this.addElement(this.positionZ = new SliderElement(this.getGUI(), 82, 78, value -> true));
         this.addElement(new TextElement(this.getGUI(), "Offset", 4, 94));
-        this.addElement(new SliderElement(this.getGUI(), 4, 103, value -> true));
-        this.addElement(new SliderElement(this.getGUI(), 43, 103, value -> true));
-        this.addElement(new SliderElement(this.getGUI(), 82, 103, value -> true));
+        this.addElement(this.offsetX = new SliderElement(this.getGUI(), 4, 103, value -> true));
+        this.addElement(this.offsetY = new SliderElement(this.getGUI(), 43, 103, value -> true));
+        this.addElement(this.offsetZ = new SliderElement(this.getGUI(), 82, 103, value -> true));
         this.addElement(new TextElement(this.getGUI(), "Scale", 4, 119));
-        this.addElement(new SliderElement(this.getGUI(), 4, 128, value -> true));
-        this.addElement(new SliderElement(this.getGUI(), 43, 128, value -> true));
-        this.addElement(new SliderElement(this.getGUI(), 82, 128, value -> true));
+        this.addElement(this.scaleX = new SliderElement(this.getGUI(), 4, 128, value -> true));
+        this.addElement(this.scaleY = new SliderElement(this.getGUI(), 43, 128, value -> true));
+        this.addElement(this.scaleZ = new SliderElement(this.getGUI(), 82, 128, value -> true));
         this.addElement(new TextElement(this.getGUI(), "Rotation", 4, 144));
     }
 

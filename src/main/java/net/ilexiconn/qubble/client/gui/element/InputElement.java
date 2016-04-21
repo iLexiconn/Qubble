@@ -22,7 +22,7 @@ public class InputElement extends Element<QubbleGUI> {
     private int cursorPosition;
     private int selectionEnd;
     private int cursorCounter;
-    private boolean editable;
+    private boolean editable = true;
 
     public InputElement(QubbleGUI gui, String text, float posX, float posY, int width) {
         this(gui, text, posX, posY, width, true);
