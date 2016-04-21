@@ -1,5 +1,6 @@
 package net.ilexiconn.qubble.client.gui.element;
 
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.minecraftforge.fml.relauncher.Side;
@@ -67,6 +68,81 @@ public class SidebarElement extends Element<QubbleGUI> {
 
     public void addElement(Element<QubbleGUI> element) {
         this.elementList.add(element.withParent(this));
+    }
+
+    public <T extends Element<QubbleGUI>> T getElement(Class<T> type, int index) {
+        int currentIndex = 0;
+        for (Element<QubbleGUI> element : this.elementList) {
+            if (type.isAssignableFrom(element.getClass())) {
+                if (currentIndex == index) {
+                    return (T) element;
+                } else {
+                    currentIndex++;
+                }
+            }
+        }
+        return null;
+    }
+
+    public void populateFields(QubbleCube cube) {
+        switch (this.getGUI().getMode()) {
+            case MODEL: {
+                this.getElement(InputElement.class, 0).clearText();
+                this.getElement(InputElement.class, 0).writeText(cube.getName());
+                this.getElement(InputElement.class, 0).setEditable(true);
+                this.getElement(SliderElement.class, 0).setValue(cube.getDimensionX());
+                this.getElement(SliderElement.class, 0).setEditable(true);
+                this.getElement(SliderElement.class, 1).setValue(cube.getDimensionY());
+                this.getElement(SliderElement.class, 1).setEditable(true);
+                this.getElement(SliderElement.class, 2).setValue(cube.getDimensionZ());
+                this.getElement(SliderElement.class, 2).setEditable(true);
+                this.getElement(SliderElement.class, 3).setValue(cube.getPositionX());
+                this.getElement(SliderElement.class, 3).setEditable(true);
+                this.getElement(SliderElement.class, 4).setValue(cube.getPositionY());
+                this.getElement(SliderElement.class, 4).setEditable(true);
+                this.getElement(SliderElement.class, 5).setValue(cube.getPositionZ());
+                this.getElement(SliderElement.class, 5).setEditable(true);
+                this.getElement(SliderElement.class, 6).setValue(cube.getOffsetX());
+                this.getElement(SliderElement.class, 6).setEditable(true);
+                this.getElement(SliderElement.class, 7).setValue(cube.getOffsetY());
+                this.getElement(SliderElement.class, 7).setEditable(true);
+                this.getElement(SliderElement.class, 8).setValue(cube.getOffsetZ());
+                this.getElement(SliderElement.class, 8).setEditable(true);
+                this.getElement(SliderElement.class, 9).setValue(cube.getScaleX());
+                this.getElement(SliderElement.class, 9).setEditable(true);
+                this.getElement(SliderElement.class, 10).setValue(cube.getScaleY());
+                this.getElement(SliderElement.class, 10).setEditable(true);
+                this.getElement(SliderElement.class, 11).setValue(cube.getScaleZ());
+                this.getElement(SliderElement.class, 11).setEditable(true);
+                break;
+            }
+            case TEXTURE: {
+                break;
+            }
+            case ANIMATE: {
+                break;
+            }
+        }
+    }
+
+    public void clearFields() {
+        switch (this.getGUI().getMode()) {
+            case MODEL: {
+                this.getElement(InputElement.class, 0).clearText();
+                this.getElement(InputElement.class, 0).setEditable(false);
+                for (int i = 0; i < 12; i++) {
+                    this.getElement(SliderElement.class, i).setValue(0.0F);
+                    this.getElement(SliderElement.class, i).setEditable(false);
+                }
+                break;
+            }
+            case TEXTURE: {
+                break;
+            }
+            case ANIMATE: {
+                break;
+            }
+        }
     }
 
     public void initModelView() {

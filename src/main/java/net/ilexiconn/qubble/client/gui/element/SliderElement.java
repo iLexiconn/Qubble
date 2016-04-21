@@ -18,6 +18,7 @@ public class SliderElement extends Element<QubbleGUI> {
     private Function<Float, Boolean> function;
     private boolean intValue;
     private DecimalFormat decimalFormat;
+    private boolean editable;
 
     public SliderElement(QubbleGUI gui, float posX, float posY, Function<Float, Boolean> function) {
         this(gui, posX, posY, false, function);
@@ -32,11 +33,11 @@ public class SliderElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), Qubble.CONFIG.getSecondaryColor());
-        boolean upperSelected = this.isSelected(mouseX, mouseY) && mouseX >= this.getPosX() + this.getWidth() - 11 && mouseY < this.getPosY() + 6;
-        boolean lowerSelected = this.isSelected(mouseX, mouseY) && mouseX >= this.getPosX() + this.getWidth() - 11 && mouseY > this.getPosY() + 6;
-        this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 11, this.getPosY(), 11, 6, upperSelected ? Qubble.CONFIG.getDarkAccentColor() : Qubble.CONFIG.getAccentColor());
-        this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 11, this.getPosY() + 6, 11, 6, lowerSelected ? Qubble.CONFIG.getDarkAccentColor() : Qubble.CONFIG.getAccentColor());
+        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), this.editable ? Qubble.CONFIG.getSecondaryColor() : Qubble.CONFIG.getSecondarySubcolor());
+        boolean upperSelected = this.editable && this.isSelected(mouseX, mouseY) && mouseX >= this.getPosX() + this.getWidth() - 11 && mouseY < this.getPosY() + 6;
+        boolean lowerSelected = this.editable && this.isSelected(mouseX, mouseY) && mouseX >= this.getPosX() + this.getWidth() - 11 && mouseY > this.getPosY() + 6;
+        this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 11, this.getPosY(), 11, 6, this.editable ? upperSelected ? Qubble.CONFIG.getDarkAccentColor() : Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTertiaryColor());
+        this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 11, this.getPosY() + 6, 11, 6, this.editable ? lowerSelected ? Qubble.CONFIG.getDarkAccentColor() : Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTertiaryColor());
         this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 8, this.getPosY() + 4, 5, 1, Qubble.CONFIG.getTextColor());
         this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 7, this.getPosY() + 3, 3, 1, Qubble.CONFIG.getTextColor());
         this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 6, this.getPosY() + 2, 1, 1, Qubble.CONFIG.getTextColor());
@@ -54,8 +55,19 @@ public class SliderElement extends Element<QubbleGUI> {
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
 
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
+
+    public void setValue(float value) {
+        this.value = value;
+    }
+
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
+        if (!this.editable) {
+            return super.mouseClicked(mouseX, mouseY, button);
+        }
         boolean upperSelected = this.isSelected(mouseX, mouseY) && mouseX >= this.getPosX() + this.getWidth() - 11 && mouseY < this.getPosY() + 6;
         boolean lowerSelected = this.isSelected(mouseX, mouseY) && mouseX >= this.getPosX() + this.getWidth() - 11 && mouseY > this.getPosY() + 6;
         if (upperSelected) {

@@ -41,7 +41,7 @@ public class InputElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), Qubble.CONFIG.getSecondaryColor());
+        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), this.editable ? Qubble.CONFIG.getSecondaryColor() : Qubble.CONFIG.getSecondarySubcolor());
         int cursor = this.cursorPosition - this.lineScrollOffset;
         int cursorEnd = this.selectionEnd - this.lineScrollOffset;
         String displayString = this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
@@ -340,6 +340,15 @@ public class InputElement extends Element<QubbleGUI> {
         }
 
         this.lineScrollOffset = MathHelper.clamp_int(this.lineScrollOffset, 0, textLength);
+    }
+
+    public void clearText() {
+        this.setCursorPositionZero();
+        this.text = "";
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
 
     private void drawCursorVertical(float startX, float startY, float endX, float endY) {

@@ -14,10 +14,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @SideOnly(Side.CLIENT)
 public class QubbleModelBase extends AdvancedModelBase {
@@ -128,5 +125,9 @@ public class QubbleModelBase extends AdvancedModelBase {
 
     public QubbleModelRenderer getCube(QubbleCube cube) {
         return this.cubes.get(cube);
+    }
+
+    public Set<Map.Entry<QubbleCube, QubbleModelRenderer>> getCubes() {
+        return this.cubes.entrySet();
     }
 }

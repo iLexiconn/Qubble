@@ -5,12 +5,14 @@ import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.util.ClientUtils;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
-import net.ilexiconn.qubble.client.gui.ModelMode;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.model.QubbleModelBase;
 import net.ilexiconn.qubble.client.model.QubbleModelRenderer;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -40,6 +42,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
     private QubbleModelBase currentModelSelection;
     private float prevMouseX;
     private float prevMouseY;
+    private QubbleCube currentSelected;
 
     private boolean dragged;
 
@@ -234,12 +237,17 @@ public class ModelViewElement extends Element<QubbleGUI> {
                 QubbleCube cube = this.getGUI().getSelectedCube();
                 if (cube != null) {
                     this.currentModel.getCube(cube).setSelected(false);
+                    this.currentSelected = null;
                 }
                 QubbleCube newCube = this.currentModel.getCube(id);
                 this.getGUI().setSelectedCube(newCube);
                 if (newCube != null) {
                     this.currentModel.getCube(newCube).setSelected(true);
+                    this.getGUI().getSidebar().populateFields(newCube);
+                    this.currentSelected = newCube;
                     return true;
+                } else {
+                    this.getGUI().getSidebar().clearFields();
                 }
                 return false;
             }
@@ -248,16 +256,15 @@ public class ModelViewElement extends Element<QubbleGUI> {
         return false;
     }
 
+    public QubbleCube getCurrentSelected() {
+        return currentSelected;
+    }
+
     @Override
     protected boolean isSelected(float mouseX, float mouseY) {
         ModelTreeElement modelTree = this.getGUI().getModelTree();
         ToolbarElement toolbar = this.getGUI().getToolbar();
         ProjectBarElement projectBar = this.getGUI().getProjectBar();
         return ElementHandler.INSTANCE.isOnTop(this.getGUI(), this, mouseX, mouseY) && mouseX > modelTree.getPosX() + modelTree.getWidth() && mouseY >= toolbar.getPosY() + toolbar.getHeight() + (projectBar.isVisible() ? projectBar.getHeight() : 0);
-    }
-
-    @Override
-    public boolean isVisible() {
-        return this.getGUI().getMode() == ModelMode.MODEL;
     }
 }
