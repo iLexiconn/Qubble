@@ -11,5 +11,6 @@ Compiling from source
 
 Contributors
 ==========
-iLexiconn  
-gegy1000  
+|![iLexiconn](https://avatars0.githubusercontent.com/u/5201999?v=3&s=125)|![gegy1000](https://avatars0.githubusercontent.com/u/5172118?v=3&s=125)|
+|:--------:|:--------:|
+| [@iLexiconn](https://github.com/iLexiconn) | [@gegy1000](https://github.com/gegy1000) |
