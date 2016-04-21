@@ -237,7 +237,6 @@ public class QubbleGUI extends GuiScreen {
                 break;
             }
         }
-        System.out.println(this.getModelView().getCurrentSelected());
         if (this.getModelView().getCurrentSelected() != null) {
             this.getSidebar().populateFields(this.getModelView().getCurrentSelected());
         }

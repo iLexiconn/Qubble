@@ -51,7 +51,6 @@ public class ToolbarElement extends Element<QubbleGUI> {
         ElementHandler.INSTANCE.addElement(this.getGUI(), this.modelButton = new ButtonElement(this.getGUI(), "Model", this.getGUI().width - 262, 0, 40, 20, (v) -> {
             if (this.modelButton.getColorScheme() != ColorScheme.TAB_ACTIVE) {
                 this.setMode(ModelMode.MODEL);
-                this.getGUI().getSidebar().initModelView();
                 return true;
             } else {
                 return false;
@@ -60,7 +59,6 @@ public class ToolbarElement extends Element<QubbleGUI> {
         ElementHandler.INSTANCE.addElement(this.getGUI(), this.textureButton = new ButtonElement(this.getGUI(), "Texture", this.getGUI().width - 222, 0, 50, 20, (v) -> {
             if (this.textureButton.getColorScheme() != ColorScheme.TAB_ACTIVE) {
                 this.setMode(ModelMode.TEXTURE);
-                this.getGUI().getSidebar().initTextureView();
                 return true;
             } else {
                 return false;
