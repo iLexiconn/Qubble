@@ -21,7 +21,7 @@ public class ScrollerElement extends Element<QubbleGUI> {
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
         if (this.maxScroll > 0) {
-            this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), this.scrolling ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getSecondaryColor());
+            this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight() - 3, this.scrolling ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getSecondaryColor());
         }
     }
 

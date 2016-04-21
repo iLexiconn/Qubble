@@ -26,7 +26,7 @@ public class ProjectBarElement extends Element<QubbleGUI> {
         ModelTreeElement modelTree = this.getGUI().getModelTree();
         SidebarElement sideBar = this.getGUI().getSidebar();
         this.setPosX(modelTree.getWidth());
-        this.setWidth(this.getGUI().width - modelTree.getWidth() - sideBar.getWidth() - 2);
+        this.setWidth(this.getGUI().width - modelTree.getWidth() - sideBar.getWidth());
     }
 
     @Override

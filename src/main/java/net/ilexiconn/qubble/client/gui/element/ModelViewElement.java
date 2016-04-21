@@ -162,15 +162,23 @@ public class ModelViewElement extends Element<QubbleGUI> {
             ClientProxy.MINECRAFT.getTextureManager().bindTexture(GRID);
             Tessellator tessellator = Tessellator.getInstance();
             VertexBuffer buffer = tessellator.getBuffer();
-            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-            float gridY = 24.0F * 0.0625F;
-            float size = 36.0F * 0.0625F;
-            float maxUV = 1.0F + (1.0F / 512.0F);
-            buffer.pos(-size, gridY, -size).tex(0.0F, 0.0F).endVertex();
-            buffer.pos(-size, gridY, size).tex(0.0F, maxUV).endVertex();
-            buffer.pos(size, gridY, size).tex(maxUV, maxUV).endVertex();
-            buffer.pos(size, gridY, -size).tex(maxUV, 0.0F).endVertex();
-            tessellator.draw();
+            float gridY = 24.1F * 0.0625F;
+            float size = 8.1F * 0.0625F;
+
+            for (int x = -3; x < 4; x++) {
+                for (int y = -3; y < 4; y++) {
+                    GlStateManager.pushMatrix();
+                    GlStateManager.translate(x + -0.005F, 0.0F, y);
+                    buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+                    buffer.pos(-size, gridY, -size).tex(0.0F, 0.0F).endVertex();
+                    buffer.pos(-size, gridY, size).tex(0.0F, 1.0F).endVertex();
+                    buffer.pos(size, gridY, size).tex(1.0F, 1.0F).endVertex();
+                    buffer.pos(size, gridY, -size).tex(1.0F, 0.0F).endVertex();
+                    tessellator.draw();
+                    GlStateManager.popMatrix();
+                }
+            }
+
             GlStateManager.disableBlend();
             GlStateManager.enableLighting();
             GlStateManager.popMatrix();
