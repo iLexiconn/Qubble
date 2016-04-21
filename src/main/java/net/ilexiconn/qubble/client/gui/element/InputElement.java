@@ -29,7 +29,7 @@ public class InputElement extends Element<QubbleGUI> {
     }
 
     public InputElement(QubbleGUI gui, String text, float posX, float posY, int width, boolean editable) {
-        super(gui, posX, posY, width, 14);
+        super(gui, posX, posY, width, 12);
         this.text = text;
         this.editable = editable;
     }
@@ -76,7 +76,7 @@ public class InputElement extends Element<QubbleGUI> {
 
         if (renderCursor) {
             if (renderVerticalCursor) {
-                this.getGUI().drawRectangle(lineX, y + 1, 1, this.getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2 + 1 + this.getGUI().mc.fontRendererObj.FONT_HEIGHT, Qubble.CONFIG.getPrimaryColor());
+                this.getGUI().drawRectangle(lineX, y, 1, this.getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2 + 1 + this.getGUI().mc.fontRendererObj.FONT_HEIGHT, Qubble.CONFIG.getPrimaryColor());
             } else {
                 this.getGUI().mc.fontRendererObj.drawString("_", cursor == 0 ? lineX + 3 : lineX, y + 1 + this.getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2, Qubble.CONFIG.getPrimaryColor(), false);
             }
@@ -84,7 +84,7 @@ public class InputElement extends Element<QubbleGUI> {
 
         if (cursorEnd != cursor) {
             float selectionWidth = x + this.getGUI().mc.fontRendererObj.getStringWidth(displayString.substring(0, cursorEnd));
-            this.drawCursorVertical(lineX + (selectionEnd > cursorPosition ? 0 : 1), y + 1, selectionWidth + (selectionEnd < cursorPosition ? 2 : 3), y + getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2 + 2 + this.getGUI().mc.fontRendererObj.FONT_HEIGHT);
+            this.drawCursorVertical(lineX + (selectionEnd > cursorPosition ? 0 : 1), y, selectionWidth + (selectionEnd < cursorPosition ? 2 : 3), y + getHeight() / 2 - this.getGUI().mc.fontRendererObj.FONT_HEIGHT / 2 + 1 + this.getGUI().mc.fontRendererObj.FONT_HEIGHT);
         }
     }
 

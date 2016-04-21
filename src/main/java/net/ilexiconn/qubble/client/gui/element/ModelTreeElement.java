@@ -17,7 +17,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
     private int entryCount;
     private List<QubbleCube> expandedCubes = new ArrayList<>();
 
-    private ScrollerElement scroller;
+    private ScrollBarElement scroller;
 
     public ModelTreeElement(QubbleGUI gui) {
         super(gui, 0.0F, 20.0F, 100, gui.height - 20);
@@ -25,12 +25,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
 
     @Override
     public void init() {
-        ElementHandler.INSTANCE.addElement(this.getGUI(), this.scroller = new ScrollerElement(this.getGUI(), 4));
-    }
-
-    @Override
-    public void update() {
-        this.scroller.updateState(this, this.getWidth() - 8, 2.0F, 10, this.entryCount + 1);
+        ElementHandler.INSTANCE.addElement(this.getGUI(), this.scroller = new ScrollBarElement(this.getGUI(), this, () -> this.getWidth() - 8.0F, () -> 2.0F, 12, () -> this.entryCount));
     }
 
     @Override
@@ -44,7 +39,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         this.startScissor();
 
         int i = 0;
-        float offset = this.scroller.getScrollYOffset();
+        float offset = this.scroller.getScrollOffset();
         for (float y = -offset; y < height + offset; y += 12.0F) {
             gui.drawRectangle(posX, posY + y, width, 12.0F, i % 2 == 0 ? Qubble.CONFIG.getSecondarySubcolor() : Qubble.CONFIG.getPrimarySubcolor());
             i++;
@@ -106,7 +101,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
 
     private boolean mouseDetectionCubeEntry(QubbleCube cube, int xOffset, float mouseX, float mouseY) {
         float entryX = this.getPosX() + xOffset;
-        float entryY = this.getPosY() + this.cubeY * 12.0F + 2.0F - this.scroller.getScrollYOffset();
+        float entryY = this.getPosY() + this.cubeY * 12.0F + 2.0F - this.scroller.getScrollOffset();
         this.cubeY++;
         boolean expanded = this.isExpanded(cube);
         if (expanded) {
@@ -131,7 +126,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
         String name = cube.getName();
         float entryX = this.getPosX() + xOffset;
-        float entryY = this.getPosY() + this.cubeY * 12.0F + 2.0F - this.scroller.getScrollYOffset();
+        float entryY = this.getPosY() + this.cubeY * 12.0F + 2.0F - this.scroller.getScrollOffset();
         fontRenderer.drawString(name, entryX + 10, entryY, this.getGUI().getSelectedCube() == cube ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTextColor(), false);
         this.cubeY++;
         boolean expanded = this.isExpanded(cube);

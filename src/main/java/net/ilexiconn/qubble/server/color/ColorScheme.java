@@ -8,7 +8,7 @@ public class ColorScheme {
     public static final ColorScheme TAB_ACTIVE = ColorScheme.create(() -> Qubble.CONFIG.getPrimaryColor(), () -> Qubble.CONFIG.getPrimaryColor());
     public static final ColorScheme OPTIONS = ColorScheme.create(() -> Qubble.CONFIG.getDarkAccentColor(), () -> 0xFF898989);
     public static final ColorScheme CLOSE = ColorScheme.create(() -> Qubble.CONFIG.getDarkAccentColor(), () -> 0xFFE04747);
-    public static final ColorScheme WINDOW = ColorScheme.create(() -> Qubble.CONFIG.getSecondaryColor(), () -> Qubble.CONFIG.getSecondarySubcolor());
+    public static final ColorScheme WINDOW = ColorScheme.create(() -> Qubble.CONFIG.getSecondaryColor(), () -> Qubble.CONFIG.getAccentColor());
 
     private IGetter<Integer> primaryColor;
     private IGetter<Integer> secondaryColor;

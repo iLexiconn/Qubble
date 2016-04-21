@@ -34,20 +34,15 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
     @Override
     public void init() {
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "Open", 0, 0, 30, 20, (v) -> {
+        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "New", 0, 0, 30, 20, (v) -> {
+            return false; //TODO
+        }));
+        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "Open", 30, 0, 30, 20, (v) -> {
             this.openModelWindow(null);
             return true;
         }));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "Save", 30, 0, 30, 20, (v) -> {
+        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "Save", 60, 0, 30, 20, (v) -> {
             return false; //TODO
-        }));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "Import", 60, 0, 40, 20, (v) -> {
-            this.openImportWindow();
-            return true;
-        }));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "Export", 100, 0, 40, 20, (v) -> {
-            this.openExportWindow();
-            return true;
         }));
 
         this.getGUI().getSidebar().initModelView();
@@ -90,12 +85,19 @@ public class ToolbarElement extends Element<QubbleGUI> {
     }
 
     public void openModelWindow(IModelImporter modelImporter) {
-        WindowElement openWindow = new WindowElement(this.getGUI(), (modelImporter == null ? "Open" : "Import " + modelImporter.getName()), 100, 100);
+        WindowElement openWindow = new WindowElement(this.getGUI(), (modelImporter == null ? "Open" : "Import " + modelImporter.getName()), 100, modelImporter == null ? 114 : 100);
         openWindow.addElement(new ListElement(this.getGUI(), 2, 16, 96, 82, this.getModels(modelImporter), (selected) -> {
             this.getGUI().selectModel(selected, modelImporter);
             ElementHandler.INSTANCE.removeElement(this.getGUI(), openWindow);
             return true;
         }));
+        if (modelImporter == null) {
+            openWindow.addElement(new ButtonElement(this.getGUI(), "Import", 2, 100, 96, 12, (v) -> {
+                this.openImportWindow();
+                ElementHandler.INSTANCE.removeElement(this.getGUI(), openWindow);
+                return true;
+            }).withColorScheme(ColorScheme.WINDOW));
+        }
         ElementHandler.INSTANCE.addElement(this.getGUI(), openWindow);
     }
 

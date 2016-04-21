@@ -19,7 +19,7 @@ public class CheckboxElement extends Element<QubbleGUI> {
     }
 
     public CheckboxElement(QubbleGUI gui, float posX, float posY, Function<Boolean, Boolean> function) {
-        super(gui, posX, posY, 14, 14);
+        super(gui, posX, posY, 12, 12);
         this.function = function;
     }
 
