@@ -3,6 +3,7 @@ package net.ilexiconn.qubble.client.gui.element;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
+import net.ilexiconn.qubble.server.color.ColorScheme;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -19,6 +20,8 @@ public class SidebarElement extends Element<QubbleGUI> {
     private SliderElement offsetX, offsetY, offsetZ;
     private SliderElement scaleX, scaleY, scaleZ;
     private SliderElement rotationX, rotationY, rotationZ;
+    private SliderElement textureX, textureY;
+    private ButtonElement mirror;
 
     public SidebarElement(QubbleGUI gui) {
         super(gui, gui.width - 122, 20, 122, gui.height - 20);
@@ -92,11 +95,11 @@ public class SidebarElement extends Element<QubbleGUI> {
     }
 
     public void populateFields(QubbleCube cube) {
+        this.nameInput.clearText();
+        this.nameInput.writeText(cube.getName());
+        this.nameInput.setEditable(true);
         switch (this.getGUI().getMode()) {
             case MODEL: {
-                this.nameInput.clearText();
-                this.nameInput.writeText(cube.getName());
-                this.nameInput.setEditable(true);
                 this.dimensionX.setValue(cube.getDimensionX());
                 this.dimensionX.setEditable(true);
                 this.dimensionY.setValue(cube.getDimensionY());
@@ -130,6 +133,12 @@ public class SidebarElement extends Element<QubbleGUI> {
                 break;
             }
             case TEXTURE: {
+                this.textureX.setValue(cube.getTextureX());
+                this.textureX.setEditable(true);
+                this.textureY.setValue(cube.getTextureY());
+                this.textureY.setEditable(true);
+                this.mirror.withColorScheme(cube.isTextureMirrored() ? ColorScheme.TOGGLE_ON : ColorScheme.TOGGLE_OFF);
+                this.mirror.setEnabled(true);
                 break;
             }
             case ANIMATE: {
@@ -139,10 +148,10 @@ public class SidebarElement extends Element<QubbleGUI> {
     }
 
     public void clearFields() {
+        this.getElement(InputElement.class, 0).clearText();
+        this.getElement(InputElement.class, 0).setEditable(false);
         switch (this.getGUI().getMode()) {
             case MODEL: {
-                this.getElement(InputElement.class, 0).clearText();
-                this.getElement(InputElement.class, 0).setEditable(false);
                 for (int i = 0; i < 15; i++) {
                     this.getElement(SliderElement.class, i).setValue(0.0F);
                     this.getElement(SliderElement.class, i).setEditable(false);
@@ -150,6 +159,11 @@ public class SidebarElement extends Element<QubbleGUI> {
                 break;
             }
             case TEXTURE: {
+                for (int i = 0; i < 2; i++) {
+                    this.getElement(SliderElement.class, i).setValue(0.0F);
+                    this.getElement(SliderElement.class, i).setEditable(false);
+                }
+                this.mirror.setEnabled(false);
                 break;
             }
             case ANIMATE: {
@@ -158,37 +172,57 @@ public class SidebarElement extends Element<QubbleGUI> {
         }
     }
 
-    public void initModelView() {
+    public void initFields() {
         this.elementList.clear();
         this.addElement(new TextElement(this.getGUI(), "Selected cube", 4, 10));
         this.addElement(this.nameInput = new InputElement(this.getGUI(), "", 4, 19, 116));
-        this.addElement(new TextElement(this.getGUI(), "Dimensions", 4, 44));
-        this.addElement(this.dimensionX = new SliderElement(this.getGUI(), 4, 53, true, value -> true));
-        this.addElement(this.dimensionY = new SliderElement(this.getGUI(), 43, 53, true, value -> true));
-        this.addElement(this.dimensionZ = new SliderElement(this.getGUI(), 82, 53, true, value -> true));
-        this.addElement(new TextElement(this.getGUI(), "Position", 4, 69));
-        this.addElement(this.positionX = new SliderElement(this.getGUI(), 4, 78, value -> true));
-        this.addElement(this.positionY = new SliderElement(this.getGUI(), 43, 78, value -> true));
-        this.addElement(this.positionZ = new SliderElement(this.getGUI(), 82, 78, value -> true));
-        this.addElement(new TextElement(this.getGUI(), "Offset", 4, 94));
-        this.addElement(this.offsetX = new SliderElement(this.getGUI(), 4, 103, value -> true));
-        this.addElement(this.offsetY = new SliderElement(this.getGUI(), 43, 103, value -> true));
-        this.addElement(this.offsetZ = new SliderElement(this.getGUI(), 82, 103, value -> true));
-        this.addElement(new TextElement(this.getGUI(), "Scale", 4, 119));
-        this.addElement(this.scaleX = new SliderElement(this.getGUI(), 4, 128, value -> true));
-        this.addElement(this.scaleY = new SliderElement(this.getGUI(), 43, 128, value -> true));
-        this.addElement(this.scaleZ = new SliderElement(this.getGUI(), 82, 128, value -> true));
-        this.addElement(new TextElement(this.getGUI(), "Rotation", 4, 144));
-        this.addElement(this.rotationX = new SliderElement(this.getGUI(), 4, 153, false, 116 - 38, -180.0F, 180.0F, value -> true));
-        this.addElement(this.rotationY = new SliderElement(this.getGUI(), 4, 166, false, 116 - 38, -180.0F, 180.0F, value -> true));
-        this.addElement(this.rotationZ = new SliderElement(this.getGUI(), 4, 179, false, 116 - 38, -180.0F, 180.0F, value -> true));
-    }
-
-    public void initTextureView() {
-        this.elementList.clear();
-    }
-
-    public void initAnimateView() {
-        this.elementList.clear();
+        switch (this.getGUI().getMode()) {
+            case MODEL: {
+                this.addElement(new TextElement(this.getGUI(), "Dimensions", 4, 44));
+                this.addElement(this.dimensionX = new SliderElement(this.getGUI(), 4, 53, true, value -> true));
+                this.addElement(this.dimensionY = new SliderElement(this.getGUI(), 43, 53, true, value -> true));
+                this.addElement(this.dimensionZ = new SliderElement(this.getGUI(), 82, 53, true, value -> true));
+                this.addElement(new TextElement(this.getGUI(), "Position", 4, 69));
+                this.addElement(this.positionX = new SliderElement(this.getGUI(), 4, 78, value -> true));
+                this.addElement(this.positionY = new SliderElement(this.getGUI(), 43, 78, value -> true));
+                this.addElement(this.positionZ = new SliderElement(this.getGUI(), 82, 78, value -> true));
+                this.addElement(new TextElement(this.getGUI(), "Offset", 4, 94));
+                this.addElement(this.offsetX = new SliderElement(this.getGUI(), 4, 103, value -> true));
+                this.addElement(this.offsetY = new SliderElement(this.getGUI(), 43, 103, value -> true));
+                this.addElement(this.offsetZ = new SliderElement(this.getGUI(), 82, 103, value -> true));
+                this.addElement(new TextElement(this.getGUI(), "Scale", 4, 119));
+                this.addElement(this.scaleX = new SliderElement(this.getGUI(), 4, 128, value -> true));
+                this.addElement(this.scaleY = new SliderElement(this.getGUI(), 43, 128, value -> true));
+                this.addElement(this.scaleZ = new SliderElement(this.getGUI(), 82, 128, value -> true));
+                this.addElement(new TextElement(this.getGUI(), "Rotation", 4, 144));
+                this.addElement(this.rotationX = new SliderElement(this.getGUI(), 4, 153, false, 116 - 38, -180.0F, 180.0F, value -> true));
+                this.addElement(this.rotationY = new SliderElement(this.getGUI(), 4, 166, false, 116 - 38, -180.0F, 180.0F, value -> true));
+                this.addElement(this.rotationZ = new SliderElement(this.getGUI(), 4, 179, false, 116 - 38, -180.0F, 180.0F, value -> true));
+                break;
+            }
+            case TEXTURE: {
+                this.addElement(new TextElement(this.getGUI(), "Texture offset", 4, 44));
+                this.addElement(this.textureX = new SliderElement(this.getGUI(), 4, 53, true, value -> true));
+                this.addElement(this.textureY = new SliderElement(this.getGUI(), 43, 53, true, value -> true));
+                this.addElement(this.mirror = new ButtonElement(this.getGUI(), "Mirror", 82, 53, 38, 12, (button) -> {
+                    if (button.getColorScheme() == ColorScheme.TOGGLE_OFF) {
+                        button.withColorScheme(ColorScheme.TOGGLE_ON);
+                    } else {
+                        button.withColorScheme(ColorScheme.TOGGLE_OFF);
+                    }
+                    return true;
+                }));
+                this.addElement(new TextElement(this.getGUI(), "Texture", 4, 69));
+                this.addElement(new InputElement(this.getGUI(), "", 4, 78, 104));
+                this.addElement(new ButtonElement(this.getGUI(), "...", 108, 78, 12, 12, (button) -> true));
+                this.addElement(new TextElement(this.getGUI(), "Texture overlay", 4, 94));
+                this.addElement(new InputElement(this.getGUI(), "", 4, 103, 104));
+                this.addElement(new ButtonElement(this.getGUI(), "...", 108, 103, 12, 12, (button) -> true));
+                break;
+            }
+            case ANIMATE: {
+                break;
+            }
+        }
     }
 }

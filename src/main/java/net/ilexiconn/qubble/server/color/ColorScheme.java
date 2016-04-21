@@ -9,6 +9,9 @@ public class ColorScheme {
     public static final ColorScheme OPTIONS = ColorScheme.create(() -> Qubble.CONFIG.getDarkAccentColor(), () -> 0xFF898989);
     public static final ColorScheme CLOSE = ColorScheme.create(() -> Qubble.CONFIG.getDarkAccentColor(), () -> 0xFFE04747);
     public static final ColorScheme WINDOW = ColorScheme.create(() -> Qubble.CONFIG.getSecondaryColor(), () -> Qubble.CONFIG.getAccentColor());
+    public static final ColorScheme TOGGLE_OFF = ColorScheme.create(() -> Qubble.CONFIG.getSecondaryColor(), () -> Qubble.CONFIG.getPrimarySubcolor());
+    public static final ColorScheme TOGGLE_ON = ColorScheme.create(() -> Qubble.CONFIG.getAccentColor(), () -> Qubble.CONFIG.getDarkAccentColor());
+    public static final ColorScheme DISABLED = ColorScheme.create(() -> Qubble.CONFIG.getTertiaryColor(), null);
 
     private IGetter<Integer> primaryColor;
     private IGetter<Integer> secondaryColor;

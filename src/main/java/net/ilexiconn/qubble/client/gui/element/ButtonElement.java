@@ -15,9 +15,10 @@ import java.util.function.Function;
 public class ButtonElement extends Element<QubbleGUI> {
     private String text;
     private ColorScheme colorScheme = ColorScheme.DEFAULT;
-    private Function<Void, Boolean> function;
+    private Function<ButtonElement, Boolean> function;
+    private boolean enabled = true;
 
-    public ButtonElement(QubbleGUI gui, String text, float posX, float posY, int width, int height, Function<Void, Boolean> function) {
+    public ButtonElement(QubbleGUI gui, String text, float posX, float posY, int width, int height, Function<ButtonElement, Boolean> function) {
         super(gui, posX, posY, width, height);
         this.text = text;
         this.function = function;
@@ -25,7 +26,7 @@ public class ButtonElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        if (this.isSelected(mouseX, mouseY)) {
+        if (this.enabled && this.isSelected(mouseX, mouseY)) {
             this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), getHeight(), this.colorScheme.getSecondaryColor());
         } else {
             this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), getHeight(), this.colorScheme.getPrimaryColor());
@@ -40,8 +41,8 @@ public class ButtonElement extends Element<QubbleGUI> {
 
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
-        if (this.isSelected(mouseX, mouseY)) {
-            if (this.function.apply(null)) {
+        if (this.enabled && this.isSelected(mouseX, mouseY)) {
+            if (this.function.apply(this)) {
                 this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
             }
             return true;
@@ -57,5 +58,12 @@ public class ButtonElement extends Element<QubbleGUI> {
 
     public ColorScheme getColorScheme() {
         return colorScheme;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        if (!enabled) {
+            this.withColorScheme(ColorScheme.DISABLED);
+        }
     }
 }

@@ -95,7 +95,7 @@ public class SliderElement extends Element<QubbleGUI> {
         boolean upperSelected = this.isSelected(mouseX, mouseY) && mouseX >= this.getPosX() + this.getWidth() - this.sliderWidth - 11 && mouseY < this.getPosY() + 6 && mouseX < this.getPosX() + this.getWidth() - this.sliderWidth;
         boolean lowerSelected = this.isSelected(mouseX, mouseY) && mouseX >= this.getPosX() + this.getWidth() - this.sliderWidth - 11 && mouseY > this.getPosY() + 6 && mouseX < this.getPosX() + this.getWidth() - this.sliderWidth;
         if (upperSelected) {
-            float newValue = this.intValue || GuiScreen.isShiftKeyDown() ? this.value + 10 : this.value + 0.1F;
+            float newValue = GuiScreen.isShiftKeyDown() ? this.intValue ? this.value + 10 : this.value + 1 : this.intValue ? this.value + 1 : this.value + 0.1F;
             if (this.maxValue == -1.0F || newValue <= this.maxValue) {
                 if (this.function.apply(newValue)) {
                     this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
@@ -104,7 +104,7 @@ public class SliderElement extends Element<QubbleGUI> {
                 }
             }
         } else if (lowerSelected) {
-            float newValue = this.intValue || GuiScreen.isShiftKeyDown() ? this.value - 10 : this.value - 0.1F;
+            float newValue = GuiScreen.isShiftKeyDown() ? this.intValue ? this.value - 10 : this.value - 1 : this.intValue ? this.value - 1 : this.value - 0.1F;
             if (this.minValue == -1.0F || newValue >= this.minValue) {
                 if (this.function.apply(newValue)) {
                     this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));

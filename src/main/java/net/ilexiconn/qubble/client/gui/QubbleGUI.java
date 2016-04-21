@@ -223,22 +223,11 @@ public class QubbleGUI extends GuiScreen {
 
     public void setMode(ModelMode mode) {
         this.mode = mode;
-        switch (mode) {
-            case MODEL: {
-                this.getSidebar().initModelView();
-                break;
-            }
-            case TEXTURE: {
-                this.getSidebar().initTextureView();
-                break;
-            }
-            case ANIMATE: {
-                this.getSidebar().initAnimateView();
-                break;
-            }
-        }
+        this.getSidebar().initFields();
         if (this.getModelView().getCurrentSelected() != null) {
             this.getSidebar().populateFields(this.getModelView().getCurrentSelected());
+        } else {
+            this.getSidebar().clearFields();
         }
     }
 
