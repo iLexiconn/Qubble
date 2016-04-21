@@ -30,7 +30,7 @@ public class InputElement extends Element<QubbleGUI> {
 
     public InputElement(QubbleGUI gui, String text, float posX, float posY, int width, boolean editable) {
         super(gui, posX, posY, width, 12);
-        this.text = text;
+        this.text = text != null ? text : "";
         this.editable = editable;
     }
 

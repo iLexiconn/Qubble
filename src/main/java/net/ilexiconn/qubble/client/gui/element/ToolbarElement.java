@@ -14,10 +14,12 @@ import net.ilexiconn.qubble.server.model.exporter.ModelExporters;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.ilexiconn.qubble.server.model.importer.ModelImporters;
 import net.ilexiconn.qubble.server.util.JSONUtil;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +45,11 @@ public class ToolbarElement extends Element<QubbleGUI> {
             return true;
         }));
         ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "Save", 60, 0, 30, 20, (v) -> {
-            return false; //TODO
+            if (this.getGUI().getSelectedModel() != null) {
+                this.openSaveWindow();
+                return true;
+            }
+            return false;
         }));
 
         this.getGUI().getSidebar().initModelView();
@@ -115,15 +121,36 @@ public class ToolbarElement extends Element<QubbleGUI> {
         ElementHandler.INSTANCE.addElement(this.getGUI(), importWindow);
     }
 
-    public void openExportWindow() {
-        if (this.getGUI().getSelectedModel() == null) {
-            return;
-        }
+    public void openSaveWindow() {
+        WindowElement saveWindow = new WindowElement(this.getGUI(), "Save", 100, 64);
+        saveWindow.addElement(new TextElement(this.getGUI(), "File name", 4, 19));
+        InputElement fileName;
+        QubbleModel selectedModel = this.getGUI().getSelectedModel();
+        saveWindow.addElement(fileName = new InputElement(this.getGUI(), selectedModel.getFileName() == null ? selectedModel.getName() : selectedModel.getFileName(), 2, 30, 96));
+        saveWindow.addElement(new ButtonElement(this.getGUI(), "Save", 2, 50, 47, 12, (v) -> {
+            QubbleModel model = selectedModel;
+            try {
+                CompressedStreamTools.writeCompressed(model.copy().serializeNBT(), new FileOutputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, fileName.getText() + ".qbl")));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            ElementHandler.INSTANCE.removeElement(this.getGUI(), saveWindow);
+            return true;
+        }).withColorScheme(ColorScheme.WINDOW));
+        saveWindow.addElement(new ButtonElement(this.getGUI(), "Export", 51, 50, 47, 12, (v) -> {
+            this.openExportWindow(fileName.getText());
+            ElementHandler.INSTANCE.removeElement(this.getGUI(), saveWindow);
+            return true;
+        }).withColorScheme(ColorScheme.WINDOW));
+        ElementHandler.INSTANCE.addElement(this.getGUI(), saveWindow);
+    }
+
+    public void openExportWindow(String fileName) {
         WindowElement exportWindow = new WindowElement(this.getGUI(), "Export", 100, 100);
         exportWindow.addElement(new ListElement(this.getGUI(), 2, 16, 96, 82, Lists.newArrayList(ModelExporters.EXPORTERS).stream().map(IModelExporter::getName).collect(Collectors.toList()), (selected) -> {
             IModelExporter exporter = ModelHandler.INSTANCE.getExporter(selected);
             if (exporter != null) {
-                this.openModelExportWindow(exporter);
+                this.openModelExportWindow(exporter, fileName);
                 ElementHandler.INSTANCE.removeElement(this.getGUI(), exportWindow);
                 return true;
             } else {
@@ -133,10 +160,11 @@ public class ToolbarElement extends Element<QubbleGUI> {
         ElementHandler.INSTANCE.addElement(this.getGUI(), exportWindow);
     }
 
-    private void openModelExportWindow(IModelExporter modelExporter) {
+    private void openModelExportWindow(IModelExporter modelExporter, String fileName) {
+        QubbleModel copy = this.getGUI().getSelectedModel().copy();
         int argumentY = 18;
         String[] argumentNames = modelExporter.getArgumentNames();
-        String[] defaultArguments = modelExporter.getDefaultArguments(this.getGUI().getSelectedModel());
+        String[] defaultArguments = modelExporter.getDefaultArguments(copy);
         InputElement[] argumentTextBoxes = new InputElement[argumentNames.length];
         int height = argumentNames.length * 28 + 32;
         WindowElement window = new WindowElement(this.getGUI(), "Export " + modelExporter.getName(), 100, height);
@@ -153,8 +181,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
                 arguments[i] = argumentTextBoxes[i].getText();
             }
             try {
-                QubbleModel copy = this.getGUI().getSelectedModel().copy();
-                modelExporter.save(modelExporter.export(copy, arguments), new File(ClientProxy.QUBBLE_EXPORT_DIRECTORY, copy.getFileName() + "." + modelExporter.getExtension()));
+                modelExporter.save(modelExporter.export(copy, arguments), new File(ClientProxy.QUBBLE_EXPORT_DIRECTORY, fileName + "." + modelExporter.getExtension()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
