@@ -6,7 +6,8 @@ public enum ModelExporters {
     KOTLIN(new KotlinExporter()),
     OBJ(new OBJExporter()),
     SCALA(new ScalaExporter()),
-    TABULA(new TabulaExporter());
+    TABULA(new TabulaExporter()),
+    TEXTURE_MAP(new TextureMapExporter());
 
     public static final ModelExporters[] VALUES = values();
     public static final IModelExporter<?>[] EXPORTERS;
