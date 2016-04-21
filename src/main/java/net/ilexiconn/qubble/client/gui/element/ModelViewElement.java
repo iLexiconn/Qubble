@@ -159,26 +159,26 @@ public class ModelViewElement extends Element<QubbleGUI> {
             GlStateManager.pushMatrix();
             GlStateManager.enableBlend();
             GlStateManager.disableLighting();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 0.5F);
             ClientProxy.MINECRAFT.getTextureManager().bindTexture(GRID);
+            double dist = 0.125D;
+            double x = -3.495D - dist - 0.01F;
+            double y = 1.50625D;
+            double z = -3.495D - dist - 0.005F;
+            double w = 7 + (dist * 2);
+            double l = 7 + (dist * 2);
             Tessellator tessellator = Tessellator.getInstance();
-            VertexBuffer buffer = tessellator.getBuffer();
-            float gridY = 24.1F * 0.0625F;
-            float size = 8.1F * 0.0625F;
-
-            for (int x = -3; x < 4; x++) {
-                for (int y = -3; y < 4; y++) {
-                    GlStateManager.pushMatrix();
-                    GlStateManager.translate(x + -0.005F, 0.0F, y);
-                    buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-                    buffer.pos(-size, gridY, -size).tex(0.0F, 0.0F).endVertex();
-                    buffer.pos(-size, gridY, size).tex(0.0F, 1.0F).endVertex();
-                    buffer.pos(size, gridY, size).tex(1.0F, 1.0F).endVertex();
-                    buffer.pos(size, gridY, -size).tex(1.0F, 0.0F).endVertex();
-                    tessellator.draw();
-                    GlStateManager.popMatrix();
-                }
-            }
-
+            VertexBuffer vertexBuffer = tessellator.getBuffer();
+            vertexBuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+            vertexBuffer.pos(x, y, z + l).tex(-0.125D, 7.125D).endVertex();
+            vertexBuffer.pos(x + w, y, z + l).tex(.125D, 7.125D).endVertex();
+            vertexBuffer.pos(x + w, y, z).tex(7.125D, -0.125D).endVertex();
+            vertexBuffer.pos(x, y, z).tex(-0.125D, -0.125D).endVertex();
+            vertexBuffer.pos(x + w, y, z + l).tex(7.125D, 7.125D).endVertex();
+            vertexBuffer.pos(x, y, z + l).tex(-0.125D, 7.125D).endVertex();
+            vertexBuffer.pos(x, y, z).tex(-0.125D, -0.125D).endVertex();
+            vertexBuffer.pos(x + w, y, z).tex(7.125D, -0.125D).endVertex();
+            tessellator.draw();
             GlStateManager.disableBlend();
             GlStateManager.enableLighting();
             GlStateManager.popMatrix();
