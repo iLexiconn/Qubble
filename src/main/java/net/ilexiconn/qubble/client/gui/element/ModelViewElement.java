@@ -158,28 +158,25 @@ public class ModelViewElement extends Element<QubbleGUI> {
             selectedBox.renderSingle(0.0625F);
             GlStateManager.popMatrix();
         }
-        GlStateManager.enableTexture2D();
+
         if (!selection) {
             GlStateManager.pushMatrix();
             GlStateManager.enableBlend();
             GlStateManager.disableLighting();
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 0.5F);
-            ClientProxy.MINECRAFT.getTextureManager().bindTexture(GRID);
+            GlStateManager.depthMask(false);
             Tessellator tessellator = Tessellator.getInstance();
             VertexBuffer buffer = tessellator.getBuffer();
-            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-            float gridY = 24.0F * 0.0625F;
-            float size = 50.0F * 0.0625F;
-            float maxUV = 2.0F + (1.0F / 128.0F);
-            buffer.pos(-size, gridY, -size).tex(0.0F, 0.0F).endVertex();
-            buffer.pos(-size, gridY, size).tex(0.0F, maxUV).endVertex();
-            buffer.pos(size, gridY, size).tex(maxUV, maxUV).endVertex();
-            buffer.pos(size, gridY, -size).tex(maxUV, 0.0F).endVertex();
-            tessellator.draw();
+            this.drawGrid(tessellator, buffer, 0.25F, 0.0F);
+            this.drawGrid(tessellator, buffer, 0.5F, 0.1125F);
+            this.drawGrid(tessellator, buffer, 1.0F, 0.225F);
+            this.drawGrid(tessellator, buffer, 2.0F, 0.45F);
+            this.drawGrid(tessellator, buffer, 4.0F, 0.9F);
+            GlStateManager.depthMask(true);
             GlStateManager.disableBlend();
             GlStateManager.enableLighting();
             GlStateManager.popMatrix();
         }
+        GlStateManager.enableTexture2D();
         GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
         RenderHelper.disableStandardItemLighting();
         GlStateManager.popMatrix();
@@ -188,6 +185,26 @@ public class ModelViewElement extends Element<QubbleGUI> {
         GlStateManager.ortho(0.0, scaledResolution.getScaledWidth_double(), scaledResolution.getScaledHeight_double(), 0.0, -5000.0D, 5000.0D);
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
         GlStateManager.loadIdentity();
+    }
+
+    private void drawGrid(Tessellator tessellator, VertexBuffer buffer, float size, float color) {
+        float scale = size / 4.0F;
+        float alpha = 1.0F - (this.zoom + 0.5F) / 10.5F;
+        GlStateManager.glLineWidth(16.0F * (this.zoom / 4.0F) * (scale / 2.0F));
+        float gridY = 24.0F * 0.0625F;
+        size /= scale;
+        for (float x = -size; x < size + scale; x += scale) {
+            buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+            buffer.pos(x, gridY, -size).color(color, color, color, alpha).endVertex();
+            buffer.pos(x, gridY, size).color(color, color, color, alpha).endVertex();
+            tessellator.draw();
+        }
+        for (float z = -size; z < size + scale; z += scale) {
+            buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+            buffer.pos(-size, gridY, z).color(color, color, color, alpha).endVertex();
+            buffer.pos(size, gridY, z).color(color, color, color, alpha).endVertex();
+            tessellator.draw();
+        }
     }
 
     private void setupCamera(float scale, float partialTicks) {
