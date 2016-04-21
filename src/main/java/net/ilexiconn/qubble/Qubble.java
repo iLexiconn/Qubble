@@ -2,7 +2,7 @@ package net.ilexiconn.qubble;
 
 import net.ilexiconn.qubble.server.ServerProxy;
 import net.ilexiconn.qubble.server.config.QubbleConfig;
-import net.ilexiconn.qubble.server.util.JSONUtil;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -27,7 +27,12 @@ public class Qubble {
     @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent event) {
         Qubble.CONFIG_FILE = new File(".", "llibrary" + File.separator + "qubble" + File.separator + "config.json");
-        Qubble.CONFIG = JSONUtil.loadConfig(Qubble.CONFIG_FILE, QubbleConfig.class);
+        try {
+            Qubble.CONFIG = new QubbleConfig();
+            Qubble.CONFIG.deserializeNBT(CompressedStreamTools.read(Qubble.CONFIG_FILE));
+        } catch (Exception e) {
+            //Meh
+        }
         Qubble.PROXY.onPreInit();
     }
 

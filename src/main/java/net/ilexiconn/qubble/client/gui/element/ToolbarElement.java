@@ -13,7 +13,6 @@ import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
 import net.ilexiconn.qubble.server.model.exporter.ModelExporters;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.ilexiconn.qubble.server.model.importer.ModelImporters;
-import net.ilexiconn.qubble.server.util.JSONUtil;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -23,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @SideOnly(Side.CLIENT)
@@ -195,30 +195,42 @@ public class ToolbarElement extends Element<QubbleGUI> {
         optionsWindow.addElement(new ColorElement(this.getGUI(), 2, 16, 195, 149, (color) -> {
             if (Qubble.CONFIG.getAccentColor() != color) {
                 Qubble.CONFIG.setAccentColor(color);
-                JSONUtil.saveConfig(Qubble.CONFIG, Qubble.CONFIG_FILE);
+                try {
+                    CompressedStreamTools.write(Qubble.CONFIG.serializeNBT(), Qubble.CONFIG_FILE);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return true;
             } else {
                 return false;
             }
         }));
 
-        final CheckboxElement dark = new CheckboxElement(this.getGUI(), 32.5F, 174.5F).withSelection(Qubble.CONFIG.getColorMode() == ColorMode.DARK);
-        final CheckboxElement light = new CheckboxElement(this.getGUI(), 122.5F, 174.5F).withSelection(Qubble.CONFIG.getColorMode() == ColorMode.LIGHT);
+        final CheckboxElement dark = new CheckboxElement(this.getGUI(), 32.5F, 174.5F).withSelection(Objects.equals(Qubble.CONFIG.getColorMode(), ColorMode.DARK.getName()));
+        final CheckboxElement light = new CheckboxElement(this.getGUI(), 122.5F, 174.5F).withSelection(Objects.equals(Qubble.CONFIG.getColorMode(), ColorMode.LIGHT.getName()));
         optionsWindow.addElement(dark.withActionHandler((selected) -> {
-            if (Qubble.CONFIG.getColorMode() != ColorMode.DARK) {
-                Qubble.CONFIG.setColorMode(ColorMode.DARK);
+            if (!Objects.equals(Qubble.CONFIG.getColorMode(), ColorMode.DARK.getName())) {
+                Qubble.CONFIG.setColorMode(ColorMode.DARK.getName());
                 light.withSelection(false);
-                JSONUtil.saveConfig(Qubble.CONFIG, Qubble.CONFIG_FILE);
+                try {
+                    CompressedStreamTools.write(Qubble.CONFIG.serializeNBT(), Qubble.CONFIG_FILE);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return true;
             } else {
                 return false;
             }
         }));
         optionsWindow.addElement(light.withActionHandler((selected) -> {
-            if (Qubble.CONFIG.getColorMode() != ColorMode.LIGHT) {
-                Qubble.CONFIG.setColorMode(ColorMode.LIGHT);
+            if (!Objects.equals(Qubble.CONFIG.getColorMode(), ColorMode.LIGHT.getName())) {
+                Qubble.CONFIG.setColorMode(ColorMode.LIGHT.getName());
                 dark.withSelection(false);
-                JSONUtil.saveConfig(Qubble.CONFIG, Qubble.CONFIG_FILE);
+                try {
+                    CompressedStreamTools.write(Qubble.CONFIG.serializeNBT(), Qubble.CONFIG_FILE);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return true;
             } else {
                 return false;

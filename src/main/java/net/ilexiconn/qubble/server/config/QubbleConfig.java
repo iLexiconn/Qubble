@@ -1,12 +1,20 @@
 package net.ilexiconn.qubble.server.config;
 
+import net.ilexiconn.llibrary.server.nbt.NBTHandler;
+import net.ilexiconn.llibrary.server.nbt.NBTMutatorProperty;
+import net.ilexiconn.llibrary.server.nbt.NBTProperty;
 import net.ilexiconn.qubble.server.color.ColorMode;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.common.util.INBTSerializable;
 
 import java.awt.*;
+import java.util.Locale;
 
-public class QubbleConfig {
+public class QubbleConfig implements INBTSerializable<NBTTagCompound> {
+    @NBTProperty
     private int accentColor = 0xFF038288;
-    private ColorMode colorMode = ColorMode.DARK;
+    @NBTMutatorProperty(type = String.class)
+    private ColorMode colorMode = ColorMode.LIGHT;
 
     public int getPrimaryColor() {
         return colorMode.getPrimaryColor();
@@ -45,15 +53,32 @@ public class QubbleConfig {
         return (0xFF << 24) | ((newColor.getRed() & 0xFF) << 16) | ((newColor.getGreen() & 0xFF) << 8) | (newColor.getBlue() & 0xFF);
     }
 
-    public ColorMode getColorMode() {
-        return colorMode;
+    public String getColorMode() {
+        return colorMode.getName();
     }
 
     public void setAccentColor(int accentColor) {
         this.accentColor = accentColor;
     }
 
-    public void setColorMode(ColorMode colorMode) {
-        this.colorMode = colorMode;
+    public void setColorMode(String colorMode) {
+        try {
+            this.colorMode = (ColorMode) ColorMode.class.getField(colorMode.toUpperCase(Locale.ENGLISH)).get(null);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            this.colorMode = ColorMode.LIGHT;
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public NBTTagCompound serializeNBT() {
+        NBTTagCompound compound = new NBTTagCompound();
+        NBTHandler.INSTANCE.saveNBTData(this, compound);
+        return compound;
+    }
+
+    @Override
+    public void deserializeNBT(NBTTagCompound compound) {
+        NBTHandler.INSTANCE.loadNBTData(this, compound);
     }
 }
