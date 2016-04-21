@@ -26,7 +26,7 @@ public class Qubble {
 
     @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent event) {
-        Qubble.CONFIG_FILE = new File(".", "llibrary" + File.separator + "qubble" + File.separator + "config.json");
+        Qubble.CONFIG_FILE = new File(".", "llibrary" + File.separator + "qubble" + File.separator + "config.dat");
         try {
             Qubble.CONFIG = new QubbleConfig();
             Qubble.CONFIG.deserializeNBT(CompressedStreamTools.read(Qubble.CONFIG_FILE));
