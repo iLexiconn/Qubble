@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
+import net.ilexiconn.qubble.client.gui.ModelMode;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.server.color.ColorMode;
 import net.ilexiconn.qubble.server.color.ColorScheme;
@@ -48,7 +49,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
         this.getGUI().getSidebar().initModelView();
         ElementHandler.INSTANCE.addElement(this.getGUI(), this.modelButton = new ButtonElement(this.getGUI(), "Model", this.getGUI().width - 262, 0, 40, 20, (v) -> {
             if (this.modelButton.getColorScheme() != ColorScheme.TAB_ACTIVE) {
-                this.setButtonColors(true, false, false);
+                this.setMode(ModelMode.MODEL);
                 this.getGUI().getSidebar().initModelView();
                 return true;
             } else {
@@ -57,7 +58,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
         }).withColorScheme(ColorScheme.TAB_ACTIVE));
         ElementHandler.INSTANCE.addElement(this.getGUI(), this.textureButton = new ButtonElement(this.getGUI(), "Texture", this.getGUI().width - 222, 0, 50, 20, (v) -> {
             if (this.textureButton.getColorScheme() != ColorScheme.TAB_ACTIVE) {
-                this.setButtonColors(false, true, false);
+                this.setMode(ModelMode.TEXTURE);
                 this.getGUI().getSidebar().initTextureView();
                 return true;
             } else {
@@ -66,7 +67,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
         }));
         ElementHandler.INSTANCE.addElement(this.getGUI(), this.animateButton = new ButtonElement(this.getGUI(), "Animate", this.getGUI().width - 172, 0, 50, 20, (v) -> {
             if (this.animateButton.getColorScheme() != ColorScheme.TAB_ACTIVE) {
-                this.setButtonColors(false, false, true);
+                this.setMode(ModelMode.ANIMATE);
                 this.getGUI().getSidebar().initAnimateView();
                 return true;
             } else {
@@ -229,9 +230,10 @@ public class ToolbarElement extends Element<QubbleGUI> {
         return list;
     }
 
-    private void setButtonColors(boolean model, boolean texture, boolean animation) {
-        this.modelButton.withColorScheme(model ? ColorScheme.TAB_ACTIVE : ColorScheme.DEFAULT);
-        this.textureButton.withColorScheme(texture ? ColorScheme.TAB_ACTIVE : ColorScheme.DEFAULT);
-        this.animateButton.withColorScheme(animation ? ColorScheme.TAB_ACTIVE : ColorScheme.DEFAULT);
+    private void setMode(ModelMode mode) {
+        this.getGUI().setMode(mode);
+        this.modelButton.withColorScheme(mode == ModelMode.MODEL ? ColorScheme.TAB_ACTIVE : ColorScheme.DEFAULT);
+        this.textureButton.withColorScheme(mode == ModelMode.TEXTURE ? ColorScheme.TAB_ACTIVE : ColorScheme.DEFAULT);
+        this.animateButton.withColorScheme(mode == ModelMode.ANIMATE ? ColorScheme.TAB_ACTIVE : ColorScheme.DEFAULT);
     }
 }

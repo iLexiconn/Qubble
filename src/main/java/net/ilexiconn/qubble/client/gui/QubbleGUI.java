@@ -39,6 +39,8 @@ public class QubbleGUI extends GuiScreen {
     private int selectedProject;
     private QubbleCube selectedCube;
 
+    private ModelMode mode = ModelMode.MODEL;
+
     public QubbleGUI(GuiScreen parent) {
         this.parent = parent;
     }
@@ -212,5 +214,13 @@ public class QubbleGUI extends GuiScreen {
 
     public List<QubbleModel> getOpenProjects() {
         return this.openProjects;
+    }
+
+    public void setMode(ModelMode mode) {
+        this.mode = mode;
+    }
+
+    public ModelMode getMode() {
+        return this.mode;
     }
 }
