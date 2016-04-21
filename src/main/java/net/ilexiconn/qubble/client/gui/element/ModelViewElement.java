@@ -189,7 +189,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
 
     private void drawGrid(Tessellator tessellator, VertexBuffer buffer, float size, float color) {
         float scale = size / 4.0F;
-        float alpha = 1.0F - (this.zoom + 0.5F) / 10.5F;
+        float alpha = Math.min(1.0F, Math.max(0.0F, ((size - 0.25F) / 3.75F) - (this.zoom + 0.5F) / 10.5F));
         GlStateManager.glLineWidth(16.0F * (this.zoom / 4.0F) * (scale / 2.0F));
         float gridY = 24.0F * 0.0625F;
         size /= scale;
