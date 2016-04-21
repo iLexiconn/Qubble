@@ -32,7 +32,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 return true;
             }
         }
-        return true;
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 return true;
             }
         }
-        return false;
+        return super.mouseDragged(mouseX, mouseY, button, timeSinceClick);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 return true;
             }
         }
-        return false;
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
