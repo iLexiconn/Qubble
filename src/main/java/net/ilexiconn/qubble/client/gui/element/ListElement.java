@@ -74,20 +74,6 @@ public class ListElement extends Element<QubbleGUI> {
                 return true;
             }
         }
-        return false;
-    }
-
-    @Override
-    public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
-        if (this.scrolling) {
-            this.scroll = (int) Math.max(0, Math.min(this.maxScroll / this.scrollPerEntry, mouseY - this.getPosY() - 2 - this.scrollYOffset));
-        }
-        return this.scrolling;
-    }
-
-    @Override
-    public boolean mouseReleased(float mouseX, float mouseY, int button) {
-        this.scrolling = false;
         int y = (int) (-this.scroll * this.scrollPerEntry * 12);
         for (String entry : this.entries) {
             if (y + 13 < this.getHeight() && y >= 0) {
@@ -104,6 +90,20 @@ public class ListElement extends Element<QubbleGUI> {
             }
             y += 13;
         }
+        return false;
+    }
+
+    @Override
+    public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
+        if (this.scrolling) {
+            this.scroll = (int) Math.max(0, Math.min(this.maxScroll / this.scrollPerEntry, mouseY - this.getPosY() - 2 - this.scrollYOffset));
+        }
+        return this.scrolling;
+    }
+
+    @Override
+    public boolean mouseReleased(float mouseX, float mouseY, int button) {
+        this.scrolling = false;
         return false;
     }
 

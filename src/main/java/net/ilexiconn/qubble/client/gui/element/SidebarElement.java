@@ -18,6 +18,7 @@ public class SidebarElement extends Element<QubbleGUI> {
     private SliderElement positionX, positionY, positionZ;
     private SliderElement offsetX, offsetY, offsetZ;
     private SliderElement scaleX, scaleY, scaleZ;
+    private SliderElement rotationX, rotationY, rotationZ;
 
     public SidebarElement(QubbleGUI gui) {
         super(gui, gui.width - 122, 20, 122, gui.height - 20);
@@ -120,6 +121,12 @@ public class SidebarElement extends Element<QubbleGUI> {
                 this.scaleY.setEditable(true);
                 this.scaleZ.setValue(cube.getScaleZ());
                 this.scaleZ.setEditable(true);
+                this.rotationX.setValue(cube.getRotationX());
+                this.rotationX.setEditable(true);
+                this.rotationY.setValue(cube.getRotationY());
+                this.rotationY.setEditable(true);
+                this.rotationZ.setValue(cube.getRotationZ());
+                this.rotationZ.setEditable(true);
                 break;
             }
             case TEXTURE: {
@@ -136,7 +143,7 @@ public class SidebarElement extends Element<QubbleGUI> {
             case MODEL: {
                 this.getElement(InputElement.class, 0).clearText();
                 this.getElement(InputElement.class, 0).setEditable(false);
-                for (int i = 0; i < 12; i++) {
+                for (int i = 0; i < 15; i++) {
                     this.getElement(SliderElement.class, i).setValue(0.0F);
                     this.getElement(SliderElement.class, i).setEditable(false);
                 }
@@ -172,6 +179,9 @@ public class SidebarElement extends Element<QubbleGUI> {
         this.addElement(this.scaleY = new SliderElement(this.getGUI(), 43, 128, value -> true));
         this.addElement(this.scaleZ = new SliderElement(this.getGUI(), 82, 128, value -> true));
         this.addElement(new TextElement(this.getGUI(), "Rotation", 4, 144));
+        this.addElement(this.rotationX = new SliderElement(this.getGUI(), 4, 153, false, 116 - 38, -180.0F, 180.0F, value -> true));
+        this.addElement(this.rotationY = new SliderElement(this.getGUI(), 4, 166, false, 116 - 38, -180.0F, 180.0F, value -> true));
+        this.addElement(this.rotationZ = new SliderElement(this.getGUI(), 4, 179, false, 116 - 38, -180.0F, 180.0F, value -> true));
     }
 
     public void initTextureView() {

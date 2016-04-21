@@ -128,9 +128,8 @@ public class ToolbarElement extends Element<QubbleGUI> {
         QubbleModel selectedModel = this.getGUI().getSelectedModel();
         saveWindow.addElement(fileName = new InputElement(this.getGUI(), selectedModel.getFileName() == null ? selectedModel.getName() : selectedModel.getFileName(), 2, 30, 96));
         saveWindow.addElement(new ButtonElement(this.getGUI(), "Save", 2, 50, 47, 12, (v) -> {
-            QubbleModel model = selectedModel;
             try {
-                CompressedStreamTools.writeCompressed(model.copy().serializeNBT(), new FileOutputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, fileName.getText() + ".qbl")));
+                CompressedStreamTools.writeCompressed(selectedModel.copy().serializeNBT(), new FileOutputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, fileName.getText() + ".qbl")));
             } catch (IOException e) {
                 e.printStackTrace();
             }
