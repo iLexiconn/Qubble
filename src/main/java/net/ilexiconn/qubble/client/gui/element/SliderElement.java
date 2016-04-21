@@ -54,7 +54,7 @@ public class SliderElement extends Element<QubbleGUI> {
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         float scaleFactor = gui.getResolution().getScaleFactor();
         GL11.glScissor((int) (posX * scaleFactor), (int) ((gui.height - (posY + height)) * scaleFactor), (int) ((width - 11) * scaleFactor), (int) (height * scaleFactor));
-        String text = this.intValue ? String.valueOf((int) this.value) : this.decimalFormat.format(this.value);
+        String text = String.valueOf(this.intValue ? (int) this.value : Float.parseFloat(this.decimalFormat.format(this.value)) + 0.0F);
         gui.mc.fontRendererObj.drawString(text, posX + 2, posY + 3.0F, textColor, false);
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
