@@ -5,6 +5,7 @@ import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.util.ClientUtils;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
+import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.model.QubbleModelBase;
 import net.ilexiconn.qubble.client.model.QubbleModelRenderer;
@@ -26,7 +27,6 @@ import java.nio.FloatBuffer;
 
 @SideOnly(Side.CLIENT)
 public class ModelViewElement extends Element<QubbleGUI> {
-    public ResourceLocation texture;
     private float cameraOffsetX = 0.0F;
     private float cameraOffsetY = 0.0F;
     private float rotationYaw = 225.0F;
@@ -70,7 +70,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         int scaleFactor = scaledResolution.getScaleFactor();
         GL11.glScissor(0, 0, gui.width * scaleFactor, (gui.height - gui.getToolbar().getHeight()) * scaleFactor);
-        if (gui.getSelectedModel() != null) {
+        if (gui.getSelectedProject() != null) {
             this.renderModel(partialTicks, scaledResolution, false);
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
@@ -118,7 +118,8 @@ public class ModelViewElement extends Element<QubbleGUI> {
         }
         GlStateManager.clear(GL11.GL_COLOR_BUFFER_BIT);
         this.setupCamera(10.0F, partialTicks);
-        QubbleModel newModel = this.getGUI().getSelectedModel();
+        Project project = this.getGUI().getSelectedProject();
+        QubbleModel newModel = project.getModel();
         if (this.currentModelContainer != newModel && newModel != null) {
             this.currentModel = new QubbleModelBase(newModel, false);
             this.currentModelSelection = new QubbleModelBase(newModel, true);
@@ -132,11 +133,15 @@ public class ModelViewElement extends Element<QubbleGUI> {
             GlStateManager.color(0.7F, 0.7F, 0.7F, 1.0F);
         }
         if (!selection) {
-            if (this.texture != null) {
+            if (project.getBaseTexture() != null) {
                 GlStateManager.enableTexture2D();
-                ClientProxy.MINECRAFT.getTextureManager().bindTexture(this.texture);
+                ClientProxy.MINECRAFT.getTextureManager().bindTexture(project.getBaseTexture().getLocation());
             }
             this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
+            if (project.getOverlayTexture() != null) {
+                ClientProxy.MINECRAFT.getTextureManager().bindTexture(project.getOverlayTexture().getLocation());
+                this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
+            }
         } else {
             this.currentModelSelection.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
         }
@@ -149,19 +154,29 @@ public class ModelViewElement extends Element<QubbleGUI> {
             GlStateManager.depthMask(true);
             GlStateManager.enableLighting();
             GlStateManager.pushMatrix();
-            if (this.texture != null) {
+            if (project.getBaseTexture() != null) {
                 GlStateManager.enableTexture2D();
             }
             if (selectedBox.getParent() != null) {
                 selectedBox.getParent().parentedPostRender(0.0625F);
             }
-            selectedBox.renderSingle(0.0625F);
+            if (project.getBaseTexture() != null) {
+                GlStateManager.enableTexture2D();
+                GlStateManager.enableBlend();
+                ClientProxy.MINECRAFT.getTextureManager().bindTexture(project.getBaseTexture().getLocation());
+                selectedBox.renderSingle(0.0625F);
+                if (project.getOverlayTexture() != null) {
+                    ClientProxy.MINECRAFT.getTextureManager().bindTexture(project.getOverlayTexture().getLocation());
+                    selectedBox.renderSingle(0.0625F);
+                }
+            }
             GlStateManager.popMatrix();
         }
 
         if (!selection) {
             GlStateManager.pushMatrix();
             GlStateManager.enableBlend();
+            GlStateManager.disableTexture2D();
             GlStateManager.disableLighting();
             GlStateManager.depthMask(false);
             Tessellator tessellator = Tessellator.getInstance();

@@ -2,11 +2,17 @@ package net.ilexiconn.qubble.client.gui.element;
 
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
 import net.ilexiconn.qubble.Qubble;
+import net.ilexiconn.qubble.client.ClientProxy;
+import net.ilexiconn.qubble.client.gui.ModelTexture;
+import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.server.color.ColorScheme;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,9 +28,37 @@ public class SidebarElement extends Element<QubbleGUI> {
     private SliderElement rotationX, rotationY, rotationZ;
     private SliderElement textureX, textureY;
     private ButtonElement mirror;
+    private InputElement texture;
+    private InputElement overlayTexture;
+
+    private boolean initialized;
 
     public SidebarElement(QubbleGUI gui) {
         super(gui, gui.width - 122, 20, 122, gui.height - 20);
+    }
+
+    @Override
+    public void update() {
+        if (this.initialized) {
+            Project selectedProject = this.getGUI().getSelectedProject();
+            switch (this.getGUI().getMode()) {
+                case MODEL: {
+                    break;
+                }
+                case TEXTURE: {
+                    ModelTexture texture = selectedProject != null ? selectedProject.getBaseTexture() : null;
+                    ModelTexture overlayTexture = selectedProject != null ? selectedProject.getOverlayTexture() : null;
+                    this.texture.clearText();
+                    this.texture.writeText(texture != null ? texture.getDisplayName() : "");
+                    this.overlayTexture.clearText();
+                    this.overlayTexture.writeText(overlayTexture != null ? overlayTexture.getDisplayName() : "");
+                    break;
+                }
+                case ANIMATE: {
+                    break;
+                }
+            }
+        }
     }
 
     @Override
@@ -148,27 +182,29 @@ public class SidebarElement extends Element<QubbleGUI> {
     }
 
     public void clearFields() {
-        this.getElement(InputElement.class, 0).clearText();
-        this.getElement(InputElement.class, 0).setEditable(false);
+        this.nameInput.clearText();
+        this.nameInput.setEditable(false);
         switch (this.getGUI().getMode()) {
             case MODEL: {
-                for (int i = 0; i < 15; i++) {
-                    this.getElement(SliderElement.class, i).setValue(0.0F);
-                    this.getElement(SliderElement.class, i).setEditable(false);
-                }
                 break;
             }
             case TEXTURE: {
-                for (int i = 0; i < 2; i++) {
-                    this.getElement(SliderElement.class, i).setValue(0.0F);
-                    this.getElement(SliderElement.class, i).setEditable(false);
-                }
-                this.mirror.setEnabled(false);
+                this.texture.clearText();
+                this.texture.setEditable(false);
+                this.overlayTexture.clearText();
+                this.overlayTexture.setEditable(false);
                 break;
             }
             case ANIMATE: {
                 break;
             }
+        }
+        int i = 0;
+        SliderElement slider;
+        while ((slider = this.getElement(SliderElement.class, i)) != null) {
+            slider.setValue(0.0F);
+            slider.setEditable(false);
+            i++;
         }
     }
 
@@ -213,16 +249,66 @@ public class SidebarElement extends Element<QubbleGUI> {
                     return true;
                 }));
                 this.addElement(new TextElement(this.getGUI(), "Texture", 4, 69));
-                this.addElement(new InputElement(this.getGUI(), "", 4, 78, 104));
-                this.addElement(new ButtonElement(this.getGUI(), "...", 108, 78, 12, 12, (button) -> true));
+                this.addElement(this.texture = new InputElement(this.getGUI(), "", 4, 78, 104));
+                this.addElement(new ButtonElement(this.getGUI(), "...", 108, 78, 12, 12, (button) -> {
+                    if (this.getGUI().getSelectedProject() != null) {
+                        this.openSelectTextureWindow("Select Texture", true);
+                        return true;
+                    }
+                    return false;
+                }));
                 this.addElement(new TextElement(this.getGUI(), "Texture overlay", 4, 94));
-                this.addElement(new InputElement(this.getGUI(), "", 4, 103, 104));
-                this.addElement(new ButtonElement(this.getGUI(), "...", 108, 103, 12, 12, (button) -> true));
+                this.addElement(this.overlayTexture = new InputElement(this.getGUI(), "", 4, 103, 104));
+                this.addElement(new ButtonElement(this.getGUI(), "...", 108, 103, 12, 12, (button) -> {
+                    if (this.getGUI().getSelectedProject() != null) {
+                        this.openSelectTextureWindow("Select Overlay Texture", false);
+                        return true;
+                    }
+                    return false;
+                }));
                 break;
             }
             case ANIMATE: {
                 break;
             }
         }
+        this.initialized = true;
+    }
+
+    private void openSelectTextureWindow(String name, boolean base) {
+        WindowElement selectTextureWindow = new WindowElement(this.getGUI(), name, 100, 100);
+        List<String> files = this.getFiles(ClientProxy.QUBBLE_TEXTURE_DIRECTORY, ".png");
+        files.add(0, "None");
+        selectTextureWindow.addElement(new ListElement(this.getGUI(), 2, 16, 96, 82, files, (selection) -> {
+            try {
+                Project project = this.getGUI().getSelectedProject();
+                if (project != null) {
+                    ModelTexture texture = null;
+                    if (!selection.equals("None")) {
+                        texture = new ModelTexture(ImageIO.read(new File(ClientProxy.QUBBLE_TEXTURE_DIRECTORY, selection + ".png")), selection);
+                    }
+                    if (base) {
+                        project.setBaseTexture(texture);
+                    } else {
+                        project.setOverlayTexture(texture);
+                    }
+                    ElementHandler.INSTANCE.removeElement(this.getGUI(), selectTextureWindow);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }));
+        ElementHandler.INSTANCE.addElement(this.getGUI(), selectTextureWindow);
+    }
+
+    private List<String> getFiles(File directory, String extension) {
+        List<String> list = new ArrayList<>();
+        for (File modelFile : directory.listFiles()) {
+            if (modelFile.isFile() && modelFile.getName().endsWith(extension)) {
+                list.add(modelFile.getName().split(extension)[0]);
+            }
+        }
+        return list;
     }
 }

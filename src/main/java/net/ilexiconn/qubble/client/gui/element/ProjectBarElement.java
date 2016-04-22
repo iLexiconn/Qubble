@@ -3,6 +3,7 @@ package net.ilexiconn.qubble.client.gui.element;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
+import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.minecraft.client.gui.FontRenderer;
 import org.lwjgl.opengl.GL11;
@@ -42,12 +43,12 @@ public class ProjectBarElement extends Element<QubbleGUI> {
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
         gui.drawRectangle(posX, posY, width, height, Qubble.CONFIG.getPrimaryColor());
         float projectX = -this.scroll;
-        List<QubbleModel> openProjects = gui.getOpenProjects();
+        List<Project> openProjects = gui.getOpenProjects();
         for (int projectIndex = 0; projectIndex < openProjects.size(); projectIndex++) {
-            QubbleModel model = openProjects.get(projectIndex);
+            QubbleModel model = openProjects.get(projectIndex).getModel();
             float projectWidth = fontRenderer.getStringWidth(model.getName()) + 15.0F;
             boolean hover = this.isSelected(mouseX, mouseY) && mouseX >= posX + projectX + projectWidth - 12 && mouseX <= posX + projectX + projectWidth;
-            if (projectIndex == gui.getSelectedProject()) {
+            if (projectIndex == gui.getSelectedProjectIndex()) {
                 gui.drawRectangle(posX + projectX, posY, projectWidth, height, Qubble.CONFIG.getTertiaryColor());
                 gui.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : Qubble.CONFIG.getTertiaryColor());
             } else {
@@ -69,10 +70,10 @@ public class ProjectBarElement extends Element<QubbleGUI> {
             FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
             if (this.isSelected(mouseX, mouseY)) {
                 float projectX = -this.scroll;
-                List<QubbleModel> openProjects = gui.getOpenProjects();
+                List<Project> openProjects = gui.getOpenProjects();
                 boolean selected = false;
                 for (int projectIndex = 0; projectIndex < openProjects.size(); projectIndex++) {
-                    QubbleModel model = openProjects.get(projectIndex);
+                    QubbleModel model = openProjects.get(projectIndex).getModel();
                     String name = model.getName() + " x";
                     float projectWidth = fontRenderer.getStringWidth(name) + 3.0F;
                     if (mouseX >= posX + projectX && mouseX < posX + projectX + projectWidth) {

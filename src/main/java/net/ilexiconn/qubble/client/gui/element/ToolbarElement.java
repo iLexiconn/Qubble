@@ -45,7 +45,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
             return true;
         }));
         ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "Save", 60, 0, 30, 20, (v) -> {
-            if (this.getGUI().getSelectedModel() != null) {
+            if (this.getGUI().getSelectedProject() != null) {
                 this.openSaveWindow();
                 return true;
             }
@@ -124,7 +124,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
         WindowElement saveWindow = new WindowElement(this.getGUI(), "Save", 100, 64);
         saveWindow.addElement(new TextElement(this.getGUI(), "File name", 4, 19));
         InputElement fileName;
-        QubbleModel selectedModel = this.getGUI().getSelectedModel();
+        QubbleModel selectedModel = this.getGUI().getSelectedProject().getModel();
         saveWindow.addElement(fileName = new InputElement(this.getGUI(), selectedModel.getFileName() == null ? selectedModel.getName() : selectedModel.getFileName(), 2, 30, 96));
         saveWindow.addElement(new ButtonElement(this.getGUI(), "Save", 2, 50, 47, 12, (v) -> {
             try {
@@ -159,7 +159,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
     }
 
     private void openModelExportWindow(IModelExporter modelExporter, String fileName) {
-        QubbleModel copy = this.getGUI().getSelectedModel().copy();
+        QubbleModel copy = this.getGUI().getSelectedProject().getModel().copy();
         int argumentY = 18;
         String[] argumentNames = modelExporter.getArgumentNames();
         String[] defaultArguments = modelExporter.getDefaultArguments(copy);

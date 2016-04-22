@@ -45,9 +45,9 @@ public class ModelTreeElement extends Element<QubbleGUI> {
             i++;
         }
 
-        if (gui.getSelectedModel() != null) {
+        if (gui.getSelectedProject() != null) {
             this.cubeY = 0;
-            QubbleModel model = gui.getSelectedModel();
+            QubbleModel model = gui.getSelectedProject().getModel();
             for (QubbleCube cube : model.getCubes()) {
                 this.drawCubeEntry(cube, 0);
             }
@@ -68,12 +68,12 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         }
         QubbleGUI gui = this.getGUI();
         if (button == 0) {
-            if (gui.getSelectedModel() != null) {
+            if (gui.getSelectedProject() != null) {
                 this.cubeY = 0;
                 if (mouseX >= this.getPosX() && mouseX < this.getPosX() + this.getWidth() - 10 && mouseY >= this.getPosY() && mouseY < this.getPosY() + this.getHeight()) {
                     gui.setSelectedCube(null);
                 }
-                QubbleModel model = gui.getSelectedModel();
+                QubbleModel model = gui.getSelectedProject().getModel();
                 for (QubbleCube cube : model.getCubes()) {
                     if (this.mouseDetectionCubeEntry(cube, 0, mouseX, mouseY)) {
                         return true;

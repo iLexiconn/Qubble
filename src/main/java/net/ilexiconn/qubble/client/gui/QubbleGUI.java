@@ -35,7 +35,7 @@ public class QubbleGUI extends GuiScreen {
     private SidebarElement sidebar;
     private ProjectBarElement projectBar;
 
-    private List<QubbleModel> openProjects = new ArrayList<>();
+    private List<Project> openProjects = new ArrayList<>();
     private int selectedProject;
     private QubbleCube selectedCube;
 
@@ -163,7 +163,7 @@ public class QubbleGUI extends GuiScreen {
                 model = importer.getModel(name, importer.read(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, name + "." + importer.getExtension())));
             }
             this.selectedProject = this.openProjects.size();
-            this.openProjects.add(model);
+            this.openProjects.add(new Project(model));
             this.setSelectedCube(null);
         } catch (IOException e) {
             e.printStackTrace();
@@ -180,11 +180,11 @@ public class QubbleGUI extends GuiScreen {
         this.selectedProject = Math.max(0, Math.min(this.openProjects.size() - 1, selectedProject));
     }
 
-    public QubbleModel getSelectedModel() {
+    public Project getSelectedProject() {
         return this.openProjects.size() > this.selectedProject ? this.openProjects.get(this.selectedProject) : null;
     }
 
-    public int getSelectedProject() {
+    public int getSelectedProjectIndex() {
         return this.selectedProject;
     }
 
@@ -217,7 +217,7 @@ public class QubbleGUI extends GuiScreen {
         return this.projectBar;
     }
 
-    public List<QubbleModel> getOpenProjects() {
+    public List<Project> getOpenProjects() {
         return this.openProjects;
     }
 
