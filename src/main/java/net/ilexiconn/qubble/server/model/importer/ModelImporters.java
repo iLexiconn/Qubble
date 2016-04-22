@@ -3,7 +3,8 @@ package net.ilexiconn.qubble.server.model.importer;
 public enum ModelImporters {
     JAVASCRIPT(new JavaScriptImporter()),
     TABULA(new TabulaImporter()),
-    TECHNE(new TechneImporter());
+    TECHNE(new TechneImporter()),
+    BLOCK_JSON(new JsonImporter());
 
     public static final ModelImporters[] VALUES = values();
     public static final IModelImporter<?>[] IMPORTERS;

@@ -7,7 +7,8 @@ public enum ModelExporters {
     OBJ(new OBJExporter()),
     SCALA(new ScalaExporter()),
     TABULA(new TabulaExporter()),
-    TEXTURE_MAP(new TextureMapExporter());
+    TEXTURE_MAP(new TextureMapExporter()),
+    BLOCK_JSON(new JsonExporter());
 
     public static final ModelExporters[] VALUES = values();
     public static final IModelExporter<?>[] EXPORTERS;
