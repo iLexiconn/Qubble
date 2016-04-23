@@ -181,11 +181,11 @@ public class ModelViewElement extends Element<QubbleGUI> {
             GlStateManager.depthMask(false);
             Tessellator tessellator = Tessellator.getInstance();
             VertexBuffer buffer = tessellator.getBuffer();
-            this.drawGrid(tessellator, buffer, 0.25F, 0.0F, 1.0F, 0.0F);
-            this.drawGrid(tessellator, buffer, 0.5F, 0.1125F, 0.5F, 0.25F);
-            this.drawGrid(tessellator, buffer, 1.0F, 0.225F, 0.0F, 0.5F);
-            this.drawGrid(tessellator, buffer, 2.0F, 0.45F, -0.5F, 0.75F);
-            this.drawGrid(tessellator, buffer, 4.0F, 0.9F, -1.0F, 1.0F);
+            this.drawGrid(tessellator, buffer, 0.25F, 0.0F);
+            this.drawGrid(tessellator, buffer, 0.5F, 0.15F);
+            this.drawGrid(tessellator, buffer, 1.0F, 0.225F);
+            this.drawGrid(tessellator, buffer, 2.0F, 0.45F);
+            this.drawGrid(tessellator, buffer, 4.0F, 0.9F);
             GlStateManager.depthMask(true);
             GlStateManager.disableBlend();
             GlStateManager.enableLighting();
@@ -202,10 +202,11 @@ public class ModelViewElement extends Element<QubbleGUI> {
         GlStateManager.loadIdentity();
     }
 
-    private void drawGrid(Tessellator tessellator, VertexBuffer buffer, float size, float color, float gradient, float intersect) {
+    private void drawGrid(Tessellator tessellator, VertexBuffer buffer, float size, float color) {
         float scale = size / 4.0F;
-        float alpha = Math.max(0.0F, Math.min(1.0F, gradient * (float) ((Math.log(this.zoom) - 0.5F) / 9.5F) + intersect));
-        GlStateManager.glLineWidth(16.0F * (this.zoom / 4.0F) * (scale / 2.0F));
+        float lineWidth = 16.0F * (this.zoom / 4.0F) * (scale / 2.0F);
+        GlStateManager.glLineWidth(lineWidth);
+        float alpha = Math.max(0.0F, Math.min(1.0F, lineWidth - 0.35F));
         float gridY = 24.0F * 0.0625F;
         size /= scale;
         for (float x = -size; x < size + scale; x += scale) {
