@@ -38,7 +38,7 @@ public class BlockModelContainer {
 
     public static class Display {
         public float[] rotation;
-        public float translation;
+        public float[] translation;
         public float[] scale;
     }
 }
