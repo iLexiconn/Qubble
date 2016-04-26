@@ -36,9 +36,9 @@ public class JsonImporter implements IModelImporter<BlockModelContainer> {
                 if (origin == null) {
                     origin = new float[] {8, 8, 8};
                 }
-                offset[0] = origin[0] - position[0];
-                offset[1] = origin[1] - position[1];
-                offset[2] = origin[2] - position[2];
+                offset[0] = position[0] - origin[0];
+                offset[1] = position[1] - origin[1];
+                offset[2] = position[2] - origin[2];
                 position[0] -= offset[0];
                 position[1] -= offset[1];
                 position[2] -= offset[2];

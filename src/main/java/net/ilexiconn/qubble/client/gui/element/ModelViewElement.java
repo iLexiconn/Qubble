@@ -135,10 +135,13 @@ public class ModelViewElement extends Element<QubbleGUI> {
         if (!selection) {
             if (project.getBaseTexture() != null) {
                 GlStateManager.enableTexture2D();
+                GlStateManager.enableBlend();
                 ClientProxy.MINECRAFT.getTextureManager().bindTexture(project.getBaseTexture().getLocation());
             }
             this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
             if (project.getOverlayTexture() != null) {
+                GlStateManager.enableTexture2D();
+                GlStateManager.enableBlend();
                 ClientProxy.MINECRAFT.getTextureManager().bindTexture(project.getOverlayTexture().getLocation());
                 this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
             }
@@ -164,11 +167,13 @@ public class ModelViewElement extends Element<QubbleGUI> {
                 GlStateManager.enableTexture2D();
                 GlStateManager.enableBlend();
                 ClientProxy.MINECRAFT.getTextureManager().bindTexture(project.getBaseTexture().getLocation());
+            }
+            selectedBox.renderSingle(0.0625F);
+            if (project.getOverlayTexture() != null) {
+                GlStateManager.enableTexture2D();
+                GlStateManager.enableBlend();
+                ClientProxy.MINECRAFT.getTextureManager().bindTexture(project.getOverlayTexture().getLocation());
                 selectedBox.renderSingle(0.0625F);
-                if (project.getOverlayTexture() != null) {
-                    ClientProxy.MINECRAFT.getTextureManager().bindTexture(project.getOverlayTexture().getLocation());
-                    selectedBox.renderSingle(0.0625F);
-                }
             }
             GlStateManager.popMatrix();
         }
