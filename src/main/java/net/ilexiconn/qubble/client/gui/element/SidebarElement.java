@@ -215,7 +215,10 @@ public class SidebarElement extends Element<QubbleGUI> {
         switch (this.getGUI().getMode()) {
             case MODEL: {
                 this.addElement(new TextElement(this.getGUI(), "Dimensions", 4, 44));
-                this.addElement(this.dimensionX = new SliderElement(this.getGUI(), 4, 53, true, value -> true));
+                this.addElement(this.dimensionX = new SliderElement(this.getGUI(), 4, 53, true, value -> {
+                    this.getGUI().getSelectedProject().getSelectedCube().setDimensions((int) (float) value, (int) (float) value, (int) (float) value);
+                    return true;
+                }));
                 this.addElement(this.dimensionY = new SliderElement(this.getGUI(), 43, 53, true, value -> true));
                 this.addElement(this.dimensionZ = new SliderElement(this.getGUI(), 82, 53, true, value -> true));
                 this.addElement(new TextElement(this.getGUI(), "Position", 4, 69));

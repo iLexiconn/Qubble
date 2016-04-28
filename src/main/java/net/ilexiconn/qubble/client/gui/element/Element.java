@@ -38,10 +38,6 @@ public class Element<T extends GuiScreen> extends Gui {
 
     }
 
-    public void renderAfter(float mouseX, float mouseY, float partialTicks) {
-
-    }
-
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
         return this.isSelected(mouseX, mouseY);
     }

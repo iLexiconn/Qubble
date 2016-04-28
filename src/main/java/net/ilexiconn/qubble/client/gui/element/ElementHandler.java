@@ -94,26 +94,6 @@ public enum ElementHandler {
         }
     }
 
-    public <T extends GuiScreen> void renderAfter(T gui, float mouseX, float mouseY, float partialTicks) {
-        if (this.elementMap.containsKey(gui)) {
-            List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));
-            for (Element<T> element : elementList) {
-                if (!(element instanceof WindowElement)) {
-                    if (element.isVisible()) {
-                        element.renderAfter(mouseX, mouseY, partialTicks);
-                    }
-                }
-            }
-            for (Element<T> element : elementList) {
-                if (element instanceof WindowElement) {
-                    if (element.isVisible()) {
-                        element.renderAfter(mouseX, mouseY, partialTicks);
-                    }
-                }
-            }
-        }
-    }
-
     public <T extends GuiScreen> void mouseClicked(T gui, float mouseX, float mouseY, int button) {
         if (this.elementMap.containsKey(gui)) {
             List<Element<T>> elementList = (List<Element<T>>) ((List<?>) this.elementMap.get(gui));

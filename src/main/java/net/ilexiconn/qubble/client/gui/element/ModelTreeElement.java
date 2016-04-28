@@ -71,7 +71,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
             if (gui.getSelectedProject() != null) {
                 this.cubeY = 0;
                 if (mouseX >= this.getPosX() && mouseX < this.getPosX() + this.getWidth() - 10 && mouseY >= this.getPosY() && mouseY < this.getPosY() + this.getHeight()) {
-                    gui.setSelectedCube(null);
+                    gui.getSelectedProject().setSelectedCube(null);
                 }
                 QubbleModel model = gui.getSelectedProject().getModel();
                 for (QubbleCube cube : model.getCubes()) {
@@ -116,7 +116,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
             }
         }
         if (mouseX >= entryX + 10 && mouseX < entryX - xOffset + this.getWidth() - 10 && mouseY >= entryY && mouseY < entryY + 10) {
-            this.getGUI().setSelectedCube(cube);
+            this.getGUI().getSelectedProject().setSelectedCube(cube);
             return true;
         }
         return false;
@@ -127,7 +127,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         String name = cube.getName();
         float entryX = this.getPosX() + xOffset;
         float entryY = this.getPosY() + this.cubeY * 12.0F + 2.0F - this.scroller.getScrollOffset();
-        fontRenderer.drawString(name, entryX + 10, entryY, this.getGUI().getSelectedCube() == cube ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTextColor(), false);
+        fontRenderer.drawString(name, entryX + 10, entryY, this.getGUI().getSelectedProject().getSelectedCube() == cube ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTextColor(), false);
         this.cubeY++;
         boolean expanded = this.isExpanded(cube);
         int prevCubeY = this.cubeY;

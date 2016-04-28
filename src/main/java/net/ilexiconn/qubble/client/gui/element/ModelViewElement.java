@@ -15,7 +15,6 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.BufferUtils;
@@ -42,13 +41,10 @@ public class ModelViewElement extends Element<QubbleGUI> {
     private QubbleModelBase currentModelSelection;
     private float prevMouseX;
     private float prevMouseY;
-    private QubbleCube currentSelected;
 
     private boolean dragged;
 
     private float partialTicks;
-
-    private static final ResourceLocation GRID = new ResourceLocation(Qubble.MODID, "/textures/grid.png");
 
     public ModelViewElement(QubbleGUI gui) {
         super(gui, 0.0F, 0.0F, gui.width, gui.height);
@@ -120,13 +116,13 @@ public class ModelViewElement extends Element<QubbleGUI> {
         this.setupCamera(10.0F, partialTicks);
         Project project = this.getGUI().getSelectedProject();
         QubbleModel newModel = project.getModel();
-        if (this.currentModelContainer != newModel && newModel != null) {
+        if (true) { //idk
             this.currentModel = new QubbleModelBase(newModel, false);
             this.currentModelSelection = new QubbleModelBase(newModel, true);
             this.currentModelContainer = newModel;
         }
         GlStateManager.translate(0.0F, -1.5F, 0.0F);
-        QubbleCube selectedCube = this.getGUI().getSelectedCube();
+        QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
         QubbleModelRenderer selectedBox = this.currentModel.getCube(selectedCube);
         GlStateManager.enableBlend();
         if (selectedBox != null && !selection) {
@@ -272,16 +268,14 @@ public class ModelViewElement extends Element<QubbleGUI> {
                 int g = (int) (buffer.get(1) * 255.0F);
                 int b = (int) (buffer.get(2) * 255.0F);
                 int id = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF));
-                QubbleCube cube = this.getGUI().getSelectedCube();
+                QubbleCube cube = this.getGUI().getSelectedProject().getSelectedCube();
                 if (cube != null) {
-                    this.currentModel.getCube(cube).setSelected(false);
-                    this.currentSelected = null;
+                    this.getGUI().getSelectedProject().setSelectedCube(null);
                 }
                 QubbleCube newCube = this.currentModel.getCube(id);
-                this.getGUI().setSelectedCube(newCube);
+                this.getGUI().getSelectedProject().setSelectedCube(newCube);
                 if (newCube != null) {
-                    this.currentModel.getCube(newCube).setSelected(true);
-                    this.currentSelected = newCube;
+                    this.getGUI().getSelectedProject().setSelectedCube(newCube);
                     return true;
                 }
                 return false;
@@ -289,10 +283,6 @@ public class ModelViewElement extends Element<QubbleGUI> {
         }
         this.dragged = false;
         return false;
-    }
-
-    public QubbleCube getCurrentSelected() {
-        return currentSelected;
     }
 
     @Override

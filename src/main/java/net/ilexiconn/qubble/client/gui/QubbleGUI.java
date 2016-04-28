@@ -1,6 +1,5 @@
 package net.ilexiconn.qubble.client.gui;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
@@ -37,7 +36,6 @@ public class QubbleGUI extends GuiScreen {
 
     private List<Project> openProjects = new ArrayList<>();
     private int selectedProject;
-    private QubbleCube selectedCube;
 
     private ModelMode mode = ModelMode.MODEL;
 
@@ -68,7 +66,6 @@ public class QubbleGUI extends GuiScreen {
         float preciseMouseX = this.getPreciseMouseX();
         float preciseMouseY = this.getPreciseMouseY();
         ElementHandler.INSTANCE.render(this, preciseMouseX, preciseMouseY, partialTicks);
-        ElementHandler.INSTANCE.renderAfter(this, preciseMouseX, preciseMouseY, partialTicks);
     }
 
     @Override
@@ -170,13 +167,15 @@ public class QubbleGUI extends GuiScreen {
 
     public void selectModel(QubbleModel model) {
         this.selectedProject = this.openProjects.size();
-        this.openProjects.add(new Project(model));
-        this.setSelectedCube(null);
+        this.openProjects.add(new Project(this, model));
+        this.selectedProject = this.openProjects.size();
+        this.openProjects.add(new Project(this, model));
+        this.getSelectedProject().setSelectedCube(null);
     }
 
     public void selectModel(int index) {
         this.selectedProject = Math.max(0, Math.min(this.openProjects.size() - 1, index));
-        this.setSelectedCube(null);
+        this.getSelectedProject().setSelectedCube(null);
     }
 
     public void closeModel(int index) {
@@ -190,19 +189,6 @@ public class QubbleGUI extends GuiScreen {
 
     public int getSelectedProjectIndex() {
         return this.selectedProject;
-    }
-
-    public void setSelectedCube(QubbleCube selectedCube) {
-        this.selectedCube = selectedCube;
-        if (selectedCube != null) {
-            this.sidebar.populateFields(selectedCube);
-        } else {
-            this.sidebar.clearFields();
-        }
-    }
-
-    public QubbleCube getSelectedCube() {
-        return this.selectedCube;
     }
 
     public ModelTreeElement getModelTree() {
@@ -228,8 +214,8 @@ public class QubbleGUI extends GuiScreen {
     public void setMode(ModelMode mode) {
         this.mode = mode;
         this.getSidebar().initFields();
-        if (this.getModelView().getCurrentSelected() != null) {
-            this.getSidebar().populateFields(this.getModelView().getCurrentSelected());
+        if (this.getSelectedProject() != null && this.getSelectedProject().getSelectedCube() != null) {
+            this.getSidebar().populateFields(this.getSelectedProject().getSelectedCube());
         } else {
             this.getSidebar().clearFields();
         }

@@ -18,7 +18,6 @@ public class QubbleModelRenderer extends AdvancedModelRenderer {
     private boolean compiled;
     private boolean selection;
     private float r, g, b;
-    private boolean selected;
     public int sizeX, sizeY, sizeZ;
 
     public QubbleModelRenderer(AdvancedModelBase model, String name, int textureX, int textureY, int id, boolean selection) {
@@ -171,13 +170,5 @@ public class QubbleModelRenderer extends AdvancedModelRenderer {
         }
         GlStateManager.glEndList();
         this.compiled = true;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-
-    public boolean isSelected() {
-        return this.selected;
     }
 }

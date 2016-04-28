@@ -1,13 +1,17 @@
 package net.ilexiconn.qubble.client.gui;
 
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 
 public class Project {
+    private QubbleGUI gui;
     private QubbleModel model;
+    private QubbleCube selectedCube;
     private ModelTexture baseTexture;
     private ModelTexture overlayTexture;
 
-    public Project(QubbleModel model) {
+    public Project(QubbleGUI gui, QubbleModel model) {
+        this.gui = gui;
         this.model = model;
     }
 
@@ -29,5 +33,18 @@ public class Project {
 
     public ModelTexture getOverlayTexture() {
         return this.overlayTexture;
+    }
+
+    public QubbleCube getSelectedCube() {
+        return selectedCube;
+    }
+
+    public void setSelectedCube(QubbleCube cube) {
+        this.selectedCube = cube;
+        if (this.selectedCube != null) {
+            this.gui.getSidebar().populateFields(selectedCube);
+        } else {
+            this.gui.getSidebar().clearFields();
+        }
     }
 }
