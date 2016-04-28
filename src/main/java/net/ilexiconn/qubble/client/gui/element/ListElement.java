@@ -28,9 +28,9 @@ public class ListElement extends Element<QubbleGUI> {
         super(gui, posX, posY, width, height);
         this.entries = entries;
         this.function = function;
-        this.maxDisplayEntries = this.getHeight() / 12;
-        this.maxScroll = Math.max(0, this.entries.size() - this.maxDisplayEntries);
-        this.scrollPerEntry = (float) (this.entries.size()) / (this.getHeight() - 2);
+        this.maxDisplayEntries = this.getHeight() / 13;
+        this.maxScroll = Math.max(0, (this.entries.size()) - this.maxDisplayEntries);
+        this.scrollPerEntry = (float) (this.entries.size()) / (this.getHeight() - 1);
     }
 
     @Override
@@ -74,9 +74,9 @@ public class ListElement extends Element<QubbleGUI> {
                 return true;
             }
         }
-        int y = (int) (-this.scroll * this.scrollPerEntry * 12);
-        for (String entry : this.entries) {
-            if (y + 13 < this.getHeight() && y >= 0) {
+        if (this.isSelected(mouseX, mouseY)) {
+            int y = (int) (-this.scroll * this.scrollPerEntry * 12);
+            for (String entry : this.entries) {
                 float entryX = this.getPosX() + 2;
                 float entryY = this.getPosY() + y + 1;
                 float entryWidth = this.getWidth() - 12;
@@ -87,8 +87,8 @@ public class ListElement extends Element<QubbleGUI> {
                     }
                     return true;
                 }
+                y += 13;
             }
-            y += 13;
         }
         return false;
     }

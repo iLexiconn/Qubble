@@ -8,28 +8,21 @@ import net.minecraft.util.ResourceLocation;
 import java.awt.image.BufferedImage;
 
 public class ModelTexture {
-    private BufferedImage image;
     private ResourceLocation location;
-    private DynamicTexture dynamicTexture;
     private String displayName;
 
     public ModelTexture(BufferedImage image, String name) {
-        this.image = image;
-        this.dynamicTexture = new DynamicTexture(image);
         this.displayName = name;
-        this.location = ClientProxy.MINECRAFT.getTextureManager().getDynamicTextureLocation(Qubble.MODID + ":" + name, this.dynamicTexture);
+        this.location = ClientProxy.MINECRAFT.getTextureManager().getDynamicTextureLocation(Qubble.MODID + ":" + name, new DynamicTexture(image));
     }
 
-    public BufferedImage getImage() {
-        return this.image;
+    public ModelTexture(ResourceLocation texture) {
+        this.location = texture;
+        this.displayName = texture.toString();
     }
 
     public ResourceLocation getLocation() {
         return this.location;
-    }
-
-    public DynamicTexture getDynamicTexture() {
-        return this.dynamicTexture;
     }
 
     public String getDisplayName() {

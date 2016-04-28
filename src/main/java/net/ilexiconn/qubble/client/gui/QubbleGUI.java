@@ -162,12 +162,16 @@ public class QubbleGUI extends GuiScreen {
             } else {
                 model = importer.getModel(name, importer.read(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, name + "." + importer.getExtension())));
             }
-            this.selectedProject = this.openProjects.size();
-            this.openProjects.add(new Project(model));
-            this.setSelectedCube(null);
+            this.selectModel(model);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void selectModel(QubbleModel model) {
+        this.selectedProject = this.openProjects.size();
+        this.openProjects.add(new Project(model));
+        this.setSelectedCube(null);
     }
 
     public void selectModel(int index) {

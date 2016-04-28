@@ -5,6 +5,7 @@ import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.ModelMode;
+import net.ilexiconn.qubble.client.gui.ModelTexture;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.server.color.ColorMode;
 import net.ilexiconn.qubble.server.color.ColorScheme;
@@ -14,6 +15,7 @@ import net.ilexiconn.qubble.server.model.exporter.ModelExporters;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.ilexiconn.qubble.server.model.importer.ModelImporters;
 import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -107,17 +109,40 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
     public void openImportWindow() {
         WindowElement importWindow = new WindowElement(this.getGUI(), "Import", 100, 100);
-        importWindow.addElement(new ListElement(this.getGUI(), 2, 16, 96, 82, Lists.newArrayList(ModelImporters.IMPORTERS).stream().map(IModelImporter::getName).collect(Collectors.toList()), (selected) -> {
-            IModelImporter importer = ModelHandler.INSTANCE.getImporter(selected);
-            if (importer != null) {
-                this.openModelWindow(importer);
+        List<String> importers = Lists.newArrayList(ModelImporters.IMPORTERS).stream().map(IModelImporter::getName).collect(Collectors.toList());
+        importers.add(0, "Game");
+        importWindow.addElement(new ListElement(this.getGUI(), 2, 16, 96, 82, importers, (selected) -> {
+            if (selected.equals("Game")) {
+                this.openGameImportWindow();
                 ElementHandler.INSTANCE.removeElement(this.getGUI(), importWindow);
                 return true;
             } else {
-                return false;
+                IModelImporter importer = ModelHandler.INSTANCE.getImporter(selected);
+                if (importer != null) {
+                    this.openModelWindow(importer);
+                    ElementHandler.INSTANCE.removeElement(this.getGUI(), importWindow);
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }));
         ElementHandler.INSTANCE.addElement(this.getGUI(), importWindow);
+    }
+
+    public void openGameImportWindow() {
+        WindowElement openWindow = new WindowElement(this.getGUI(), "Import Game Model", 150, 200);
+        openWindow.addElement(new ListElement(this.getGUI(), 2, 16, 146, 182, ClientProxy.getGameModels(), (selected) -> {
+            QubbleModel model = ClientProxy.GAME_MODELS.get(selected);
+            this.getGUI().selectModel(model);
+            ResourceLocation texture = ClientProxy.GAME_TEXTURES.get(selected);
+            if (texture != null) {
+                this.getGUI().getSelectedProject().setBaseTexture(new ModelTexture(texture));
+            }
+            ElementHandler.INSTANCE.removeElement(this.getGUI(), openWindow);
+            return true;
+        }));
+        ElementHandler.INSTANCE.addElement(this.getGUI(), openWindow);
     }
 
     public void openSaveWindow() {

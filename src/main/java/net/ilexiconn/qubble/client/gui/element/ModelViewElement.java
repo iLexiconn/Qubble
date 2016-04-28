@@ -263,7 +263,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseReleased(float mouseX, float mouseY, int button) {
         if (button == 0) {
-            if (!this.dragged && this.currentModel != null && this.isSelected(mouseX, mouseY)) {
+            if (!this.dragged && this.getGUI().getSelectedProject() != null && this.currentModel != null && this.isSelected(mouseX, mouseY)) {
                 ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
                 this.renderModel(this.partialTicks, scaledResolution, true);
                 FloatBuffer buffer = BufferUtils.createFloatBuffer(3);

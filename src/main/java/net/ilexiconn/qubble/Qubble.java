@@ -31,7 +31,8 @@ public class Qubble {
             Qubble.CONFIG = new QubbleConfig();
             Qubble.CONFIG.deserializeNBT(CompressedStreamTools.read(Qubble.CONFIG_FILE));
         } catch (Exception e) {
-            //Meh
+            System.err.println("Failed to load Qubble config file!");
+            e.printStackTrace();
         }
         Qubble.PROXY.onPreInit();
     }
