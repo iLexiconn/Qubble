@@ -116,11 +116,9 @@ public class ModelViewElement extends Element<QubbleGUI> {
         this.setupCamera(10.0F, partialTicks);
         Project project = this.getGUI().getSelectedProject();
         QubbleModel newModel = project.getModel();
-        if (true) { //idk
-            this.currentModel = new QubbleModelBase(newModel, false);
-            this.currentModelSelection = new QubbleModelBase(newModel, true);
-            this.currentModelContainer = newModel;
-        }
+        this.currentModel = new QubbleModelBase(newModel, false);
+        this.currentModelSelection = new QubbleModelBase(newModel, true);
+        this.currentModelContainer = newModel;
         GlStateManager.translate(0.0F, -1.5F, 0.0F);
         QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
         QubbleModelRenderer selectedBox = this.currentModel.getCube(selectedCube);
