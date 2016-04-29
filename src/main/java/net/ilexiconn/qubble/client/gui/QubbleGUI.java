@@ -166,21 +166,21 @@ public class QubbleGUI extends GuiScreen {
     }
 
     public void selectModel(QubbleModel model) {
-        this.selectedProject = this.openProjects.size();
+        this.selectModel(this.openProjects.size() - 1);
         this.openProjects.add(new Project(this, model));
-        this.selectedProject = this.openProjects.size();
-        this.openProjects.add(new Project(this, model));
-        this.getSelectedProject().setSelectedCube(null);
     }
 
     public void selectModel(int index) {
         this.selectedProject = Math.max(0, Math.min(this.openProjects.size() - 1, index));
-        this.getSelectedProject().setSelectedCube(null);
+        Project selectedProject = this.getSelectedProject();
+        if (selectedProject != null && selectedProject.getSelectedCube() != null) {
+            this.sidebar.populateFields(selectedProject.getSelectedCube());
+        }
     }
 
     public void closeModel(int index) {
         this.openProjects.remove(index);
-        this.selectedProject = Math.max(0, Math.min(this.openProjects.size() - 1, selectedProject));
+        this.selectModel(selectedProject);
     }
 
     public Project getSelectedProject() {
