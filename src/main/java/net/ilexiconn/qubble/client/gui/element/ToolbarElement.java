@@ -110,10 +110,15 @@ public class ToolbarElement extends Element<QubbleGUI> {
     public void openImportWindow() {
         WindowElement importWindow = new WindowElement(this.getGUI(), "Import", 100, 100);
         List<String> importers = Lists.newArrayList(ModelImporters.IMPORTERS).stream().map(IModelImporter::getName).collect(Collectors.toList());
+        importers.add(0, "Game Blocks");
         importers.add(0, "Game");
         importWindow.addElement(new ListElement(this.getGUI(), 2, 16, 96, 82, importers, (selected) -> {
             if (selected.equals("Game")) {
                 this.openGameImportWindow();
+                ElementHandler.INSTANCE.removeElement(this.getGUI(), importWindow);
+                return true;
+            } else if (selected.equals("Game Blocks")) {
+                this.openGameBlockImportWindow();
                 ElementHandler.INSTANCE.removeElement(this.getGUI(), importWindow);
                 return true;
             } else {
@@ -139,6 +144,17 @@ public class ToolbarElement extends Element<QubbleGUI> {
             if (texture != null) {
                 this.getGUI().getSelectedProject().setBaseTexture(new ModelTexture(texture));
             }
+            ElementHandler.INSTANCE.removeElement(this.getGUI(), openWindow);
+            return true;
+        }));
+        ElementHandler.INSTANCE.addElement(this.getGUI(), openWindow);
+    }
+
+    public void openGameBlockImportWindow() {
+        WindowElement openWindow = new WindowElement(this.getGUI(), "Import Block Model", 150, 200);
+        openWindow.addElement(new ListElement(this.getGUI(), 2, 16, 146, 182, ClientProxy.getGameBlockModels(), (selected) -> {
+            QubbleModel model = ClientProxy.GAME_JSON_MODELS.get(selected);
+            this.getGUI().selectModel(model);
             ElementHandler.INSTANCE.removeElement(this.getGUI(), openWindow);
             return true;
         }));

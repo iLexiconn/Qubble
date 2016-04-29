@@ -1,26 +1,44 @@
 package net.ilexiconn.qubble.client;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
+import net.ilexiconn.qubble.client.model.BlockModelContainer;
 import net.ilexiconn.qubble.client.world.DummyWorld;
 import net.ilexiconn.qubble.server.ServerProxy;
+import net.ilexiconn.qubble.server.model.importer.IModelImporter;
+import net.ilexiconn.qubble.server.model.importer.ModelImporters;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.*;
+import net.minecraft.client.renderer.block.model.ModelBlockDefinition;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.Variant;
+import net.minecraft.client.renderer.block.model.VariantList;
+import net.minecraft.client.renderer.block.model.multipart.Multipart;
+import net.minecraft.client.renderer.block.model.multipart.Selector;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.BlockStateLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 @SideOnly(Side.CLIENT)
@@ -32,8 +50,10 @@ public class ClientProxy extends ServerProxy {
     public static final File QUBBLE_TEXTURE_DIRECTORY = new File(QUBBLE_DIRECTORY, "textures");
     public static final File QUBBLE_EXPORT_DIRECTORY = new File(QUBBLE_DIRECTORY, "exports");
     public static final Map<String, QubbleModel> GAME_MODELS = new HashMap<>();
+    public static final Map<String, QubbleModel> GAME_JSON_MODELS = new HashMap<>();
     public static final Map<String, ResourceLocation> GAME_TEXTURES = new HashMap<>();
     private static Field TEXTURE_QUADS_FIELD;
+    private static Method GET_ENTITY_TEXTURE_METHOD;
 
     @Override
     public void onPreInit() {
@@ -55,6 +75,13 @@ public class ClientProxy extends ServerProxy {
                 break;
             }
         }
+        for (Method method : Render.class.getDeclaredMethods()) {
+            if (method.getReturnType().equals(ResourceLocation.class) && Modifier.isAbstract(method.getModifiers()) && method.getParameterTypes().length == 1) {
+                method.setAccessible(true);
+                GET_ENTITY_TEXTURE_METHOD = method;
+                break;
+            }
+        }
     }
 
     @Override
@@ -68,11 +95,17 @@ public class ClientProxy extends ServerProxy {
         for (Map.Entry<Class<? extends Entity>, Render<? extends Entity>> entry : MINECRAFT.getRenderManager().entityRenderMap.entrySet()) {
             Render<? extends Entity> renderer = entry.getValue();
             String entityName = entry.getKey().getSimpleName().replaceAll("Entity", "");
+            Entity entity = null;
+            try {
+                entity = entry.getKey().getConstructor(World.class).newInstance(new DummyWorld());
+                entityName = entity.getName();
+            } catch (Exception e) {
+            }
             for (Field field : this.getAllFields(renderer.getClass())) {
                 try {
                     if (ModelBase.class.isAssignableFrom(field.getType())) {
                         field.setAccessible(true);
-                        QubbleModel model = this.parseModel((ModelBase) field.get(renderer), entry.getKey());
+                        QubbleModel model = this.parseModel((ModelBase) field.get(renderer), entry.getKey(), entityName);
                         if (model.getCubes().size() > 0) {
                             GAME_MODELS.put(entityName, model);
                         }
@@ -97,6 +130,15 @@ public class ClientProxy extends ServerProxy {
                     e.printStackTrace();
                 }
             }
+            if (entity != null) {
+                try {
+                    ResourceLocation texture = (ResourceLocation) GET_ENTITY_TEXTURE_METHOD.invoke(renderer, entity);
+                    if (texture != null) {
+                        GAME_TEXTURES.put(entityName, texture);
+                    }
+                } catch (Exception e) {
+                }
+            }
         }
         for (Map.Entry<Class<? extends TileEntity>, TileEntitySpecialRenderer<? extends TileEntity>> entry : TileEntityRendererDispatcher.instance.mapSpecialRenderers.entrySet()) {
             TileEntitySpecialRenderer<? extends TileEntity> renderer = entry.getValue();
@@ -105,7 +147,7 @@ public class ClientProxy extends ServerProxy {
                 try {
                     if (ModelBase.class.isAssignableFrom(field.getType())) {
                         field.setAccessible(true);
-                        QubbleModel model = this.parseModel((ModelBase) field.get(renderer), entry.getKey());
+                        QubbleModel model = this.parseModel((ModelBase) field.get(renderer), entry.getKey(), tileName);
                         if (model.getCubes().size() > 0) {
                             GAME_MODELS.put(tileName, model);
                         }
@@ -131,6 +173,55 @@ public class ClientProxy extends ServerProxy {
                 }
             }
         }
+        Map<IBlockState, ModelResourceLocation> blockModels = MINECRAFT.getRenderItem().getItemModelMesher().getModelManager().getBlockModelShapes().getBlockStateMapper().putAllStateModelLocations();
+        Gson gson = (new GsonBuilder()).registerTypeAdapter(ModelBlockDefinition.class, new ModelBlockDefinition.Deserializer()).registerTypeAdapter(Variant.class, new Variant.Deserializer()).registerTypeAdapter(VariantList.class, new VariantList.Deserializer()).registerTypeAdapter(Multipart.class, new Multipart.Deserializer()).registerTypeAdapter(Selector.class, new Selector.Deserializer()).create();
+        IResourceManager resourceManager = MINECRAFT.getResourceManager();
+        IModelImporter<BlockModelContainer> importer = (IModelImporter<BlockModelContainer>) ModelImporters.BLOCK_JSON.getModelImporter();
+        for (Map.Entry<IBlockState, ModelResourceLocation> entry : blockModels.entrySet()) {
+            String name = entry.getKey().getBlock().getLocalizedName();
+            ModelResourceLocation modelResource = entry.getValue();
+            try {
+                ResourceLocation blockStateResource = new ResourceLocation(modelResource.getResourceDomain(), "blockstates/" + modelResource.getResourcePath() + ".json");
+                ModelBlockDefinition state = BlockStateLoader.load(new InputStreamReader(resourceManager.getResource(blockStateResource).getInputStream()), gson);
+                outer:
+                for (VariantList variantList : state.getMultipartVariants()) {
+                    for (Variant variant : variantList.getVariantList()) {
+                        ResourceLocation resource = variant.getModelLocation();
+                        QubbleModel qubbleModel = parseJsonModel(gson, resourceManager, importer, name, new ResourceLocation(resource.getResourceDomain(), "models/" + resource.getResourcePath() + ".json"));
+                        if (qubbleModel != null) {
+                            GAME_JSON_MODELS.put(name, qubbleModel);
+                        }
+                        break outer;
+                    }
+                }
+            } catch (IOException e) {
+                System.err.println(e.toString());
+            }
+        }
+    }
+
+    private QubbleModel parseJsonModel(Gson gson, IResourceManager resourceManager, IModelImporter<BlockModelContainer> importer, String name, ResourceLocation resource) throws IOException {
+        BlockModelContainer model = gson.fromJson(new InputStreamReader(resourceManager.getResource(resource).getInputStream()), BlockModelContainer.class);
+        if (model.parent == null || !model.parent.contains("cube_all")) {
+            QubbleModel qubbleModel = importer.getModel(name, model);
+            if (model.parent != null) {
+                ResourceLocation parentResource = new ResourceLocation(model.parent);
+                QubbleModel parent = this.parseJsonModel(gson, resourceManager, importer, name, new ResourceLocation(parentResource.getResourceDomain(), "models/" + parentResource.getResourcePath() + ".json"));
+                if (parent != null) {
+                    qubbleModel.getCubes().addAll(parent.getCubes());
+                }
+            }
+            if (qubbleModel.getCubes().size() > 0) {
+                if (qubbleModel.getCubes().size() == 1) {
+                    QubbleCube cube = qubbleModel.getCubes().get(0);
+                    if (cube.getDimensionX() == 16.0F && cube.getDimensionY() == 16.0F && cube.getDimensionZ() == 16.0F) {
+                        return null;
+                    }
+                }
+                return qubbleModel;
+            }
+        }
+        return null;
     }
 
     private List<Field> getAllFields(Class<?> clazz) {
@@ -142,8 +233,8 @@ public class ClientProxy extends ServerProxy {
         return fields;
     }
 
-    private QubbleModel parseModel(ModelBase model, Class<?> clazz) {
-        QubbleModel qubbleModel = QubbleModel.create(model.getClass().getSimpleName().replaceAll("Model", ""), "Unknown", model.textureWidth, model.textureHeight);
+    private QubbleModel parseModel(ModelBase model, Class<?> clazz, String name) {
+        QubbleModel qubbleModel = QubbleModel.create(name, "Unknown", model.textureWidth, model.textureHeight);
         if (clazz != null && Entity.class.isAssignableFrom(clazz)) {
             try {
                 Entity entity = (Entity) clazz.getConstructor(World.class).newInstance(new DummyWorld());
@@ -276,6 +367,15 @@ public class ClientProxy extends ServerProxy {
     public static List<String> getGameModels() {
         List<String> gameModels = new LinkedList<>();
         for (Map.Entry<String, QubbleModel> entry : GAME_MODELS.entrySet()) {
+            gameModels.add(entry.getKey());
+        }
+        Collections.sort(gameModels);
+        return gameModels;
+    }
+
+    public static List<String> getGameBlockModels() {
+        List<String> gameModels = new LinkedList<>();
+        for (Map.Entry<String, QubbleModel> entry : GAME_JSON_MODELS.entrySet()) {
             gameModels.add(entry.getKey());
         }
         Collections.sort(gameModels);
