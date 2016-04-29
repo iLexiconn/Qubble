@@ -166,8 +166,8 @@ public class QubbleGUI extends GuiScreen {
     }
 
     public void selectModel(QubbleModel model) {
-        this.selectModel(this.openProjects.size() - 1);
         this.openProjects.add(new Project(this, model));
+        this.selectModel(this.openProjects.size() - 1);
     }
 
     public void selectModel(int index) {
