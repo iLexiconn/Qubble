@@ -18,35 +18,33 @@ import java.util.*;
 
 @SideOnly(Side.CLIENT)
 public class QubbleModelBase extends AdvancedModelBase {
-    private QubbleModel model;
     private List<QubbleModelRenderer> rootCubes = new ArrayList<>();
     private Map<Integer, QubbleCube> ids = new HashMap<>();
     private Map<QubbleCube, QubbleModelRenderer> cubes = new HashMap<>();
     private int id;
 
-    public QubbleModelBase(QubbleModel model, boolean selection) {
+    public QubbleModelBase(QubbleModel model) {
         this.textureWidth = model.getTextureWidth();
         this.textureHeight = model.getTextureHeight();
-        this.model = model;
         for (QubbleCube cube : model.getCubes()) {
-            this.parseCube(cube, null, selection);
+            this.parseCube(cube, null);
         }
     }
 
-    private void parseCube(QubbleCube cube, QubbleModelRenderer parent, boolean selection) {
-        QubbleModelRenderer box = this.createCube(cube, selection);
+    private void parseCube(QubbleCube cube, QubbleModelRenderer parent) {
+        QubbleModelRenderer box = this.createCube(cube);
         if (parent != null) {
             parent.addChild(box);
         } else {
             this.rootCubes.add(box);
         }
         for (QubbleCube child : cube.getChildren()) {
-            this.parseCube(child, box, selection);
+            this.parseCube(child, box);
         }
     }
 
-    private QubbleModelRenderer createCube(QubbleCube cube, boolean selection) {
-        QubbleModelRenderer box = new QubbleModelRenderer(this, cube.getName(), cube.getTextureX(), cube.getTextureY(), this.id, selection);
+    private QubbleModelRenderer createCube(QubbleCube cube) {
+        QubbleModelRenderer box = new QubbleModelRenderer(this, cube.getName(), cube.getTextureX(), cube.getTextureY(), this.id);
         box.setRotationPoint(cube.getPositionX(), cube.getPositionY(), cube.getPositionZ());
         box.addBox(cube.getOffsetX(), cube.getOffsetY(), cube.getOffsetZ(), cube.getDimensionX(), cube.getDimensionY(), cube.getDimensionZ(), 0.0F);
         box.rotateAngleX = (float) Math.toRadians(cube.getRotationX());
@@ -58,12 +56,11 @@ public class QubbleModelBase extends AdvancedModelBase {
         return box;
     }
 
-    @Override
-    public void render(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float rotationYaw, float rotationPitch, float scale) {
+    public void render(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float rotationYaw, float rotationPitch, float scale, boolean selection) {
         this.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, rotationYaw, rotationPitch, scale, entity);
         GlStateManager.pushMatrix();
         for (QubbleModelRenderer cube : this.rootCubes) {
-            cube.render(scale);
+            cube.render(scale, selection);
         }
         GlStateManager.popMatrix();
     }

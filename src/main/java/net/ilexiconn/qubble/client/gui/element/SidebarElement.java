@@ -216,33 +216,115 @@ public class SidebarElement extends Element<QubbleGUI> {
             case MODEL: {
                 this.addElement(new TextElement(this.getGUI(), "Dimensions", 4, 44));
                 this.addElement(this.dimensionX = new SliderElement(this.getGUI(), 4, 53, true, value -> {
-                    this.getGUI().getSelectedProject().getSelectedCube().setDimensions((int) (float) value, (int) (float) value, (int) (float) value);
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setDimensions((int) (float) value, selectedCube.getDimensionY(), selectedCube.getDimensionZ());
+                    this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
                 }));
-                this.addElement(this.dimensionY = new SliderElement(this.getGUI(), 43, 53, true, value -> true));
-                this.addElement(this.dimensionZ = new SliderElement(this.getGUI(), 82, 53, true, value -> true));
+                this.addElement(this.dimensionY = new SliderElement(this.getGUI(), 43, 53, true, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setDimensions(selectedCube.getDimensionX(), (int) (float) value, selectedCube.getDimensionZ());
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
+                this.addElement(this.dimensionZ = new SliderElement(this.getGUI(), 82, 53, true, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setDimensions(selectedCube.getDimensionX(), selectedCube.getDimensionY(), (int) (float) value);
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
                 this.addElement(new TextElement(this.getGUI(), "Position", 4, 69));
-                this.addElement(this.positionX = new SliderElement(this.getGUI(), 4, 78, value -> true));
-                this.addElement(this.positionY = new SliderElement(this.getGUI(), 43, 78, value -> true));
-                this.addElement(this.positionZ = new SliderElement(this.getGUI(), 82, 78, value -> true));
+                this.addElement(this.positionX = new SliderElement(this.getGUI(), 4, 78, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setPosition(value, selectedCube.getPositionY(), selectedCube.getPositionZ());
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
+                this.addElement(this.positionY = new SliderElement(this.getGUI(), 43, 78, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setPosition(selectedCube.getPositionX(), value, selectedCube.getPositionZ());
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
+                this.addElement(this.positionZ = new SliderElement(this.getGUI(), 82, 78, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setPosition(selectedCube.getPositionX(), selectedCube.getPositionY(), value);
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
                 this.addElement(new TextElement(this.getGUI(), "Offset", 4, 94));
-                this.addElement(this.offsetX = new SliderElement(this.getGUI(), 4, 103, value -> true));
-                this.addElement(this.offsetY = new SliderElement(this.getGUI(), 43, 103, value -> true));
-                this.addElement(this.offsetZ = new SliderElement(this.getGUI(), 82, 103, value -> true));
+                this.addElement(this.offsetX = new SliderElement(this.getGUI(), 4, 103, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setOffset(value, selectedCube.getOffsetY(), selectedCube.getOffsetZ());
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
+                this.addElement(this.offsetY = new SliderElement(this.getGUI(), 43, 103, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setOffset(selectedCube.getOffsetX(), value, selectedCube.getOffsetZ());
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
+                this.addElement(this.offsetZ = new SliderElement(this.getGUI(), 82, 103, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setOffset(selectedCube.getOffsetX(), selectedCube.getOffsetY(), value);
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
                 this.addElement(new TextElement(this.getGUI(), "Scale", 4, 119));
-                this.addElement(this.scaleX = new SliderElement(this.getGUI(), 4, 128, value -> true));
-                this.addElement(this.scaleY = new SliderElement(this.getGUI(), 43, 128, value -> true));
-                this.addElement(this.scaleZ = new SliderElement(this.getGUI(), 82, 128, value -> true));
+                this.addElement(this.scaleX = new SliderElement(this.getGUI(), 4, 128, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setScale(value, selectedCube.getScaleY(), selectedCube.getScaleZ());
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
+                this.addElement(this.scaleY = new SliderElement(this.getGUI(), 43, 128, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setScale(selectedCube.getScaleX(), value, selectedCube.getScaleZ());
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
+                this.addElement(this.scaleZ = new SliderElement(this.getGUI(), 82, 128, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setScale(selectedCube.getScaleX(), selectedCube.getScaleY(), value);
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
                 this.addElement(new TextElement(this.getGUI(), "Rotation", 4, 144));
-                this.addElement(this.rotationX = new SliderElement(this.getGUI(), 4, 153, false, 116 - 38, -180.0F, 180.0F, value -> true));
-                this.addElement(this.rotationY = new SliderElement(this.getGUI(), 4, 166, false, 116 - 38, -180.0F, 180.0F, value -> true));
-                this.addElement(this.rotationZ = new SliderElement(this.getGUI(), 4, 179, false, 116 - 38, -180.0F, 180.0F, value -> true));
+                this.addElement(this.rotationX = new SliderElement(this.getGUI(), 4, 153, false, 116 - 38, -180.0F, 180.0F, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setRotation(value, selectedCube.getRotationY(), selectedCube.getRotationZ());
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
+                this.addElement(this.rotationY = new SliderElement(this.getGUI(), 4, 166, false, 116 - 38, -180.0F, 180.0F, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setRotation(selectedCube.getRotationX(), value, selectedCube.getRotationZ());
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
+                this.addElement(this.rotationZ = new SliderElement(this.getGUI(), 4, 179, false, 116 - 38, -180.0F, 180.0F, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setRotation(selectedCube.getRotationX(), selectedCube.getRotationY(), value);
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
                 break;
             }
             case TEXTURE: {
                 this.addElement(new TextElement(this.getGUI(), "Texture offset", 4, 44));
-                this.addElement(this.textureX = new SliderElement(this.getGUI(), 4, 53, true, value -> true));
-                this.addElement(this.textureY = new SliderElement(this.getGUI(), 43, 53, true, value -> true));
+                this.addElement(this.textureX = new SliderElement(this.getGUI(), 4, 53, true, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setTexture((int) (float) value, selectedCube.getTextureY());
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
+                this.addElement(this.textureY = new SliderElement(this.getGUI(), 43, 53, true, value -> {
+                    QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setTexture(selectedCube.getTextureX(), (int) (float) value);
+                    this.getGUI().getModelView().updatePart(selectedCube);
+                    return true;
+                }));
                 this.addElement(this.mirror = new ButtonElement(this.getGUI(), "Mirror", 82, 53, 38, 12, (button) -> {
                     if (button.getColorScheme() == ColorScheme.TOGGLE_OFF) {
                         button.withColorScheme(ColorScheme.TOGGLE_ON);

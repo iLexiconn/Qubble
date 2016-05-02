@@ -16,14 +16,12 @@ import org.lwjgl.opengl.GL11;
 public class QubbleModelRenderer extends AdvancedModelRenderer {
     private int displayList;
     private boolean compiled;
-    private boolean selection;
     private float r, g, b;
     public int sizeX, sizeY, sizeZ;
 
-    public QubbleModelRenderer(AdvancedModelBase model, String name, int textureX, int textureY, int id, boolean selection) {
+    public QubbleModelRenderer(AdvancedModelBase model, String name, int textureX, int textureY, int id) {
         super(model, name);
         this.setTextureOffset(textureX, textureY);
-        this.selection = selection;
         this.r = (float) (id >> 16 & 0xFF) / 255.0F;
         this.g = (float) (id >> 8 & 0xFF) / 255.0F;
         this.b = (float) (id & 0xFF) / 255.0F;
@@ -41,9 +39,6 @@ public class QubbleModelRenderer extends AdvancedModelRenderer {
     public void postRender(float scale) {
         if (!this.isHidden) {
             if (this.showModel) {
-                if (this.selection) {
-                    GlStateManager.color(this.r, this.g, this.b, 1.0F);
-                }
                 if (!this.compiled) {
                     this.compileDisplayList(scale);
                 }
@@ -65,12 +60,11 @@ public class QubbleModelRenderer extends AdvancedModelRenderer {
     }
 
 
-    @Override
-    public void render(float scale) {
+    public void render(float scale, boolean selection) {
         if (!this.isHidden) {
             if (this.showModel) {
                 GlStateManager.pushMatrix();
-                if (this.selection) {
+                if (selection) {
                     GlStateManager.color(this.r, this.g, this.b, 1.0F);
                 }
                 if (!this.compiled) {
@@ -108,7 +102,11 @@ public class QubbleModelRenderer extends AdvancedModelRenderer {
                 }
                 if (this.childModels != null) {
                     for (ModelRenderer childModel : this.childModels) {
-                        childModel.render(scale);
+                        if (childModel instanceof QubbleModelRenderer) {
+                            ((QubbleModelRenderer) childModel).render(scale, selection);
+                        } else {
+                            childModel.render(scale);
+                        }
                     }
                 }
                 GlStateManager.popMatrix();
@@ -116,11 +114,11 @@ public class QubbleModelRenderer extends AdvancedModelRenderer {
         }
     }
 
-    public void renderSingle(float scale) {
+    public void renderSingle(float scale, boolean selection) {
         if (!this.isHidden) {
             if (this.showModel) {
                 GlStateManager.pushMatrix();
-                if (this.selection) {
+                if (selection) {
                     GlStateManager.color(this.r, this.g, this.b, 1.0F);
                 }
                 if (!this.compiled) {
@@ -161,7 +159,11 @@ public class QubbleModelRenderer extends AdvancedModelRenderer {
         }
     }
 
-    private void compileDisplayList(float scale) {
+    public void compileDisplayList(float scale) {
+        if (this.compiled) {
+            GLAllocation.deleteDisplayLists(this.displayList);
+            this.compiled = false;
+        }
         this.displayList = GLAllocation.generateDisplayLists(1);
         GlStateManager.glNewList(this.displayList, GL11.GL_COMPILE);
         VertexBuffer buffer = Tessellator.getInstance().getBuffer();

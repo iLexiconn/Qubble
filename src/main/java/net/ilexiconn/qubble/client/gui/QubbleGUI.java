@@ -172,9 +172,12 @@ public class QubbleGUI extends GuiScreen {
 
     public void selectModel(int index) {
         this.selectedProject = Math.max(0, Math.min(this.openProjects.size() - 1, index));
+        this.modelView.updateModel();
         Project selectedProject = this.getSelectedProject();
         if (selectedProject != null && selectedProject.getSelectedCube() != null) {
             this.sidebar.populateFields(selectedProject.getSelectedCube());
+        } else {
+            this.sidebar.clearFields();
         }
     }
 

@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -36,9 +37,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
     private float prevCameraOffsetY;
     private float zoom = 1.0F;
     private float zoomVelocity;
-    private QubbleModel currentModelContainer;
     private QubbleModelBase currentModel;
-    private QubbleModelBase currentModelSelection;
     private float prevMouseX;
     private float prevMouseY;
 
@@ -115,90 +114,80 @@ public class ModelViewElement extends Element<QubbleGUI> {
         GlStateManager.clear(GL11.GL_COLOR_BUFFER_BIT);
         this.setupCamera(10.0F, partialTicks);
         Project project = this.getGUI().getSelectedProject();
-        QubbleModel newModel = project.getModel();
-        this.currentModel = new QubbleModelBase(newModel, false);
-        this.currentModelSelection = new QubbleModelBase(newModel, true);
-        this.currentModelContainer = newModel;
-        GlStateManager.translate(0.0F, -1.5F, 0.0F);
-        QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
-        QubbleModelRenderer selectedBox = this.currentModel.getCube(selectedCube);
-        GlStateManager.enableBlend();
-        if (selectedBox != null && !selection) {
-            GlStateManager.color(0.7F, 0.7F, 0.7F, 1.0F);
-        }
-        if (!selection) {
-            if (project.getBaseTexture() != null) {
-                GlStateManager.enableTexture2D();
-                GlStateManager.enableBlend();
-                ClientProxy.MINECRAFT.getTextureManager().bindTexture(project.getBaseTexture().getLocation());
+        if (project != null) {
+            if (this.currentModel == null) {
+                this.updateModel();
             }
-            this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
-            if (project.getOverlayTexture() != null) {
+            GlStateManager.translate(0.0F, -1.5F, 0.0F);
+            QubbleCube selectedCube = project.getSelectedCube();
+            QubbleModelRenderer selectedBox = this.currentModel.getCube(selectedCube);
+            GlStateManager.enableBlend();
+            if (selectedBox != null && !selection) {
+                GlStateManager.color(0.7F, 0.7F, 0.7F, 1.0F);
+            }
+            TextureManager textureManager = ClientProxy.MINECRAFT.getTextureManager();
+            if (!selection && project.getBaseTexture() != null) {
                 GlStateManager.enableTexture2D();
-                GlStateManager.enableBlend();
-                ClientProxy.MINECRAFT.getTextureManager().bindTexture(project.getOverlayTexture().getLocation());
+                textureManager.bindTexture(project.getBaseTexture().getLocation());
+            }
+            this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F, selection);
+            if (!selection && project.getOverlayTexture() != null) {
+                GlStateManager.enableTexture2D();
+                textureManager.bindTexture(project.getOverlayTexture().getLocation());
                 this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
             }
-        } else {
-            this.currentModelSelection.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
-        }
-        GlStateManager.disableBlend();
-        if (selectedBox != null && !selection) {
-            GlStateManager.disableTexture2D();
-            GlStateManager.disableLighting();
-            GlStateManager.depthMask(false);
-            this.currentModel.renderSelectedOutline(selectedBox, 0.0625F);
-            GlStateManager.depthMask(true);
-            GlStateManager.enableLighting();
-            GlStateManager.pushMatrix();
-            if (project.getBaseTexture() != null) {
-                GlStateManager.enableTexture2D();
+            if (selectedBox != null && !selection) {
+                GlStateManager.disableTexture2D();
+                GlStateManager.disableLighting();
+                GlStateManager.depthMask(false);
+                this.currentModel.renderSelectedOutline(selectedBox, 0.0625F);
+                GlStateManager.depthMask(true);
+                GlStateManager.enableLighting();
+                GlStateManager.pushMatrix();
+                if (selectedBox.getParent() != null) {
+                    selectedBox.getParent().parentedPostRender(0.0625F);
+                }
+                if (project.getBaseTexture() != null) {
+                    GlStateManager.enableTexture2D();
+                    textureManager.bindTexture(project.getBaseTexture().getLocation());
+                }
+                selectedBox.renderSingle(0.0625F, false);
+                if (project.getOverlayTexture() != null) {
+                    GlStateManager.enableTexture2D();
+                    textureManager.bindTexture(project.getOverlayTexture().getLocation());
+                    selectedBox.renderSingle(0.0625F, false);
+                }
+                GlStateManager.popMatrix();
             }
-            if (selectedBox.getParent() != null) {
-                selectedBox.getParent().parentedPostRender(0.0625F);
-            }
-            if (project.getBaseTexture() != null) {
-                GlStateManager.enableTexture2D();
-                GlStateManager.enableBlend();
-                ClientProxy.MINECRAFT.getTextureManager().bindTexture(project.getBaseTexture().getLocation());
-            }
-            selectedBox.renderSingle(0.0625F);
-            if (project.getOverlayTexture() != null) {
-                GlStateManager.enableTexture2D();
-                GlStateManager.enableBlend();
-                ClientProxy.MINECRAFT.getTextureManager().bindTexture(project.getOverlayTexture().getLocation());
-                selectedBox.renderSingle(0.0625F);
-            }
-            GlStateManager.popMatrix();
-        }
 
-        if (!selection) {
-            GlStateManager.pushMatrix();
-            GlStateManager.enableBlend();
-            GlStateManager.disableTexture2D();
-            GlStateManager.disableLighting();
-            GlStateManager.depthMask(false);
-            Tessellator tessellator = Tessellator.getInstance();
-            VertexBuffer buffer = tessellator.getBuffer();
-            this.drawGrid(tessellator, buffer, 0.25F, 0.0F);
-            this.drawGrid(tessellator, buffer, 0.5F, 0.15F);
-            this.drawGrid(tessellator, buffer, 1.0F, 0.225F);
-            this.drawGrid(tessellator, buffer, 2.0F, 0.45F);
-            this.drawGrid(tessellator, buffer, 4.0F, 0.9F);
-            GlStateManager.depthMask(true);
-            GlStateManager.disableBlend();
-            GlStateManager.enableLighting();
+            if (!selection) {
+                GlStateManager.pushMatrix();
+                GlStateManager.enableBlend();
+                GlStateManager.disableTexture2D();
+                GlStateManager.disableLighting();
+                GlStateManager.depthMask(false);
+                Tessellator tessellator = Tessellator.getInstance();
+                VertexBuffer buffer = tessellator.getBuffer();
+                this.drawGrid(tessellator, buffer, 0.25F, 0.0F);
+                this.drawGrid(tessellator, buffer, 0.5F, 0.15F);
+                this.drawGrid(tessellator, buffer, 1.0F, 0.225F);
+                this.drawGrid(tessellator, buffer, 2.0F, 0.45F);
+                this.drawGrid(tessellator, buffer, 4.0F, 0.9F);
+                GlStateManager.depthMask(true);
+                GlStateManager.disableBlend();
+                GlStateManager.enableLighting();
+                GlStateManager.popMatrix();
+            }
+            GlStateManager.enableTexture2D();
+            GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
+            RenderHelper.disableStandardItemLighting();
             GlStateManager.popMatrix();
+            GlStateManager.matrixMode(GL11.GL_PROJECTION);
+            GlStateManager.loadIdentity();
+            GlStateManager.ortho(0.0, scaledResolution.getScaledWidth_double(), scaledResolution.getScaledHeight_double(), 0.0, -5000.0D, 5000.0D);
+            GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+            GlStateManager.loadIdentity();
         }
-        GlStateManager.enableTexture2D();
-        GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.popMatrix();
-        GlStateManager.matrixMode(GL11.GL_PROJECTION);
-        GlStateManager.loadIdentity();
-        GlStateManager.ortho(0.0, scaledResolution.getScaledWidth_double(), scaledResolution.getScaledHeight_double(), 0.0, -5000.0D, 5000.0D);
-        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-        GlStateManager.loadIdentity();
     }
 
     private void drawGrid(Tessellator tessellator, VertexBuffer buffer, float size, float color) {
@@ -252,6 +241,32 @@ public class ModelViewElement extends Element<QubbleGUI> {
             }
         }
         return false;
+    }
+
+    public void updateModel() {
+        Project selectedProject = this.getGUI().getSelectedProject();
+        if (selectedProject != null && selectedProject.getModel() != null) {
+            QubbleModel newModel = selectedProject.getModel();
+            this.currentModel = new QubbleModelBase(newModel);
+        } else {
+            this.currentModel = null;
+        }
+    }
+
+    public void updatePart(QubbleCube cube) {
+        if (this.currentModel == null) {
+            this.updateModel();
+        } else {
+            QubbleModelRenderer box = this.currentModel.getCube(cube);
+            box.setRotationPoint(cube.getPositionX(), cube.getPositionY(), cube.getPositionZ());
+            box.setTextureOffset(cube.getTextureX(), cube.getTextureY());
+            box.cubeList.clear();
+            box.addBox(cube.getOffsetX(), cube.getOffsetY(), cube.getOffsetZ(), cube.getDimensionX(), cube.getDimensionY(), cube.getDimensionZ(), 0.0F);
+            box.rotateAngleX = (float) Math.toRadians(cube.getRotationX());
+            box.rotateAngleY = (float) Math.toRadians(cube.getRotationY());
+            box.rotateAngleZ = (float) Math.toRadians(cube.getRotationZ());
+            box.compileDisplayList(0.0625F);
+        }
     }
 
     @Override

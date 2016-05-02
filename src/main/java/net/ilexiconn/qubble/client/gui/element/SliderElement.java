@@ -114,6 +114,7 @@ public class SliderElement extends Element<QubbleGUI> {
             }
         } else if (indicatorSelected) {
             this.dragging = true;
+            this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -121,14 +122,20 @@ public class SliderElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
         if (this.dragging) {
-            this.value = Math.max(minValue, Math.min(maxValue, (((mouseX - (this.getPosX() + 38.0F)) / ((this.getWidth() - 38.0F) - 4.0F)) * (maxValue - minValue)) + minValue));
-            //do stuff, idk
+            float newValue = value = Math.max(minValue, Math.min(maxValue, (((mouseX - (this.getPosX() + 38.0F)) / ((this.getWidth() - 38.0F) - 4.0F)) * (maxValue - minValue)) + minValue));
+            if (this.function.apply(newValue)) {
+                this.value = newValue;
+                return true;
+            }
         }
         return this.dragging;
     }
 
     @Override
     public boolean mouseReleased(float mouseX, float mouseY, int button) {
+        if (this.dragging) {
+            this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
+        }
         this.dragging = false;
         return false;
     }
