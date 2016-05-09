@@ -100,6 +100,8 @@ public class ModelViewElement extends Element<QubbleGUI> {
         GLU.gluPerspective(30.0F, (float) (scaledResolution.getScaledWidth_double() / scaledResolution.getScaledHeight_double()), 1.0F, 10000.0F);
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
         GlStateManager.loadIdentity();
+        GlStateManager.enableBlend();
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         if (selection) {
             GlStateManager.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
         } else {
@@ -121,7 +123,6 @@ public class ModelViewElement extends Element<QubbleGUI> {
             GlStateManager.translate(0.0F, -1.5F, 0.0F);
             QubbleCube selectedCube = project.getSelectedCube();
             QubbleModelRenderer selectedBox = this.currentModel.getCube(selectedCube);
-            GlStateManager.enableBlend();
             if (selectedBox != null && !selection) {
                 GlStateManager.color(0.7F, 0.7F, 0.7F, 1.0F);
             }
@@ -162,7 +163,6 @@ public class ModelViewElement extends Element<QubbleGUI> {
 
             if (!selection) {
                 GlStateManager.pushMatrix();
-                GlStateManager.enableBlend();
                 GlStateManager.disableTexture2D();
                 GlStateManager.disableLighting();
                 GlStateManager.depthMask(false);
@@ -174,7 +174,6 @@ public class ModelViewElement extends Element<QubbleGUI> {
                 this.drawGrid(tessellator, buffer, 2.0F, 0.45F);
                 this.drawGrid(tessellator, buffer, 4.0F, 0.9F);
                 GlStateManager.depthMask(true);
-                GlStateManager.disableBlend();
                 GlStateManager.enableLighting();
                 GlStateManager.popMatrix();
             }
@@ -187,6 +186,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
             GlStateManager.ortho(0.0, scaledResolution.getScaledWidth_double(), scaledResolution.getScaledHeight_double(), 0.0, -5000.0D, 5000.0D);
             GlStateManager.matrixMode(GL11.GL_MODELVIEW);
             GlStateManager.loadIdentity();
+            GlStateManager.disableBlend();
         }
     }
 
@@ -224,7 +224,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
 
     @Override
     public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
-        if (this.isSelected(mouseX, mouseY)) {
+        if (!this.getGUI().getModelTree().isParenting() && this.isSelected(mouseX, mouseY)) {
             float xMovement = mouseX - this.prevMouseX;
             float yMovement = mouseY - this.prevMouseY;
             if (button == 0) {

@@ -139,7 +139,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
         WindowElement openWindow = new WindowElement(this.getGUI(), "Import Game Model", 150, 200);
         openWindow.addElement(new ListElement(this.getGUI(), 2, 16, 146, 182, ClientProxy.getGameModels(), (selected) -> {
             QubbleModel model = ClientProxy.GAME_MODELS.get(selected);
-            this.getGUI().selectModel(model);
+            this.getGUI().selectModel(model.copy());
             ResourceLocation texture = ClientProxy.GAME_TEXTURES.get(selected);
             if (texture != null) {
                 this.getGUI().getSelectedProject().setBaseTexture(new ModelTexture(texture));
