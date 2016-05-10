@@ -11,7 +11,10 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Keyboard;
 
+import javax.vecmath.Matrix4d;
+import javax.vecmath.Vector3d;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ModelTreeElement extends Element<QubbleGUI> {
@@ -159,26 +162,53 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         if (this.parenting != null) {
             Project selectedProject = this.getGUI().getSelectedProject();
             if (selectedProject != null && selectedProject.getModel() != null) {
+                QubbleModel model = selectedProject.getModel();
                 QubbleCube newParent = this.getSelectedCube(mouseX, mouseY);
-                QubbleCube prevParent = this.getParent(selectedProject.getModel(), parenting);
+                QubbleCube prevParent = this.getParent(model, parenting);
                 if (!this.hasChild(parenting, newParent)) {
-                    selectedProject.getModel().getCubes().remove(parenting);
-                    if (newParent != parenting && newParent != null && newParent != prevParent) {
-                        if (!newParent.getChildren().contains(parenting)) {
-                            newParent.getChildren().add(parenting);
+                    if (newParent != parenting) {
+                        if (GuiScreen.isShiftKeyDown()) {
+                            if (newParent != null) {
+                                this.inheritParentTransformation(model, parenting, newParent);
+                            }
+                            this.maintainParentTransformation(model, parenting);
                         }
-                    } else if (newParent == null) {
-                        selectedProject.getModel().getCubes().add(parenting);
+                        model.getCubes().remove(parenting);
+                        if (newParent != parenting && newParent != null && newParent != prevParent) {
+                            if (!newParent.getChildren().contains(parenting)) {
+                                newParent.getChildren().add(parenting);
+                            }
+                        } else if (newParent == null) {
+                            model.getCubes().add(parenting);
+                        }
+                        if (prevParent != null && newParent != prevParent) {
+                            prevParent.getChildren().remove(parenting);
+                        }
+                        this.getGUI().getModelView().updateModel();
                     }
-                    if (prevParent != null && newParent != prevParent) {
-                        prevParent.getChildren().remove(parenting);
-                    }
-                    this.getGUI().getModelView().updateModel();
                 }
             }
             this.parenting = null;
         }
         return false;
+    }
+
+    private void maintainParentTransformation(QubbleModel model, QubbleCube parenting) {
+        this.applyTransformation(parenting, this.getParentTransformation(model, parenting, true, false));
+    }
+
+    private void inheritParentTransformation(QubbleModel model, QubbleCube parenting, QubbleCube newParent) {
+        Matrix4d matrix = this.getParentTransformationMatrix(model, newParent, true, false);
+        matrix.invert();
+        matrix.mul(this.getParentTransformationMatrix(model, parenting, false, false));
+
+        float[][] parentTransformation = this.getParentTransformation(matrix);
+        this.applyTransformation(parenting, parentTransformation);
+    }
+
+    private void applyTransformation(QubbleCube parenting, float[][] parentTransformation) {
+        parenting.setPosition(parentTransformation[0][0], parentTransformation[0][1], parentTransformation[0][2]);
+        parenting.setRotation(parentTransformation[1][0], parentTransformation[1][1], parentTransformation[1][2]);
     }
 
     private QubbleCube mouseDetectionCubeEntry(QubbleCube cube, int xOffset, float mouseX, float mouseY) {
@@ -337,6 +367,72 @@ public class ModelTreeElement extends Element<QubbleGUI> {
             }
         }
         return false;
+    }
+
+    private List<QubbleCube> getParents(QubbleModel model, QubbleCube cube, boolean ignoreSelf) {
+        QubbleCube parent = cube;
+        List<QubbleCube> parents = new ArrayList<>();
+        if (!ignoreSelf) {
+            parents.add(cube);
+        }
+        while ((parent = this.getParent(model, parent)) != null) {
+            parents.add(parent);
+        }
+        Collections.reverse(parents);
+        return parents;
+    }
+
+    private float[][] getParentTransformation(QubbleModel model, QubbleCube cube, boolean includeParents, boolean ignoreSelf) {
+        return this.getParentTransformation(this.getParentTransformationMatrix(model, cube, includeParents, ignoreSelf));
+    }
+
+    private Matrix4d getParentTransformationMatrix(QubbleModel model, QubbleCube cube, boolean includeParents, boolean ignoreSelf) {
+        List<QubbleCube> parentCubes = new ArrayList<>();
+        if (includeParents) {
+            parentCubes = this.getParents(model, cube, ignoreSelf);
+        } else if (!ignoreSelf) {
+            parentCubes.add(cube);
+        }
+        Matrix4d matrix = new Matrix4d();
+        matrix.setIdentity();
+        Matrix4d transform = new Matrix4d();
+        for (QubbleCube child : parentCubes) {
+            transform.setIdentity();
+            transform.setTranslation(new Vector3d(child.getPositionX(), child.getPositionY(), child.getPositionZ()));
+            matrix.mul(transform);
+            transform.rotZ(child.getRotationZ() / 180 * Math.PI);
+            matrix.mul(transform);
+            transform.rotY(child.getRotationY() / 180 * Math.PI);
+            matrix.mul(transform);
+            transform.rotX(child.getRotationX() / 180 * Math.PI);
+            matrix.mul(transform);
+        }
+        return matrix;
+    }
+
+    private float[][] getParentTransformation(Matrix4d matrix) {
+        double sinRotationAngleY, cosRotationAngleY, sinRotationAngleX, cosRotationAngleX, sinRotationAngleZ, cosRotationAngleZ;
+        sinRotationAngleY = -matrix.m20;
+        cosRotationAngleY = Math.sqrt(1 - sinRotationAngleY * sinRotationAngleY);
+        if (Math.abs(cosRotationAngleY) > 0.0001) {
+            sinRotationAngleX = matrix.m21 / cosRotationAngleY;
+            cosRotationAngleX = matrix.m22 / cosRotationAngleY;
+            sinRotationAngleZ = matrix.m10 / cosRotationAngleY;
+            cosRotationAngleZ = matrix.m00 / cosRotationAngleY;
+        } else {
+            sinRotationAngleX = -matrix.m12;
+            cosRotationAngleX = matrix.m11;
+            sinRotationAngleZ = 0;
+            cosRotationAngleZ = 1;
+        }
+        float rotationAngleX = (float) (epsilon((float) Math.atan2(sinRotationAngleX, cosRotationAngleX)) / Math.PI * 180);
+        float rotationAngleY = (float) (epsilon((float) Math.atan2(sinRotationAngleY, cosRotationAngleY)) / Math.PI * 180);
+        float rotationAngleZ = (float) (epsilon((float) Math.atan2(sinRotationAngleZ, cosRotationAngleZ)) / Math.PI * 180);
+        return new float[][]{{epsilon((float) matrix.m03), epsilon((float) matrix.m13), epsilon((float) matrix.m23)}, {rotationAngleX, rotationAngleY, rotationAngleZ}};
+    }
+
+    private float epsilon(float x) {
+        return x < 0 ? x > -0.0001F ? 0 : x : x < 0.0001F ? 0 : x;
     }
 
     public boolean isParenting() {
