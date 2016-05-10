@@ -168,10 +168,10 @@ public class ModelTreeElement extends Element<QubbleGUI> {
                 if (!this.hasChild(parenting, newParent)) {
                     if (newParent != parenting) {
                         if (GuiScreen.isShiftKeyDown()) {
+                            this.maintainParentTransformation(model, parenting);
                             if (newParent != null) {
                                 this.inheritParentTransformation(model, parenting, newParent);
                             }
-                            this.maintainParentTransformation(model, parenting);
                         }
                         model.getCubes().remove(parenting);
                         if (newParent != parenting && newParent != null && newParent != prevParent) {
