@@ -9,6 +9,7 @@ import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.server.color.ColorScheme;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -33,6 +34,17 @@ public class SidebarElement extends Element<QubbleGUI> {
 
     public SidebarElement(QubbleGUI gui) {
         super(gui, gui.width - 122, 20, 122, gui.height - 20);
+    }
+
+    @Override
+    public void init() {
+        this.initFields();
+        Project selectedProject = this.getGUI().getSelectedProject();
+        if (selectedProject != null && selectedProject.getSelectedCube() != null) {
+            this.populateFields(selectedProject.getSelectedCube());
+        } else {
+            this.clearFields();
+        }
     }
 
     @Override
@@ -166,116 +178,116 @@ public class SidebarElement extends Element<QubbleGUI> {
         switch (this.getGUI().getMode()) {
             case MODEL: {
                 this.addChild(new TextElement(this.getGUI(), "Dimensions", 4, 44));
-                this.addChild(this.dimensionX = new SliderElement(this.getGUI(), 4, 53, true, value -> {
+                this.addChild(this.dimensionX = new SliderElement(this.getGUI(), 4, 53, true, 0.0F, -1.0F, -1.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setDimensions((int) (float) value, selectedCube.getDimensionY(), selectedCube.getDimensionZ());
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
-                this.addChild(this.dimensionY = new SliderElement(this.getGUI(), 43, 53, true, value -> {
+                }, this::isNumber));
+                this.addChild(this.dimensionY = new SliderElement(this.getGUI(), 43, 53, true, 0.0F, -1.0F, -1.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setDimensions(selectedCube.getDimensionX(), (int) (float) value, selectedCube.getDimensionZ());
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
-                this.addChild(this.dimensionZ = new SliderElement(this.getGUI(), 82, 53, true, value -> {
+                }, this::isNumber));
+                this.addChild(this.dimensionZ = new SliderElement(this.getGUI(), 82, 53, true, 0.0F, -1.0F, -1.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setDimensions(selectedCube.getDimensionX(), selectedCube.getDimensionY(), (int) (float) value);
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
+                }, this::isNumber));
                 this.addChild(new TextElement(this.getGUI(), "Position", 4, 69));
-                this.addChild(this.positionX = new SliderElement(this.getGUI(), 4, 78, value -> {
+                this.addChild(this.positionX = new SliderElement(this.getGUI(), 4, 78, false, 0.0F, -1.0F, -1.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setPosition(value, selectedCube.getPositionY(), selectedCube.getPositionZ());
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
-                this.addChild(this.positionY = new SliderElement(this.getGUI(), 43, 78, value -> {
+                }, key -> this.isNumber(key) || (key == Keyboard.KEY_PERIOD && !this.positionX.getValueInput().getText().contains("."))));
+                this.addChild(this.positionY = new SliderElement(this.getGUI(), 43, 78, false, 0.0F, -1.0F, -1.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setPosition(selectedCube.getPositionX(), value, selectedCube.getPositionZ());
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
-                this.addChild(this.positionZ = new SliderElement(this.getGUI(), 82, 78, value -> {
+                }, key -> this.isNumber(key) || (key == Keyboard.KEY_PERIOD && !this.positionY.getValueInput().getText().contains("."))));
+                this.addChild(this.positionZ = new SliderElement(this.getGUI(), 82, 78, false, 0.0F, -1.0F, -1.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setPosition(selectedCube.getPositionX(), selectedCube.getPositionY(), value);
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
+                }, key -> this.isNumber(key) || (key == Keyboard.KEY_PERIOD && !this.positionZ.getValueInput().getText().contains("."))));
                 this.addChild(new TextElement(this.getGUI(), "Offset", 4, 94));
-                this.addChild(this.offsetX = new SliderElement(this.getGUI(), 4, 103, value -> {
+                this.addChild(this.offsetX = new SliderElement(this.getGUI(), 4, 103, false, 0.0F, -1.0F, -1.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setOffset(value, selectedCube.getOffsetY(), selectedCube.getOffsetZ());
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
-                this.addChild(this.offsetY = new SliderElement(this.getGUI(), 43, 103, value -> {
+                }, key -> this.isNumber(key) || (key == Keyboard.KEY_PERIOD && !this.offsetX.getValueInput().getText().contains("."))));
+                this.addChild(this.offsetY = new SliderElement(this.getGUI(), 43, 103, false, 0.0F, -1.0F, -1.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setOffset(selectedCube.getOffsetX(), value, selectedCube.getOffsetZ());
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
-                this.addChild(this.offsetZ = new SliderElement(this.getGUI(), 82, 103, value -> {
+                }, key -> this.isNumber(key) || (key == Keyboard.KEY_PERIOD && !this.offsetY.getValueInput().getText().contains("."))));
+                this.addChild(this.offsetZ = new SliderElement(this.getGUI(), 82, 103, false, 0.0F, -1.0F, -1.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setOffset(selectedCube.getOffsetX(), selectedCube.getOffsetY(), value);
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
+                }, key -> this.isNumber(key) || (key == Keyboard.KEY_PERIOD && !this.offsetZ.getValueInput().getText().contains("."))));
                 this.addChild(new TextElement(this.getGUI(), "Scale", 4, 119));
-                this.addChild(this.scaleX = new SliderElement(this.getGUI(), 4, 128, value -> {
+                this.addChild(this.scaleX = new SliderElement(this.getGUI(), 4, 128, false, 0.0F, -1.0F, -1.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setScale(value, selectedCube.getScaleY(), selectedCube.getScaleZ());
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
-                this.addChild(this.scaleY = new SliderElement(this.getGUI(), 43, 128, value -> {
+                }, key -> this.isNumber(key) || (key == Keyboard.KEY_PERIOD && !this.scaleX.getValueInput().getText().contains("."))));
+                this.addChild(this.scaleY = new SliderElement(this.getGUI(), 43, 128, false, 0.0F, -1.0F, -1.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setScale(selectedCube.getScaleX(), value, selectedCube.getScaleZ());
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
-                this.addChild(this.scaleZ = new SliderElement(this.getGUI(), 82, 128, value -> {
+                }, key -> this.isNumber(key) || (key == Keyboard.KEY_PERIOD && !this.scaleY.getValueInput().getText().contains("."))));
+                this.addChild(this.scaleZ = new SliderElement(this.getGUI(), 82, 128, false, 0.0F, -1.0F, -1.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setScale(selectedCube.getScaleX(), selectedCube.getScaleY(), value);
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
+                }, key -> this.isNumber(key) || (key == Keyboard.KEY_PERIOD && !this.scaleZ.getValueInput().getText().contains("."))));
                 this.addChild(new TextElement(this.getGUI(), "Rotation", 4, 144));
                 this.addChild(this.rotationX = new SliderElement(this.getGUI(), 4, 153, false, 116 - 38, -180.0F, 180.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setRotation(value, selectedCube.getRotationY(), selectedCube.getRotationZ());
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
+                }, key -> this.isNumber(key) || (key == Keyboard.KEY_PERIOD && !this.rotationX.getValueInput().getText().contains("."))));
                 this.addChild(this.rotationY = new SliderElement(this.getGUI(), 4, 166, false, 116 - 38, -180.0F, 180.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setRotation(selectedCube.getRotationX(), value, selectedCube.getRotationZ());
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
+                }, key -> this.isNumber(key) || (key == Keyboard.KEY_PERIOD && !this.rotationY.getValueInput().getText().contains("."))));
                 this.addChild(this.rotationZ = new SliderElement(this.getGUI(), 4, 179, false, 116 - 38, -180.0F, 180.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setRotation(selectedCube.getRotationX(), selectedCube.getRotationY(), value);
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
+                }, key -> this.isNumber(key) || (key == Keyboard.KEY_PERIOD && !this.rotationZ.getValueInput().getText().contains("."))));
                 break;
             }
             case TEXTURE: {
                 this.addChild(new TextElement(this.getGUI(), "Texture offset", 4, 44));
-                this.addChild(this.textureX = new SliderElement(this.getGUI(), 4, 53, true, value -> {
+                this.addChild(this.textureX = new SliderElement(this.getGUI(), 4, 53, true, 0.0F, -1.0F, -1.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setTexture((int) (float) value, selectedCube.getTextureY());
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
-                this.addChild(this.textureY = new SliderElement(this.getGUI(), 43, 53, true, value -> {
+                }, this::isNumber));
+                this.addChild(this.textureY = new SliderElement(this.getGUI(), 43, 53, true, 0.0F, -1.0F, -1.0F, value -> {
                     QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
                     selectedCube.setTexture(selectedCube.getTextureX(), (int) (float) value);
                     this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
-                }));
+                }, this::isNumber));
                 this.addChild(this.mirror = new ButtonElement(this.getGUI(), "Mirror", 82, 53, 38, 12, (button) -> {
                     if (button.getColorScheme() == ColorScheme.TOGGLE_OFF) {
                         button.withColorScheme(ColorScheme.TOGGLE_ON);
@@ -309,6 +321,10 @@ public class SidebarElement extends Element<QubbleGUI> {
             }
         }
         this.initialized = true;
+    }
+
+    private boolean isNumber(int key) {
+        return key >= 2 && key <= 11;
     }
 
     private void addChild(Element<QubbleGUI> element) {

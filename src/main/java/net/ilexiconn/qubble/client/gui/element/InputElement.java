@@ -14,6 +14,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import java.util.function.Function;
+
 @SideOnly(Side.CLIENT)
 public class InputElement extends Element<QubbleGUI> {
     private String text;
@@ -23,15 +25,18 @@ public class InputElement extends Element<QubbleGUI> {
     private int selectionEnd;
     private int cursorCounter;
     private boolean editable = true;
+    private Function<Integer, Boolean> allowKey;
+    private Function<InputElement, Void> onEnter;
 
     public InputElement(QubbleGUI gui, String text, float posX, float posY, int width) {
-        this(gui, text, posX, posY, width, true);
+        this(gui, text, posX, posY, width, true, (key) -> true);
     }
 
-    public InputElement(QubbleGUI gui, String text, float posX, float posY, int width, boolean editable) {
+    public InputElement(QubbleGUI gui, String text, float posX, float posY, int width, boolean editable, Function<Integer, Boolean> allowKey) {
         super(gui, posX, posY, width, 12);
         this.text = text != null ? text : "";
         this.editable = editable;
+        this.allowKey = allowKey;
     }
 
     @Override
@@ -90,7 +95,13 @@ public class InputElement extends Element<QubbleGUI> {
 
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
-        this.selected = this.isMouseSelecting(mouseX, mouseY);
+        boolean newSelected = this.isMouseSelecting(mouseX, mouseY);
+        if (!newSelected && this.selected) {
+            if (this.onEnter != null) {
+                this.onEnter.apply(this);
+            }
+        }
+        this.selected = newSelected;
         if (this.selected && button == 0 && this.editable) {
             int width = (int) (mouseX - this.getPosX() - 1);
             String displayString = this.getGUI().mc.fontRendererObj.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
@@ -117,6 +128,11 @@ public class InputElement extends Element<QubbleGUI> {
         } else if (GuiScreen.isKeyComboCtrlX(key)) {
             GuiScreen.setClipboardString(this.getSelectedText());
             this.writeText("");
+            return true;
+        } else if (key == Keyboard.KEY_RETURN) {
+            if (this.onEnter != null) {
+                this.onEnter.apply(this);
+            }
             return true;
         } else {
             switch (key) {
@@ -175,7 +191,7 @@ public class InputElement extends Element<QubbleGUI> {
                     }
                     return true;
                 default:
-                    if (ChatAllowedCharacters.isAllowedCharacter(character)) {
+                    if (ChatAllowedCharacters.isAllowedCharacter(character) && allowKey.apply(key)) {
                         this.writeText(Character.toString(character));
                         return true;
                     } else {
@@ -386,5 +402,9 @@ public class InputElement extends Element<QubbleGUI> {
         tessellator.draw();
         GlStateManager.disableColorLogic();
         GlStateManager.enableTexture2D();
+    }
+
+    public void setOnEnter(Function<InputElement, Void> function) {
+        this.onEnter = function;
     }
 }

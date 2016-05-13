@@ -104,6 +104,7 @@ public class Element<T extends GuiScreen> extends Gui {
                 this.parent.children.add(this);
             }
         }
+        this.children.clear();
         this.init();
         return this;
     }

@@ -14,9 +14,9 @@ import java.util.function.Function;
 
 @SideOnly(Side.CLIENT)
 public class SliderElement extends Element<QubbleGUI> {
-    private float value;
     private Function<Float, Boolean> function;
-    private boolean intValue;
+    private Function<Integer, Boolean> allowKey;
+    private boolean isInteger;
     private DecimalFormat decimalFormat;
     private boolean hasSlider;
     private float sliderWidth;
@@ -24,24 +24,49 @@ public class SliderElement extends Element<QubbleGUI> {
     private float maxValue;
     private boolean editable = true;
     private boolean dragging;
+    private InputElement value;
 
     public SliderElement(QubbleGUI gui, float posX, float posY, Function<Float, Boolean> function) {
         this(gui, posX, posY, false, function);
     }
 
-    public SliderElement(QubbleGUI gui, float posX, float posY, boolean intValue, Function<Float, Boolean> function) {
-        this(gui, posX, posY, intValue, 0.0F, -1.0F, -1.0F, function);
+    public SliderElement(QubbleGUI gui, float posX, float posY, boolean isInteger, Function<Float, Boolean> function) {
+        this(gui, posX, posY, isInteger, 0.0F, -1.0F, -1.0F, function, (key) -> true);
     }
 
-    public SliderElement(QubbleGUI gui, float posX, float posY, boolean intValue, float sliderWidth, float minValue, float maxValue, Function<Float, Boolean> function) {
+    public SliderElement(QubbleGUI gui, float posX, float posY, boolean isInteger, float sliderWidth, float minValue, float maxValue, Function<Float, Boolean> function, Function<Integer, Boolean> allowKey) {
         super(gui, posX, posY, (int) (38 + sliderWidth), 12);
         this.function = function;
-        this.intValue = intValue;
+        this.isInteger = isInteger;
         this.decimalFormat = new DecimalFormat("#.#");
         this.hasSlider = sliderWidth > 0.0F;
         this.sliderWidth = sliderWidth;
         this.minValue = minValue;
         this.maxValue = maxValue;
+        this.allowKey = allowKey;
+    }
+
+    @Override
+    public void init() {
+        this.value = (InputElement) new InputElement(this.getGUI(), "0.0", -1.0F, 0.0F, 28, true, allowKey).withParent(this);
+        this.value.setOnEnter((input) -> {
+            float value = 0.0F;
+            String text = input.getText();
+            if (!this.isInteger) {
+                if (text.endsWith("\\.")) {
+                    text += "0";
+                } else if (text.startsWith("\\.")) {
+                    text = "0" + text;
+                }
+            }
+            if (text.length() == 0) {
+                text = "0";
+            }
+            value = Float.parseFloat(text);
+            this.setValue(value);
+            function.apply(value);
+            return null;
+        });
     }
 
     @Override
@@ -67,11 +92,9 @@ public class SliderElement extends Element<QubbleGUI> {
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         float scaleFactor = gui.getResolution().getScaleFactor();
         GL11.glScissor((int) (posX * scaleFactor), (int) ((gui.height - (posY + height)) * scaleFactor), (int) ((width - 11) * scaleFactor), (int) (height * scaleFactor));
-        String text = String.valueOf(this.intValue ? (int) this.value : Float.parseFloat(this.decimalFormat.format(this.value)) + 0.0F);
-        gui.mc.fontRendererObj.drawString(text, posX + 2, posY + 3.0F, textColor, false);
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
         if (this.hasSlider) {
-            float offsetX = ((this.sliderWidth - 4) * (this.value - this.minValue) / (this.maxValue - this.minValue));
+            float offsetX = ((this.sliderWidth - 4) * (this.getValue() - this.minValue) / (this.maxValue - this.minValue));
             boolean indicatorSelected = this.editable && selected && mouseX >= this.getPosX() + 38 + offsetX && mouseX <= this.getPosX() + 38 + offsetX + 4;
             this.getGUI().drawRectangle(this.getPosX() + 38 + offsetX, this.getPosY(), 4, this.getHeight(), this.editable ? indicatorSelected ? Qubble.CONFIG.getDarkAccentColor() : Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTertiaryColor());
         }
@@ -79,10 +102,16 @@ public class SliderElement extends Element<QubbleGUI> {
 
     public void setEditable(boolean editable) {
         this.editable = editable;
+        this.value.setEditable(editable);
     }
 
     public void setValue(float value) {
-        this.value = value;
+        this.value.clearText();
+        if (this.isInteger) {
+            this.value.writeText(String.valueOf((int) value));
+        } else {
+            this.value.writeText(String.valueOf(Float.parseFloat(this.decimalFormat.format(value)) + 0.0F));
+        }
     }
 
     @Override
@@ -90,25 +119,25 @@ public class SliderElement extends Element<QubbleGUI> {
         if (!this.editable) {
             return super.mouseClicked(mouseX, mouseY, button);
         }
-        float offsetX = ((this.sliderWidth - 4) * (this.value - this.minValue) / (this.maxValue - this.minValue));
+        float offsetX = ((this.sliderWidth - 4) * (this.getValue() - this.minValue) / (this.maxValue - this.minValue));
         boolean indicatorSelected = this.isSelected(mouseX, mouseY) && mouseX >= this.getPosX() + 38 + offsetX && mouseX <= this.getPosX() + 38 + offsetX + 4;
         boolean upperSelected = this.isSelected(mouseX, mouseY) && mouseX >= this.getPosX() + this.getWidth() - this.sliderWidth - 11 && mouseY < this.getPosY() + 6 && mouseX < this.getPosX() + this.getWidth() - this.sliderWidth;
         boolean lowerSelected = this.isSelected(mouseX, mouseY) && mouseX >= this.getPosX() + this.getWidth() - this.sliderWidth - 11 && mouseY > this.getPosY() + 6 && mouseX < this.getPosX() + this.getWidth() - this.sliderWidth;
         if (upperSelected) {
-            float newValue = GuiScreen.isShiftKeyDown() ? this.intValue ? this.value + 10 : this.value + 1 : this.intValue ? this.value + 1 : this.value + 0.1F;
+            float newValue = GuiScreen.isShiftKeyDown() ? this.isInteger ? this.getValue() + 10 : this.getValue() + 1 : this.isInteger ? this.getValue() + 1 : this.getValue() + 0.1F;
             if (this.maxValue == -1.0F || newValue <= this.maxValue) {
                 if (this.function.apply(newValue)) {
                     this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
-                    this.value = newValue;
+                    this.setValue(newValue);
                     return true;
                 }
             }
         } else if (lowerSelected) {
-            float newValue = GuiScreen.isShiftKeyDown() ? this.intValue ? this.value - 10 : this.value - 1 : this.intValue ? this.value - 1 : this.value - 0.1F;
+            float newValue = GuiScreen.isShiftKeyDown() ? this.isInteger ? this.getValue() - 10 : this.getValue() - 1 : this.isInteger ? this.getValue() - 1 : this.getValue() - 0.1F;
             if (this.minValue == -1.0F || newValue >= this.minValue) {
                 if (this.function.apply(newValue)) {
                     this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
-                    this.value = newValue;
+                    this.setValue(newValue);
                     return true;
                 }
             }
@@ -116,15 +145,19 @@ public class SliderElement extends Element<QubbleGUI> {
             this.dragging = true;
             this.getGUI().mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1.0F));
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return false;
+    }
+
+    private float getValue() {
+        return Float.parseFloat(this.value.getText());
     }
 
     @Override
     public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
         if (this.dragging) {
-            float newValue = value = Math.max(minValue, Math.min(maxValue, (((mouseX - (this.getPosX() + 38.0F)) / ((this.getWidth() - 38.0F) - 4.0F)) * (maxValue - minValue)) + minValue));
+            float newValue = Math.max(minValue, Math.min(maxValue, (((mouseX - (this.getPosX() + 38.0F)) / ((this.getWidth() - 38.0F) - 4.0F)) * (maxValue - minValue)) + minValue));
             if (this.function.apply(newValue)) {
-                this.value = newValue;
+                this.setValue(newValue);
                 return true;
             }
         }
@@ -138,5 +171,9 @@ public class SliderElement extends Element<QubbleGUI> {
         }
         this.dragging = false;
         return false;
+    }
+
+    public InputElement getValueInput() {
+        return value;
     }
 }

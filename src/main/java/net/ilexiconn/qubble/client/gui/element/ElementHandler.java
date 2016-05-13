@@ -81,6 +81,7 @@ public enum ElementHandler {
 
     private <T extends GuiScreen> void initElement(Element<T> element) {
         if (element.isVisible()) {
+            element.getChildren().clear();
             element.init();
             for (Element<T> child : element.getChildren()) {
                 this.initElement(child);

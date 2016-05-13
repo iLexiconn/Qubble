@@ -47,9 +47,9 @@ public class QubbleGUI extends GuiScreen {
     public void initGui() {
         ElementHandler.INSTANCE.clearGUI(this);
         ElementHandler.INSTANCE.addElement(this, this.modelView = new ModelViewElement(this));
-        ElementHandler.INSTANCE.addElement(this, this.toolbar = new ToolbarElement(this));
         ElementHandler.INSTANCE.addElement(this, this.modelTree = new ModelTreeElement(this));
         ElementHandler.INSTANCE.addElement(this, this.sidebar = new SidebarElement(this));
+        ElementHandler.INSTANCE.addElement(this, this.toolbar = new ToolbarElement(this));
         ElementHandler.INSTANCE.addElement(this, this.projectBar = new ProjectBarElement(this));
         ElementHandler.INSTANCE.init(this);
     }
