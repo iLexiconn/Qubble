@@ -49,7 +49,7 @@ public class SliderElement extends Element<QubbleGUI> {
     @Override
     public void init() {
         this.value = (InputElement) new InputElement(this.getGUI(), "0.0", -1.0F, 0.0F, 28, true, allowKey).withParent(this);
-        this.value.setOnEnter((input) -> {
+        this.value.withOnEnter((input) -> {
             float value = 0.0F;
             String text = input.getText();
             if (!this.isInteger) {

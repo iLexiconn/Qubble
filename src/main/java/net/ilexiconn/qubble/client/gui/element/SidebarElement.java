@@ -174,7 +174,12 @@ public class SidebarElement extends Element<QubbleGUI> {
     public void initFields() {
         this.getChildren().clear();
         this.addChild(new TextElement(this.getGUI(), "Selected cube", 4, 10));
-        this.addChild(this.nameInput = new InputElement(this.getGUI(), "", 4, 19, 116));
+        this.addChild(this.nameInput = new InputElement(this.getGUI(), "", 4, 19, 116).withOnEnter(inputElement -> {
+            QubbleCube selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+            selectedCube.setName(inputElement.getText());
+            this.getGUI().getModelView().updatePart(selectedCube);
+            return null;
+        }));
         switch (this.getGUI().getMode()) {
             case MODEL: {
                 this.addChild(new TextElement(this.getGUI(), "Dimensions", 4, 44));

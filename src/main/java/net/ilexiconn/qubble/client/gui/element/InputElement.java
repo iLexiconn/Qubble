@@ -404,7 +404,8 @@ public class InputElement extends Element<QubbleGUI> {
         GlStateManager.enableTexture2D();
     }
 
-    public void setOnEnter(Function<InputElement, Void> function) {
+    public InputElement withOnEnter(Function<InputElement, Void> function) {
         this.onEnter = function;
+        return this;
     }
 }
