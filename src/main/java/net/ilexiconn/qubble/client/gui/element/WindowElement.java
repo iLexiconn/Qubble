@@ -18,8 +18,6 @@ public class WindowElement extends Element<QubbleGUI> {
     private float dragOffsetY;
     private boolean isDragging;
 
-    private List<Element<QubbleGUI>> elementList = new ArrayList<>();
-
     public WindowElement(QubbleGUI gui, String name, int width, int height) {
         this(gui, name, width, height, gui.width / 2 - width / 2, gui.height / 2 - height / 2);
     }
@@ -34,12 +32,7 @@ public class WindowElement extends Element<QubbleGUI> {
     }
 
     public void addElement(Element<QubbleGUI> element) {
-        this.elementList.add(element.withParent(this));
-    }
-
-    @Override
-    public void update() {
-        this.elementList.forEach(Element::update);
+        element.withParent(this);
     }
 
     @Override
@@ -50,9 +43,6 @@ public class WindowElement extends Element<QubbleGUI> {
         this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), 14, Qubble.CONFIG.getAccentColor());
         FontRenderer fontRenderer = this.getGUI().mc.fontRendererObj;
         fontRenderer.drawString(this.name, this.getPosX() + 2.0F, this.getPosY() + 3.0F, Qubble.CONFIG.getTextColor(), false);
-        for (Element<QubbleGUI> element : this.elementList) {
-            element.render(mouseX, mouseY, partialTicks);
-        }
         GlStateManager.popMatrix();
         this.endScissor();
     }
@@ -68,13 +58,9 @@ public class WindowElement extends Element<QubbleGUI> {
             this.isDragging = true;
             ElementHandler.INSTANCE.removeElement(this.getGUI(), this);
             ElementHandler.INSTANCE.addElement(this.getGUI(), this);
+            return true;
         }
-        for (Element<QubbleGUI> element : this.elementList) {
-            if (element.mouseClicked(mouseX, mouseY, button)) {
-                return true;
-            }
-        }
-        return true;
+        return false;
     }
 
     @Override
@@ -84,32 +70,12 @@ public class WindowElement extends Element<QubbleGUI> {
             this.setPosY(Math.min(Math.max(mouseY - this.dragOffsetY, 0), this.getGUI().height - this.getHeight()));
             return true;
         }
-        for (Element<QubbleGUI> element : this.elementList) {
-            if (element.mouseDragged(mouseX, mouseY, button, timeSinceClick)) {
-                return true;
-            }
-        }
         return false;
     }
 
     @Override
     public boolean mouseReleased(float mouseX, float mouseY, int button) {
         this.isDragging = false;
-        for (Element<QubbleGUI> element : this.elementList) {
-            if (element.mouseReleased(mouseX, mouseY, button)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean keyPressed(char character, int keyCode) {
-        for (Element<QubbleGUI> element : this.elementList) {
-            if (element.keyPressed(character, keyCode)) {
-                return true;
-            }
-        }
         return false;
     }
 }

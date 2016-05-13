@@ -8,6 +8,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @SideOnly(Side.CLIENT)
 public class Element<T extends GuiScreen> extends Gui {
     private T gui;
@@ -16,6 +19,7 @@ public class Element<T extends GuiScreen> extends Gui {
     private int width;
     private int height;
     private Element<T> parent;
+    private List<Element<T>> children = new ArrayList<>();
     private boolean visible = true;
 
     public Element(T gui, float posX, float posY, int width, int height) {
@@ -91,12 +95,25 @@ public class Element<T extends GuiScreen> extends Gui {
     }
 
     public Element<T> withParent(Element<T> parent) {
+        if (this.parent != null) {
+            this.parent.children.remove(this);
+        }
         this.parent = parent;
+        if (this.parent != null) {
+            if (!this.parent.children.contains(this)) {
+                this.parent.children.add(this);
+            }
+        }
+        this.init();
         return this;
     }
 
     public Element<T> getParent() {
         return parent;
+    }
+
+    public List<Element<T>> getChildren() {
+        return children;
     }
 
     public boolean isVisible() {

@@ -16,18 +16,20 @@ public class ScrollBarElement<T extends GuiScreen> extends Element<T> {
     private float entryHeight;
     private IGetter<Float> offsetX;
     private IGetter<Float> offsetY;
+    private IGetter<Float> displayHeight;
 
     private int scroll;
     private int scrollYOffset;
     private boolean scrolling;
 
-    public ScrollBarElement(T gui, Element<T> parent, IGetter<Float> posX, IGetter<Float> posY, int entryHeight, IGetter<Integer> entryCount) {
+    public ScrollBarElement(T gui, Element<T> parent, IGetter<Float> posX, IGetter<Float> posY, IGetter<Float> displayHeight, int entryHeight, IGetter<Integer> entryCount) {
         super(gui, posX.get(), posY.get(), 4, 0);
         this.withParent(parent);
         this.offsetX = posX;
         this.offsetY = posY;
         this.entryHeight = entryHeight;
         this.entryCount = entryCount;
+        this.displayHeight = displayHeight;
     }
 
     @Override
@@ -52,7 +54,7 @@ public class ScrollBarElement<T extends GuiScreen> extends Element<T> {
     @Override
     public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
         if (this.scrolling) {
-            this.scroll = (int) Math.max(0, Math.min(this.maxScroll / this.scrollPerEntry, ((mouseY - this.scrollYOffset) - (this.getPosY() - this.scroll))));
+            this.scroll = (int) Math.max(0, Math.min(this.maxScroll / this.scrollPerEntry, mouseY - this.scrollYOffset - (this.offsetY.get() + this.getParent().getPosY())));
         }
         return this.scrolling;
     }
@@ -67,15 +69,20 @@ public class ScrollBarElement<T extends GuiScreen> extends Element<T> {
     public void update() {
         this.setPosX(this.offsetX.get());
         this.setPosY(this.offsetY.get() + this.scroll);
-        int maxDisplayEntries = (int) (this.getParent().getHeight() / entryHeight);
+        float parentHeight = this.getParent().getHeight();
+        int maxDisplayEntries = (int) (parentHeight / entryHeight);
         int entryCount = this.entryCount.get();
         this.maxScroll = Math.max(0, entryCount - maxDisplayEntries);
-        this.scrollPerEntry = (float) entryCount / this.getParent().getHeight();
-        this.setHeight((int) (this.getParent().getHeight() / ((float) entryCount / (float) maxDisplayEntries)));
+        this.scrollPerEntry = (float) entryCount / parentHeight;
+        this.setHeight((int) (parentHeight / ((float) entryCount / (float) maxDisplayEntries)));
+
+        if (this.scroll > this.maxScroll / this.scrollPerEntry) {
+            this.scroll = (int) (this.maxScroll / this.scrollPerEntry);
+        }
     }
 
     public float getScrollOffset() {
-        return this.scroll * this.scrollPerEntry * this.entryHeight;
+        return this.scroll * (this.entryCount.get() / this.displayHeight.get()) * this.entryHeight;
     }
 
     private void drawRectangle(double x, double y, double width, double height, int color) {
@@ -97,5 +104,13 @@ public class ScrollBarElement<T extends GuiScreen> extends Element<T> {
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
         GlStateManager.enableTexture2D();
+    }
+
+    public boolean isScrolling() {
+        return scrolling;
+    }
+
+    public int getMaxScroll() {
+        return maxScroll;
     }
 }
