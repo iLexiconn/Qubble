@@ -1,0 +1,16 @@
+[
+  {
+    "modid": "qubble",
+    "name": "Qubble",
+    "description": "",
+    "version": "${version}",
+    "url": "https://github.com/iLexiconn/Qubble/",
+    "authorList": [
+      "iLexiconn",
+      "gegy1000"
+    ],
+    "dependencies": [
+      "llibrary@[${llibrary_version},)"
+    ]
+  }
+]
