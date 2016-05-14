@@ -1,8 +1,6 @@
 package net.ilexiconn.qubble;
 
 import net.ilexiconn.qubble.server.ServerProxy;
-import net.ilexiconn.qubble.server.config.QubbleConfig;
-import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -21,19 +19,10 @@ public class Qubble {
     public static Qubble INSTANCE;
     @SidedProxy(serverSide = "net.ilexiconn.qubble.server.ServerProxy", clientSide = "net.ilexiconn.qubble.client.ClientProxy")
     public static ServerProxy PROXY;
-    public static QubbleConfig CONFIG;
     public static File CONFIG_FILE;
 
     @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent event) {
-        Qubble.CONFIG_FILE = new File(".", "llibrary" + File.separator + "qubble" + File.separator + "config.dat");
-        try {
-            Qubble.CONFIG = new QubbleConfig();
-            Qubble.CONFIG.deserializeNBT(CompressedStreamTools.read(Qubble.CONFIG_FILE));
-        } catch (Exception e) {
-            System.err.println("Failed to load Qubble config file!");
-            e.printStackTrace();
-        }
         Qubble.PROXY.onPreInit();
     }
 

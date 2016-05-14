@@ -1,6 +1,6 @@
 package net.ilexiconn.qubble.client.gui.element;
 
-import net.ilexiconn.qubble.Qubble;
+import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -16,6 +16,6 @@ public class TextElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        this.getGUI().mc.fontRendererObj.drawString(this.text, this.getPosX(), this.getPosY(), Qubble.CONFIG.getTextColor(), false);
+        this.getGUI().mc.fontRendererObj.drawString(this.text, this.getPosX(), this.getPosY(), LLibrary.CONFIG.getTextColor(), false);
     }
 }

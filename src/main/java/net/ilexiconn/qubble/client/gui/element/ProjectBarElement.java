@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.client.gui.element;
 
+import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
-import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
@@ -41,7 +41,7 @@ public class ProjectBarElement extends Element<QubbleGUI> {
         float scaleFactor = gui.getResolution().getScaleFactor();
         GL11.glScissor((int) (posX * scaleFactor), (int) (((gui.height - (posY + height))) * scaleFactor), (int) (width * scaleFactor), (int) (height * scaleFactor));
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
-        gui.drawRectangle(posX, posY, width, height, Qubble.CONFIG.getPrimaryColor());
+        gui.drawRectangle(posX, posY, width, height, LLibrary.CONFIG.getPrimaryColor());
         float projectX = -this.scroll;
         List<Project> openProjects = gui.getOpenProjects();
         for (int projectIndex = 0; projectIndex < openProjects.size(); projectIndex++) {
@@ -49,13 +49,13 @@ public class ProjectBarElement extends Element<QubbleGUI> {
             float projectWidth = fontRenderer.getStringWidth(model.getName()) + 15.0F;
             boolean hover = this.isSelected(mouseX, mouseY) && mouseX >= posX + projectX + projectWidth - 12 && mouseX <= posX + projectX + projectWidth;
             if (projectIndex == gui.getSelectedProjectIndex()) {
-                gui.drawRectangle(posX + projectX, posY, projectWidth, height, Qubble.CONFIG.getTertiaryColor());
-                gui.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : Qubble.CONFIG.getTertiaryColor());
+                gui.drawRectangle(posX + projectX, posY, projectWidth, height, LLibrary.CONFIG.getTertiaryColor());
+                gui.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : LLibrary.CONFIG.getTertiaryColor());
             } else {
-                gui.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : Qubble.CONFIG.getPrimaryColor());
+                gui.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : LLibrary.CONFIG.getPrimaryColor());
             }
-            fontRenderer.drawString("x", posX + projectX + projectWidth - 9, posY + 2, Qubble.CONFIG.getTextColor(), false);
-            fontRenderer.drawString(model.getName(), posX + projectX + 2, posY + 2, Qubble.CONFIG.getTextColor(), false);
+            fontRenderer.drawString("x", posX + projectX + projectWidth - 9, posY + 2, LLibrary.CONFIG.getTextColor(), false);
+            fontRenderer.drawString(model.getName(), posX + projectX + 2, posY + 2, LLibrary.CONFIG.getTextColor(), false);
             projectX += projectWidth;
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);

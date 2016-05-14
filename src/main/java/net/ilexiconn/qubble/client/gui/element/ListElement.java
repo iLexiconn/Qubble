@@ -1,6 +1,6 @@
 package net.ilexiconn.qubble.client.gui.element;
 
-import net.ilexiconn.qubble.Qubble;
+import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
@@ -31,7 +31,7 @@ public class ListElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), Qubble.CONFIG.getSecondaryColor());
+        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), LLibrary.CONFIG.getSecondaryColor());
         FontRenderer fontRenderer = this.getGUI().mc.fontRendererObj;
         float y = -this.scroller.getScrollOffset();
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
@@ -44,13 +44,13 @@ public class ListElement extends Element<QubbleGUI> {
             int entryHeight = 11;
             boolean selected = this.isSelected(this.getPosX() + 2, this.getPosY() + y + 1, entryWidth, entryHeight + 1, mouseX, mouseY) && !this.scroller.isScrolling();
             if (selected) {
-                this.getGUI().drawRectangle(entryX, entryY, entryWidth, entryHeight + 1, Qubble.CONFIG.getAccentColor());
+                this.getGUI().drawRectangle(entryX, entryY, entryWidth, entryHeight + 1, LLibrary.CONFIG.getAccentColor());
             }
-            fontRenderer.drawString(entry, entryX + 2, entryY + 2, Qubble.CONFIG.getTextColor(), false);
+            fontRenderer.drawString(entry, entryX + 2, entryY + 2, LLibrary.CONFIG.getTextColor(), false);
             y += 13;
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
-        this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 9, this.getPosY() + 1, 6, this.getHeight() - 2, Qubble.CONFIG.getPrimaryColor());
+        this.getGUI().drawRectangle(this.getPosX() + this.getWidth() - 9, this.getPosY() + 1, 6, this.getHeight() - 2, LLibrary.CONFIG.getPrimaryColor());
     }
 
     @Override

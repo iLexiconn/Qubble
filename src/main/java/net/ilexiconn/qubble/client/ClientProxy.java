@@ -2,7 +2,7 @@ package net.ilexiconn.qubble.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.model.BlockModelContainer;
 import net.ilexiconn.qubble.client.world.DummyWorld;
@@ -106,7 +106,7 @@ public class ClientProxy extends ServerProxy {
                     if (ModelBase.class.isAssignableFrom(field.getType())) {
                         field.setAccessible(true);
                         QubbleModel model = this.parseModel((ModelBase) field.get(renderer), entry.getKey(), entityName);
-                        if (model.getCubes().size() > 0) {
+                        if (model.getCuboids().size() > 0) {
                             GAME_MODELS.put(entityName, model);
                         }
                     } else if (ResourceLocation[].class.isAssignableFrom(field.getType()) && !GAME_TEXTURES.containsKey(entityName)) {
@@ -148,7 +148,7 @@ public class ClientProxy extends ServerProxy {
                     if (ModelBase.class.isAssignableFrom(field.getType())) {
                         field.setAccessible(true);
                         QubbleModel model = this.parseModel((ModelBase) field.get(renderer), entry.getKey(), tileName);
-                        if (model.getCubes().size() > 0) {
+                        if (model.getCuboids().size() > 0) {
                             GAME_MODELS.put(tileName, model);
                         }
                     } else if (ResourceLocation[].class.isAssignableFrom(field.getType()) && !GAME_TEXTURES.containsKey(tileName)) {
@@ -208,12 +208,12 @@ public class ClientProxy extends ServerProxy {
                 ResourceLocation parentResource = new ResourceLocation(model.parent);
                 QubbleModel parent = this.parseJsonModel(gson, resourceManager, importer, name, new ResourceLocation(parentResource.getResourceDomain(), "models/" + parentResource.getResourcePath() + ".json"));
                 if (parent != null) {
-                    qubbleModel.getCubes().addAll(parent.getCubes());
+                    qubbleModel.getCuboids().addAll(parent.getCuboids());
                 }
             }
-            if (qubbleModel.getCubes().size() > 0) {
-                if (qubbleModel.getCubes().size() == 1) {
-                    QubbleCube cube = qubbleModel.getCubes().get(0);
+            if (qubbleModel.getCuboids().size() > 0) {
+                if (qubbleModel.getCuboids().size() == 1) {
+                    QubbleCuboid cube = qubbleModel.getCuboids().get(0);
                     if (cube.getDimensionX() == 16.0F && cube.getDimensionY() == 16.0F && cube.getDimensionZ() == 16.0F) {
                         return null;
                     }
@@ -265,13 +265,13 @@ public class ClientProxy extends ServerProxy {
             }
         }
         for (Map.Entry<String, ModelRenderer> entry : cuboidsWithNames.entrySet()) {
-            qubbleModel.getCubes().addAll(parseModelRenderer(model, qubbleModel, entry.getKey(), entry.getValue(), null));
+            qubbleModel.getCuboids().addAll(parseModelRenderer(model, qubbleModel, entry.getKey(), entry.getValue(), null));
         }
         return qubbleModel;
     }
 
-    private List<QubbleCube> parseModelRenderer(ModelBase model, QubbleModel qubbleModel, String name, ModelRenderer modelRenderer, QubbleCube parent) {
-        List<QubbleCube> cubes = new ArrayList<>();
+    private List<QubbleCuboid> parseModelRenderer(ModelBase model, QubbleModel qubbleModel, String name, ModelRenderer modelRenderer, QubbleCuboid parent) {
+        List<QubbleCuboid> cubes = new ArrayList<>();
         int boxIndex = 0;
         if (modelRenderer != null && modelRenderer.cubeList != null) {
             for (ModelBox box : modelRenderer.cubeList) {
@@ -281,7 +281,7 @@ public class ClientProxy extends ServerProxy {
                     textureWidth = modelRenderer.textureWidth;
                     textureHeight = modelRenderer.textureHeight;
                 }
-                QubbleCube cube = QubbleCube.create((modelRenderer.boxName != null ? modelRenderer.boxName : name) + (boxIndex != 0 ? box.boxName != null ? box.boxName : "_" + boxIndex : ""));
+                QubbleCuboid cube = QubbleCuboid.create((modelRenderer.boxName != null ? modelRenderer.boxName : name) + (boxIndex != 0 ? box.boxName != null ? box.boxName : "_" + boxIndex : ""));
                 cube.setPosition(modelRenderer.rotationPointX, modelRenderer.rotationPointY, modelRenderer.rotationPointZ);
                 cube.setRotation((float) Math.toDegrees(modelRenderer.rotateAngleX), (float) Math.toDegrees(modelRenderer.rotateAngleY), (float) Math.toDegrees(modelRenderer.rotateAngleZ));
                 cube.setOffset(box.posX1, box.posY1, box.posZ1);

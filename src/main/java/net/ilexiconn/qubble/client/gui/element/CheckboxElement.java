@@ -1,6 +1,6 @@
 package net.ilexiconn.qubble.client.gui.element;
 
-import net.ilexiconn.qubble.Qubble;
+import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.init.SoundEvents;
@@ -25,9 +25,9 @@ public class CheckboxElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        this.getGUI().drawRectangle(this.getPosX() + 1, this.getPosY() + 1, this.getWidth() - 1, this.getHeight() - 1, Qubble.CONFIG.getSecondaryColor());
+        this.getGUI().drawRectangle(this.getPosX() + 1, this.getPosY() + 1, this.getWidth() - 1, this.getHeight() - 1, LLibrary.CONFIG.getSecondaryColor());
         if (this.selected) {
-            this.getGUI().drawRectangle(this.getPosX() + 3, this.getPosY() + 3, this.getWidth() - 5, this.getHeight() - 5, Qubble.CONFIG.getTextColor());
+            this.getGUI().drawRectangle(this.getPosX() + 3, this.getPosY() + 3, this.getWidth() - 5, this.getHeight() - 5, LLibrary.CONFIG.getTextColor());
         }
     }
 

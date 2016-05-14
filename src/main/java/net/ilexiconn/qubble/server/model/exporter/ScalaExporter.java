@@ -1,6 +1,6 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 
 import java.io.File;
@@ -39,10 +39,10 @@ public class ScalaExporter implements IModelExporter<List<String>> {
         list.add("  textureWidth = " + model.getTextureWidth());
         list.add("  textureHeight = " + model.getTextureHeight());
         list.add("");
-        this.addCubeDeclarations(model.getCubes(), null, list);
+        this.addCubeDeclarations(model.getCuboids(), null, list);
         list.add("");
         list.add("  override def render(entity: Entity, limbSwing: Float, limbSwingAmount: Float, ageInTick: Float, rotationYaw: Float, rotationPitch: Float, scale: Float) {");
-        this.addRenderCalls(model.getCubes(), list);
+        this.addRenderCalls(model.getCuboids(), list);
         list.add("  }");
         list.add("");
         this.addRotationAngles(list);
@@ -57,8 +57,8 @@ public class ScalaExporter implements IModelExporter<List<String>> {
         writer.close();
     }
 
-    public void addCubeDeclarations(List<QubbleCube> cubes, QubbleCube parent, List<String> list) {
-        for (QubbleCube cube : cubes) {
+    public void addCubeDeclarations(List<QubbleCuboid> cubes, QubbleCuboid parent, List<String> list) {
+        for (QubbleCuboid cube : cubes) {
             String field = this.getFieldName(cube);
             list.add("  val " + field + " = new ModelRenderer(this, " + cube.getTextureX() + ", " + cube.getTextureY() + ")");
             list.add("  this." + field + ".setRotationPoint(" + cube.getPositionX() + "F, " + cube.getPositionY() + "F, " + cube.getPositionZ() + "F)");
@@ -76,8 +76,8 @@ public class ScalaExporter implements IModelExporter<List<String>> {
         }
     }
 
-    public void addRenderCalls(List<QubbleCube> cubes, List<String> list) {
-        for (QubbleCube cube : cubes) {
+    public void addRenderCalls(List<QubbleCuboid> cubes, List<String> list) {
+        for (QubbleCuboid cube : cubes) {
             String field = this.getFieldName(cube);
             boolean scale = cube.getRotationX() != 0.0F || cube.getRotationY() != 0.0F || cube.getRotationZ() != 0.0F;
             boolean blend = cube.getOpacity() != 100.0F;
@@ -112,7 +112,7 @@ public class ScalaExporter implements IModelExporter<List<String>> {
         list.add("  }");
     }
 
-    public String getFieldName(QubbleCube cube) {
+    public String getFieldName(QubbleCuboid cube) {
         return cube.getName().replaceAll("[^A-Za-z0-9_$]", "");
     }
 

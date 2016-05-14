@@ -1,9 +1,9 @@
 package net.ilexiconn.qubble.client.gui.element;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.LLibrary;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.util.ClientUtils;
-import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
@@ -105,7 +105,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
         if (selection) {
             GlStateManager.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
         } else {
-            int color = Qubble.CONFIG.getTertiaryColor();
+            int color = LLibrary.CONFIG.getTertiaryColor();
             float r = (float) (color >> 16 & 0xFF) / 255.0F;
             float g = (float) (color >> 8 & 0xFF) / 255.0F;
             float b = (float) (color & 0xFF) / 255.0F;
@@ -121,7 +121,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
                 this.updateModel();
             }
             GlStateManager.translate(0.0F, -1.5F, 0.0F);
-            QubbleCube selectedCube = project.getSelectedCube();
+            QubbleCuboid selectedCube = project.getSelectedCube();
             QubbleModelRenderer selectedBox = this.currentModel.getCube(selectedCube);
             if (selectedBox != null && !selection) {
                 GlStateManager.color(0.7F, 0.7F, 0.7F, 1.0F);
@@ -253,7 +253,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
         }
     }
 
-    public void updatePart(QubbleCube cube) {
+    public void updatePart(QubbleCuboid cube) {
         if (this.currentModel == null) {
             this.updateModel();
         } else {
@@ -281,11 +281,11 @@ public class ModelViewElement extends Element<QubbleGUI> {
                 int g = (int) (buffer.get(1) * 255.0F);
                 int b = (int) (buffer.get(2) * 255.0F);
                 int id = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF));
-                QubbleCube cube = this.getGUI().getSelectedProject().getSelectedCube();
+                QubbleCuboid cube = this.getGUI().getSelectedProject().getSelectedCube();
                 if (cube != null) {
                     this.getGUI().getSelectedProject().setSelectedCube(null);
                 }
-                QubbleCube newCube = this.currentModel.getCube(id);
+                QubbleCuboid newCube = this.currentModel.getCube(id);
                 this.getGUI().getSelectedProject().setSelectedCube(newCube);
                 if (newCube != null) {
                     this.getGUI().getSelectedProject().setSelectedCube(newCube);

@@ -1,6 +1,6 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 
 import javax.imageio.ImageIO;
@@ -23,7 +23,7 @@ public class TextureMapExporter implements IModelExporter<BufferedImage> {
     public BufferedImage export(QubbleModel model, String... arguments) {
         model.unparent();
         BufferedImage texture = new BufferedImage(model.getTextureWidth(), model.getTextureHeight(), BufferedImage.TYPE_INT_ARGB);
-        for (QubbleCube cube : model.getCubes()) {
+        for (QubbleCuboid cube : model.getCuboids()) {
             int textureX = cube.getTextureX();
             int textureY = cube.getTextureY();
             int dimensionX = cube.getDimensionX();

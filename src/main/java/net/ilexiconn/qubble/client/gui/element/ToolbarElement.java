@@ -1,8 +1,8 @@
 package net.ilexiconn.qubble.client.gui.element;
 
 import com.google.common.collect.Lists;
+import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
-import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.ModelMode;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
@@ -235,44 +235,32 @@ public class ToolbarElement extends Element<QubbleGUI> {
     public void openOptionsWindow() {
         WindowElement optionsWindow = new WindowElement(this.getGUI(), "Options", 200, 200);
         optionsWindow.addElement(new ColorElement(this.getGUI(), 2, 16, 195, 149, (color) -> {
-            if (Qubble.CONFIG.getAccentColor() != color) {
-                Qubble.CONFIG.setAccentColor(color);
-                try {
-                    CompressedStreamTools.write(Qubble.CONFIG.serializeNBT(), Qubble.CONFIG_FILE);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            if (LLibrary.CONFIG.getAccentColor() != color) {
+                LLibrary.CONFIG.setAccentColor(color);
+                LLibrary.CONFIG.save();
                 return true;
             } else {
                 return false;
             }
         }));
 
-        final CheckboxElement dark = new CheckboxElement(this.getGUI(), 32.5F, 174.5F).withSelection(Objects.equals(Qubble.CONFIG.getColorMode(), ColorMode.DARK.getName()));
-        final CheckboxElement light = new CheckboxElement(this.getGUI(), 122.5F, 174.5F).withSelection(Objects.equals(Qubble.CONFIG.getColorMode(), ColorMode.LIGHT.getName()));
+        final CheckboxElement dark = new CheckboxElement(this.getGUI(), 32.5F, 174.5F).withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.DARK.getName()));
+        final CheckboxElement light = new CheckboxElement(this.getGUI(), 122.5F, 174.5F).withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.LIGHT.getName()));
         optionsWindow.addElement(dark.withActionHandler((selected) -> {
-            if (!Objects.equals(Qubble.CONFIG.getColorMode(), ColorMode.DARK.getName())) {
-                Qubble.CONFIG.setColorMode(ColorMode.DARK.getName());
+            if (!Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.DARK.getName())) {
+                LLibrary.CONFIG.setColorMode(ColorMode.DARK.getName());
                 light.withSelection(false);
-                try {
-                    CompressedStreamTools.write(Qubble.CONFIG.serializeNBT(), Qubble.CONFIG_FILE);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                LLibrary.CONFIG.save();
                 return true;
             } else {
                 return false;
             }
         }));
         optionsWindow.addElement(light.withActionHandler((selected) -> {
-            if (!Objects.equals(Qubble.CONFIG.getColorMode(), ColorMode.LIGHT.getName())) {
-                Qubble.CONFIG.setColorMode(ColorMode.LIGHT.getName());
+            if (!Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.LIGHT.getName())) {
+                LLibrary.CONFIG.setColorMode(ColorMode.LIGHT.getName());
                 dark.withSelection(false);
-                try {
-                    CompressedStreamTools.write(Qubble.CONFIG.serializeNBT(), Qubble.CONFIG_FILE);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                LLibrary.CONFIG.save();
                 return true;
             } else {
                 return false;
@@ -287,7 +275,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), Qubble.CONFIG.getAccentColor());
+        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), LLibrary.CONFIG.getAccentColor());
     }
 
     private List<String> getModels(IModelImporter modelImporter) {

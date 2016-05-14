@@ -1,6 +1,6 @@
 package net.ilexiconn.qubble.server.model.importer;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.model.tabula.TabulaModelHandler;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaCubeContainer;
@@ -28,13 +28,13 @@ public class TabulaImporter implements IModelImporter<TabulaModelContainer> {
 
     @Override
     public QubbleModel getModel(String fileName, TabulaModelContainer model) {
-        List<QubbleCube> cubes = new ArrayList<>();
+        List<QubbleCuboid> cubes = new ArrayList<>();
         cubes.addAll(this.addChildren(null, model.getCubes()));
         for (TabulaCubeGroupContainer cubeGroup : model.getCubeGroups()) {
             cubes.addAll(this.addChildrenFromGroup(null, cubeGroup));
         }
         QubbleModel qubble = QubbleModel.create(model.getName(), model.getAuthor(), model.getTextureWidth(), model.getTextureHeight());
-        qubble.getCubes().addAll(cubes);
+        qubble.getCuboids().addAll(cubes);
         qubble.setFileName(fileName);
         return qubble;
     }
@@ -52,10 +52,10 @@ public class TabulaImporter implements IModelImporter<TabulaModelContainer> {
         return container;
     }
 
-    public List<QubbleCube> addChildren(QubbleCube parent, List<TabulaCubeContainer> cubes) {
-        List<QubbleCube> list = new ArrayList<>();
+    public List<QubbleCuboid> addChildren(QubbleCuboid parent, List<TabulaCubeContainer> cubes) {
+        List<QubbleCuboid> list = new ArrayList<>();
         for (TabulaCubeContainer cube : cubes) {
-            QubbleCube qubble = QubbleCube.create(cube.getName());
+            QubbleCuboid qubble = QubbleCuboid.create(cube.getName());
             qubble.setDimensions(cube.getDimensions()[0], cube.getDimensions()[1], cube.getDimensions()[2]);
             qubble.setPosition((float) cube.getPosition()[0], (float) cube.getPosition()[1], (float) cube.getPosition()[2]);
             qubble.setOffset((float) cube.getOffset()[0], (float) cube.getOffset()[1], (float) cube.getOffset()[2]);
@@ -74,8 +74,8 @@ public class TabulaImporter implements IModelImporter<TabulaModelContainer> {
         return list;
     }
 
-    public List<QubbleCube> addChildrenFromGroup(QubbleCube parent, TabulaCubeGroupContainer cubeGroup) {
-        List<QubbleCube> list = this.addChildren(parent, cubeGroup.getCubes());
+    public List<QubbleCuboid> addChildrenFromGroup(QubbleCuboid parent, TabulaCubeGroupContainer cubeGroup) {
+        List<QubbleCuboid> list = this.addChildren(parent, cubeGroup.getCubes());
         for (TabulaCubeGroupContainer group : cubeGroup.getCubeGroups()) {
             list.addAll(this.addChildrenFromGroup(parent, group));
         }

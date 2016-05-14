@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
 import net.ilexiconn.llibrary.client.model.obj.*;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -24,7 +24,7 @@ public class OBJExporter implements IModelExporter<OBJModel> {
     public OBJModel export(QubbleModel model, String... arguments) {
         OBJModel obj = new OBJModel();
         model.unparent();
-        model.getCubes().stream().map(cube -> this.convertBoxToShape(obj, model, cube, 0.0625F)).forEach(obj::addShape);
+        model.getCuboids().stream().map(cube -> this.convertBoxToShape(obj, model, cube, 0.0625F)).forEach(obj::addShape);
         return obj;
     }
 
@@ -35,7 +35,7 @@ public class OBJExporter implements IModelExporter<OBJModel> {
         writer.close();
     }
 
-    public Shape convertBoxToShape(OBJModel obj, QubbleModel model, QubbleCube cube, float scale) {
+    public Shape convertBoxToShape(OBJModel obj, QubbleModel model, QubbleCuboid cube, float scale) {
         Shape shape = new Shape(obj, cube.getName());
         Vertex frontTopLeft = new Vertex(cube.getOffsetX(), cube.getOffsetY(), cube.getOffsetZ());
         Vertex frontTopRight = new Vertex(cube.getOffsetX() + cube.getDimensionX(), cube.getOffsetY(), cube.getOffsetZ());
@@ -66,7 +66,7 @@ public class OBJExporter implements IModelExporter<OBJModel> {
         return shape;
     }
 
-    public TextureCoords createUV(QubbleModel qubble, QubbleCube cube, float baseU, float baseV, float mirrorOffset) {
+    public TextureCoords createUV(QubbleModel qubble, QubbleCuboid cube, float baseU, float baseV, float mirrorOffset) {
         if (!cube.isTextureMirrored()) {
             return new TextureCoords((cube.getTextureX() + baseU) / qubble.getTextureWidth(), 1.0F - (cube.getTextureY() + baseV) / qubble.getTextureHeight());
         } else {

@@ -1,8 +1,8 @@
 package net.ilexiconn.qubble.client.gui.element;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.LLibrary;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
-import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
@@ -21,11 +21,11 @@ public class ModelTreeElement extends Element<QubbleGUI> {
     private boolean resizing;
     private int cubeY;
     private int entryCount;
-    private List<QubbleCube> expandedCubes = new ArrayList<>();
+    private List<QubbleCuboid> expandedCubes = new ArrayList<>();
 
     private ScrollBarElement scroller;
 
-    private QubbleCube parenting;
+    private QubbleCuboid parenting;
 
     public ModelTreeElement(QubbleGUI gui) {
         super(gui, 0.0F, 20.0F, 100, gui.height - 36);
@@ -41,10 +41,10 @@ public class ModelTreeElement extends Element<QubbleGUI> {
             createCubeWindow.addElement(new ButtonElement(this.getGUI(), "Create", 2, 30, 96, 10, (element) -> {
                 Project selectedProject = this.getGUI().getSelectedProject();
                 if (selectedProject != null && selectedProject.getModel() != null && nameElement.getText().length() > 0) {
-                    QubbleCube cube = QubbleCube.create(nameElement.getText());
+                    QubbleCuboid cube = QubbleCuboid.create(nameElement.getText());
                     cube.setDimensions(1, 1, 1);
                     cube.setScale(1.0F, 1.0F, 1.0F);
-                    selectedProject.getModel().getCubes().add(cube);
+                    selectedProject.getModel().getCuboids().add(cube);
                     selectedProject.setSelectedCube(cube);
                     this.getGUI().getModelView().updateModel();
                     ElementHandler.INSTANCE.removeElement(this.getGUI(), createCubeWindow);
@@ -77,7 +77,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         int i = 0;
         float offset = this.scroller.getScrollOffset();
         for (float y = -offset; y < height + offset; y += 12.0F) {
-            gui.drawRectangle(posX, posY + y, width, 12.0F, i % 2 == 0 ? Qubble.CONFIG.getSecondarySubcolor() : Qubble.CONFIG.getPrimarySubcolor());
+            gui.drawRectangle(posX, posY + y, width, 12.0F, i % 2 == 0 ? LLibrary.CONFIG.getSecondarySubcolor() : LLibrary.CONFIG.getPrimarySubcolor());
             i++;
         }
 
@@ -85,14 +85,14 @@ public class ModelTreeElement extends Element<QubbleGUI> {
 
         if (gui.getSelectedProject() != null) {
             QubbleModel model = gui.getSelectedProject().getModel();
-            for (QubbleCube cube : model.getCubes()) {
+            for (QubbleCuboid cube : model.getCuboids()) {
                 this.drawCubeEntry(cube, 0);
             }
         }
 
         this.entryCount = this.cubeY;
 
-        gui.drawRectangle(posX + width - 2, posY, 2, height, Qubble.CONFIG.getAccentColor());
+        gui.drawRectangle(posX + width - 2, posY, 2, height, LLibrary.CONFIG.getAccentColor());
 
         this.endScissor();
 
@@ -101,11 +101,11 @@ public class ModelTreeElement extends Element<QubbleGUI> {
             String name = this.parenting.getName();
             float entryX = mouseX - 12;
             float entryY = mouseY - 2;
-            this.getGUI().drawRectangle(entryX + 9, entryY - 1, fontRenderer.getStringWidth(name) + 1, fontRenderer.FONT_HEIGHT + 1, Qubble.CONFIG.getSecondaryColor());
-            fontRenderer.drawString(name, entryX + 10, entryY, Qubble.CONFIG.getAccentColor(), false);
+            this.getGUI().drawRectangle(entryX + 9, entryY - 1, fontRenderer.getStringWidth(name) + 1, fontRenderer.FONT_HEIGHT + 1, LLibrary.CONFIG.getSecondaryColor());
+            fontRenderer.drawString(name, entryX + 10, entryY, LLibrary.CONFIG.getAccentColor(), false);
         }
 
-        gui.drawRectangle(posX, posY + height, this.getWidth(), 16, Qubble.CONFIG.getAccentColor());
+        gui.drawRectangle(posX, posY + height, this.getWidth(), 16, LLibrary.CONFIG.getAccentColor());
     }
 
     @Override
@@ -122,7 +122,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         return false;
     }
 
-    private QubbleCube getSelectedCube(float mouseX, float mouseY) {
+    private QubbleCuboid getSelectedCube(float mouseX, float mouseY) {
         QubbleGUI gui = this.getGUI();
         if (gui.getSelectedProject() != null) {
             this.cubeY = 0;
@@ -130,8 +130,8 @@ public class ModelTreeElement extends Element<QubbleGUI> {
                 gui.getSelectedProject().setSelectedCube(null);
             }
             QubbleModel model = gui.getSelectedProject().getModel();
-            for (QubbleCube cube : model.getCubes()) {
-                QubbleCube selected = this.mouseDetectionCubeEntry(cube, 0, mouseX, mouseY);
+            for (QubbleCuboid cube : model.getCuboids()) {
+                QubbleCuboid selected = this.mouseDetectionCubeEntry(cube, 0, mouseX, mouseY);
                 if (selected != null) {
                     return selected;
                 }
@@ -164,8 +164,8 @@ public class ModelTreeElement extends Element<QubbleGUI> {
             Project selectedProject = this.getGUI().getSelectedProject();
             if (selectedProject != null && selectedProject.getModel() != null) {
                 QubbleModel model = selectedProject.getModel();
-                QubbleCube newParent = this.getSelectedCube(mouseX, mouseY);
-                QubbleCube prevParent = this.getParent(model, parenting);
+                QubbleCuboid newParent = this.getSelectedCube(mouseX, mouseY);
+                QubbleCuboid prevParent = this.getParent(model, parenting);
                 if (!this.hasChild(parenting, newParent)) {
                     if (newParent != parenting) {
                         if (GuiScreen.isShiftKeyDown()) {
@@ -174,13 +174,13 @@ public class ModelTreeElement extends Element<QubbleGUI> {
                                 this.inheritParentTransformation(model, parenting, newParent);
                             }
                         }
-                        model.getCubes().remove(parenting);
+                        model.getCuboids().remove(parenting);
                         if (newParent != parenting && newParent != null && newParent != prevParent) {
                             if (!newParent.getChildren().contains(parenting)) {
                                 newParent.getChildren().add(parenting);
                             }
                         } else if (newParent == null) {
-                            model.getCubes().add(parenting);
+                            model.getCuboids().add(parenting);
                         }
                         if (prevParent != null && newParent != prevParent) {
                             prevParent.getChildren().remove(parenting);
@@ -194,11 +194,11 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         return false;
     }
 
-    private void maintainParentTransformation(QubbleModel model, QubbleCube parenting) {
+    private void maintainParentTransformation(QubbleModel model, QubbleCuboid parenting) {
         this.applyTransformation(parenting, this.getParentTransformation(model, parenting, true, false));
     }
 
-    private void inheritParentTransformation(QubbleModel model, QubbleCube parenting, QubbleCube newParent) {
+    private void inheritParentTransformation(QubbleModel model, QubbleCuboid parenting, QubbleCuboid newParent) {
         Matrix4d matrix = this.getParentTransformationMatrix(model, newParent, true, false);
         matrix.invert();
         matrix.mul(this.getParentTransformationMatrix(model, parenting, false, false));
@@ -207,19 +207,19 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         this.applyTransformation(parenting, parentTransformation);
     }
 
-    private void applyTransformation(QubbleCube parenting, float[][] parentTransformation) {
+    private void applyTransformation(QubbleCuboid parenting, float[][] parentTransformation) {
         parenting.setPosition(parentTransformation[0][0], parentTransformation[0][1], parentTransformation[0][2]);
         parenting.setRotation(parentTransformation[1][0], parentTransformation[1][1], parentTransformation[1][2]);
     }
 
-    private QubbleCube mouseDetectionCubeEntry(QubbleCube cube, int xOffset, float mouseX, float mouseY) {
+    private QubbleCuboid mouseDetectionCubeEntry(QubbleCuboid cube, int xOffset, float mouseX, float mouseY) {
         float entryX = this.getPosX() + xOffset;
         float entryY = this.getPosY() + this.cubeY * 12.0F + 2.0F - this.scroller.getScrollOffset();
         this.cubeY++;
         boolean expanded = this.isExpanded(cube);
         if (expanded) {
-            for (QubbleCube child : cube.getChildren()) {
-                QubbleCube selected = this.mouseDetectionCubeEntry(child, xOffset + 6, mouseX, mouseY);
+            for (QubbleCuboid child : cube.getChildren()) {
+                QubbleCuboid selected = this.mouseDetectionCubeEntry(child, xOffset + 6, mouseX, mouseY);
                 if (selected != null) {
                     return selected;
                 }
@@ -237,13 +237,13 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         return null;
     }
 
-    private void drawCubeEntry(QubbleCube cube, int xOffset) {
+    private void drawCubeEntry(QubbleCuboid cube, int xOffset) {
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
         String name = cube.getName();
         float entryX = this.getPosX() + xOffset;
         float entryY = this.getPosY() + this.cubeY * 12.0F + 2.0F - this.scroller.getScrollOffset();
         if (!cube.equals(parenting)) {
-            fontRenderer.drawString(name, entryX + 10, entryY, this.getGUI().getSelectedProject().getSelectedCube() == cube ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTextColor(), false);
+            fontRenderer.drawString(name, entryX + 10, entryY, this.getGUI().getSelectedProject().getSelectedCube() == cube ? LLibrary.CONFIG.getAccentColor() : LLibrary.CONFIG.getTextColor(), false);
         }
         this.cubeY++;
         boolean expanded = this.isExpanded(cube);
@@ -251,7 +251,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         int size = 0;
         if (expanded) {
             int i = 0;
-            for (QubbleCube child : cube.getChildren()) {
+            for (QubbleCuboid child : cube.getChildren()) {
                 if (i == cube.getChildren().size() - 1) {
                     size = (this.cubeY + 1) - prevCubeY;
                 }
@@ -273,11 +273,11 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         }
     }
 
-    private boolean isExpanded(QubbleCube cube) {
+    private boolean isExpanded(QubbleCuboid cube) {
         return this.expandedCubes.contains(cube);
     }
 
-    private void setExpanded(QubbleCube cube, boolean expanded) {
+    private void setExpanded(QubbleCuboid cube, boolean expanded) {
         boolean carryToChildren = GuiScreen.isShiftKeyDown();
         if (expanded) {
             if (!this.expandedCubes.contains(cube)) {
@@ -288,7 +288,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
             carryToChildren = true;
         }
         if (carryToChildren) {
-            for (QubbleCube child : cube.getChildren()) {
+            for (QubbleCuboid child : cube.getChildren()) {
                 this.setExpanded(child, expanded);
             }
         }
@@ -305,20 +305,20 @@ public class ModelTreeElement extends Element<QubbleGUI> {
     }
 
     private void removeCube(Project selectedProject) {
-        QubbleCube selectedCube = selectedProject.getSelectedCube();
-        for (QubbleCube currentCube : selectedProject.getModel().getCubes()) {
+        QubbleCuboid selectedCube = selectedProject.getSelectedCube();
+        for (QubbleCuboid currentCube : selectedProject.getModel().getCuboids()) {
             if (this.removeChildCube(currentCube, selectedCube)) {
                 break;
             }
         }
-        selectedProject.getModel().getCubes().remove(selectedCube);
+        selectedProject.getModel().getCuboids().remove(selectedCube);
         this.getGUI().getModelView().updateModel();
         this.getGUI().getSidebar().clearFields();
     }
 
-    private boolean removeChildCube(QubbleCube parent, QubbleCube cube) {
+    private boolean removeChildCube(QubbleCuboid parent, QubbleCuboid cube) {
         boolean isChild = false;
-        for (QubbleCube currentCube : parent.getChildren()) {
+        for (QubbleCuboid currentCube : parent.getChildren()) {
             if (currentCube.equals(cube)) {
                 isChild = true;
                 break;
@@ -334,9 +334,9 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         return false;
     }
 
-    public QubbleCube getParent(QubbleModel model, QubbleCube cuboid) {
-        for (QubbleCube currentCube : model.getCubes()) {
-            QubbleCube foundParent = this.getParent(currentCube, cuboid);
+    public QubbleCuboid getParent(QubbleModel model, QubbleCuboid cuboid) {
+        for (QubbleCuboid currentCube : model.getCuboids()) {
+            QubbleCuboid foundParent = this.getParent(currentCube, cuboid);
             if (foundParent != null) {
                 return foundParent;
             }
@@ -344,12 +344,12 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         return null;
     }
 
-    private QubbleCube getParent(QubbleCube parent, QubbleCube cuboid) {
+    private QubbleCuboid getParent(QubbleCuboid parent, QubbleCuboid cuboid) {
         if (parent.getChildren().contains(cuboid)) {
             return parent;
         }
-        for (QubbleCube child : parent.getChildren()) {
-            QubbleCube foundParent = this.getParent(child, cuboid);
+        for (QubbleCuboid child : parent.getChildren()) {
+            QubbleCuboid foundParent = this.getParent(child, cuboid);
             if (foundParent != null) {
                 return foundParent;
             }
@@ -357,11 +357,11 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         return null;
     }
 
-    private boolean hasChild(QubbleCube parent, QubbleCube child) {
+    private boolean hasChild(QubbleCuboid parent, QubbleCuboid child) {
         if (parent.getChildren().contains(child)) {
             return true;
         }
-        for (QubbleCube c : parent.getChildren()) {
+        for (QubbleCuboid c : parent.getChildren()) {
             boolean hasChild = this.hasChild(c, child);
             if (hasChild) {
                 return true;
@@ -370,9 +370,9 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         return false;
     }
 
-    private List<QubbleCube> getParents(QubbleModel model, QubbleCube cube, boolean ignoreSelf) {
-        QubbleCube parent = cube;
-        List<QubbleCube> parents = new ArrayList<>();
+    private List<QubbleCuboid> getParents(QubbleModel model, QubbleCuboid cube, boolean ignoreSelf) {
+        QubbleCuboid parent = cube;
+        List<QubbleCuboid> parents = new ArrayList<>();
         if (!ignoreSelf) {
             parents.add(cube);
         }
@@ -383,12 +383,12 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         return parents;
     }
 
-    private float[][] getParentTransformation(QubbleModel model, QubbleCube cube, boolean includeParents, boolean ignoreSelf) {
+    private float[][] getParentTransformation(QubbleModel model, QubbleCuboid cube, boolean includeParents, boolean ignoreSelf) {
         return this.getParentTransformation(this.getParentTransformationMatrix(model, cube, includeParents, ignoreSelf));
     }
 
-    private Matrix4d getParentTransformationMatrix(QubbleModel model, QubbleCube cube, boolean includeParents, boolean ignoreSelf) {
-        List<QubbleCube> parentCubes = new ArrayList<>();
+    private Matrix4d getParentTransformationMatrix(QubbleModel model, QubbleCuboid cube, boolean includeParents, boolean ignoreSelf) {
+        List<QubbleCuboid> parentCubes = new ArrayList<>();
         if (includeParents) {
             parentCubes = this.getParents(model, cube, ignoreSelf);
         } else if (!ignoreSelf) {
@@ -397,7 +397,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         Matrix4d matrix = new Matrix4d();
         matrix.setIdentity();
         Matrix4d transform = new Matrix4d();
-        for (QubbleCube child : parentCubes) {
+        for (QubbleCuboid child : parentCubes) {
             transform.setIdentity();
             transform.setTranslation(new Vector3d(child.getPositionX(), child.getPositionY(), child.getPositionZ()));
             matrix.mul(transform);

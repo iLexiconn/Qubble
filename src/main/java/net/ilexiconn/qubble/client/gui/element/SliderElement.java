@@ -1,6 +1,6 @@
 package net.ilexiconn.qubble.client.gui.element;
 
-import net.ilexiconn.qubble.Qubble;
+import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiScreen;
@@ -76,13 +76,13 @@ public class SliderElement extends Element<QubbleGUI> {
         float posY = this.getPosY();
         int width = this.getWidth();
         int height = this.getHeight();
-        gui.drawRectangle(posX, posY, width, height, this.editable ? Qubble.CONFIG.getSecondaryColor() : Qubble.CONFIG.getSecondarySubcolor());
+        gui.drawRectangle(posX, posY, width, height, this.editable ? LLibrary.CONFIG.getSecondaryColor() : LLibrary.CONFIG.getSecondarySubcolor());
         boolean selected = this.isSelected(mouseX, mouseY);
         boolean upperSelected = this.editable && selected && mouseX >= posX + width - this.sliderWidth - 11 && mouseY < posY + 6 && mouseX < posX + width - this.sliderWidth;
         boolean lowerSelected = this.editable && selected && mouseX >= posX + width - this.sliderWidth - 11 && mouseY > posY + 6 && mouseX < posX + width - this.sliderWidth;
-        gui.drawRectangle(posX + width - 11 - this.sliderWidth, posY, 11, 6, this.editable ? upperSelected ? Qubble.CONFIG.getDarkAccentColor() : Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTertiaryColor());
-        gui.drawRectangle(posX + width - 11 - this.sliderWidth, posY + 6, 11, 6, this.editable ? lowerSelected ? Qubble.CONFIG.getDarkAccentColor() : Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTertiaryColor());
-        int textColor = Qubble.CONFIG.getTextColor();
+        gui.drawRectangle(posX + width - 11 - this.sliderWidth, posY, 11, 6, this.editable ? upperSelected ? LLibrary.CONFIG.getDarkAccentColor() : LLibrary.CONFIG.getAccentColor() : LLibrary.CONFIG.getTertiaryColor());
+        gui.drawRectangle(posX + width - 11 - this.sliderWidth, posY + 6, 11, 6, this.editable ? lowerSelected ? LLibrary.CONFIG.getDarkAccentColor() : LLibrary.CONFIG.getAccentColor() : LLibrary.CONFIG.getTertiaryColor());
+        int textColor = LLibrary.CONFIG.getTextColor();
         gui.drawRectangle(posX + width - 8 - this.sliderWidth, posY + 4, 5, 1, textColor);
         gui.drawRectangle(posX + width - 7 - this.sliderWidth, posY + 3, 3, 1, textColor);
         gui.drawRectangle(posX + width - 6 - this.sliderWidth, posY + 2, 1, 1, textColor);
@@ -96,7 +96,7 @@ public class SliderElement extends Element<QubbleGUI> {
         if (this.hasSlider) {
             float offsetX = ((this.sliderWidth - 4) * (this.getValue() - this.minValue) / (this.maxValue - this.minValue));
             boolean indicatorSelected = this.editable && selected && mouseX >= this.getPosX() + 38 + offsetX && mouseX <= this.getPosX() + 38 + offsetX + 4;
-            this.getGUI().drawRectangle(this.getPosX() + 38 + offsetX, this.getPosY(), 4, this.getHeight(), this.editable ? indicatorSelected ? Qubble.CONFIG.getDarkAccentColor() : Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getTertiaryColor());
+            this.getGUI().drawRectangle(this.getPosX() + 38 + offsetX, this.getPosY(), 4, this.getHeight(), this.editable ? indicatorSelected ? LLibrary.CONFIG.getDarkAccentColor() : LLibrary.CONFIG.getAccentColor() : LLibrary.CONFIG.getTertiaryColor());
         }
     }
 

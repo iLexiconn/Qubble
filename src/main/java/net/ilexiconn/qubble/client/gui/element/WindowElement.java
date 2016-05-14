@@ -1,15 +1,12 @@
 package net.ilexiconn.qubble.client.gui.element;
 
-import net.ilexiconn.qubble.Qubble;
+import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.server.color.ColorScheme;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class WindowElement extends Element<QubbleGUI> {
@@ -39,10 +36,10 @@ public class WindowElement extends Element<QubbleGUI> {
     public void render(float mouseX, float mouseY, float partialTicks) {
         GlStateManager.pushMatrix();
         this.startScissor();
-        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), Qubble.CONFIG.getPrimaryColor());
-        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), 14, Qubble.CONFIG.getAccentColor());
+        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), LLibrary.CONFIG.getPrimaryColor());
+        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), 14, LLibrary.CONFIG.getAccentColor());
         FontRenderer fontRenderer = this.getGUI().mc.fontRendererObj;
-        fontRenderer.drawString(this.name, this.getPosX() + 2.0F, this.getPosY() + 3.0F, Qubble.CONFIG.getTextColor(), false);
+        fontRenderer.drawString(this.name, this.getPosX() + 2.0F, this.getPosY() + 3.0F, LLibrary.CONFIG.getTextColor(), false);
         GlStateManager.popMatrix();
         this.endScissor();
     }

@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.server.model.importer;
 
 import com.google.gson.Gson;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.model.BlockModelContainer;
 
@@ -25,7 +25,7 @@ public class JsonImporter implements IModelImporter<BlockModelContainer> {
         int partIndex = 0;
         QubbleModel qubbleModel = QubbleModel.create(fileName, "Unknown", 64, 32);
         for (BlockModelContainer.Element element : model.elements) {
-            QubbleCube cube = QubbleCube.create(element.name == null ? "Part " + partIndex++ : element.name);
+            QubbleCuboid cube = QubbleCuboid.create(element.name == null ? "Part " + partIndex++ : element.name);
             float[] position = new float[] {element.from[0], element.from[1], element.from[2]};
             float[] offset = new float[3];
             float[] rotation = new float[3];
@@ -54,7 +54,7 @@ public class JsonImporter implements IModelImporter<BlockModelContainer> {
             cube.setDimensions(dimensions[0], dimensions[1], dimensions[2]);
             cube.setOffset(offset[0], offset[1], offset[2]);
             cube.setRotation(-rotation[0], -rotation[1], -rotation[2]);
-            qubbleModel.getCubes().add(cube);
+            qubbleModel.getCuboids().add(cube);
         }
         return qubbleModel;
     }

@@ -1,6 +1,6 @@
 package net.ilexiconn.qubble.client.gui.element;
 
-import net.ilexiconn.qubble.Qubble;
+import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.server.color.ColorScheme;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -29,9 +29,9 @@ public class ButtonElement extends Element<QubbleGUI> {
         this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), this.enabled && this.isSelected(mouseX, mouseY) ? this.colorScheme.getSecondaryColor() : this.colorScheme.getPrimaryColor());
         FontRenderer fontRenderer = this.getGUI().mc.fontRendererObj;
         if (this.text.length() == 1) {
-            fontRenderer.drawString(this.text, this.getPosX() + (this.getWidth() / 2) - (fontRenderer.getStringWidth(this.text) / 2) + 0.0625F, this.getPosY() + (this.getHeight() / 2) - (fontRenderer.FONT_HEIGHT / 2) + 0.0625F, Qubble.CONFIG.getTextColor(), false);
+            fontRenderer.drawString(this.text, this.getPosX() + (this.getWidth() / 2) - (fontRenderer.getStringWidth(this.text) / 2) + 0.0625F, this.getPosY() + (this.getHeight() / 2) - (fontRenderer.FONT_HEIGHT / 2) + 0.0625F, LLibrary.CONFIG.getTextColor(), false);
         } else {
-            fontRenderer.drawString(this.text, this.getPosX() + (this.getWidth() / 2) - (fontRenderer.getStringWidth(this.text) / 2), this.getPosY() + (this.getHeight() / 2) - (fontRenderer.FONT_HEIGHT / 2), Qubble.CONFIG.getTextColor(), false);
+            fontRenderer.drawString(this.text, this.getPosX() + (this.getWidth() / 2) - (fontRenderer.getStringWidth(this.text) / 2), this.getPosY() + (this.getHeight() / 2) - (fontRenderer.FONT_HEIGHT / 2), LLibrary.CONFIG.getTextColor(), false);
         }
     }
 

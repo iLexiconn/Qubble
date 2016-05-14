@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.client.gui;
 
+import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
-import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.element.*;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
@@ -77,7 +77,7 @@ public class QubbleGUI extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        Gui.drawRect(0, 0, this.width, this.height, Qubble.CONFIG.getTertiaryColor());
+        Gui.drawRect(0, 0, this.width, this.height, LLibrary.CONFIG.getTertiaryColor());
         this.resolution = new ScaledResolution(this.mc);
         float preciseMouseX = this.getPreciseMouseX();
         float preciseMouseY = this.getPreciseMouseY();

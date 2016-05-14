@@ -1,6 +1,6 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 
 import java.io.File;
@@ -38,18 +38,18 @@ public class JavaExporter implements IModelExporter<List<String>> {
         list.add(" */");
         list.add("@SideOnly(Side.CLIENT)");
         list.add("public class " + arguments[1] + " extends ModelBase {");
-        this.addCubeFields(model.getCubes(), list);
+        this.addCubeFields(model.getCuboids(), list);
         list.add("");
         list.add("    public " + arguments[1] + "() {");
         list.add("        this.textureWidth = " + model.getTextureWidth() + ";");
         list.add("        this.textureHeight = " + model.getTextureHeight() + ";");
         list.add("");
-        this.addCubeDeclarations(model.getCubes(), null, list);
+        this.addCubeDeclarations(model.getCuboids(), null, list);
         list.add("    }");
         list.add("");
         list.add("    @Override");
         list.add("    public void render(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float rotationYaw, float rotationPitch, float scale) {");
-        this.addRenderCalls(model.getCubes(), list);
+        this.addRenderCalls(model.getCuboids(), list);
         list.add("    }");
         list.add("");
         this.addRotationAngles(list);
@@ -64,15 +64,15 @@ public class JavaExporter implements IModelExporter<List<String>> {
         writer.close();
     }
 
-    public void addCubeFields(List<QubbleCube> cubes, List<String> list) {
-        for (QubbleCube cube : cubes) {
+    public void addCubeFields(List<QubbleCuboid> cubes, List<String> list) {
+        for (QubbleCuboid cube : cubes) {
             list.add("    public ModelRenderer " + this.getFieldName(cube) + ";");
             this.addCubeFields(cube.getChildren(), list);
         }
     }
 
-    public void addCubeDeclarations(List<QubbleCube> cubes, QubbleCube parent, List<String> list) {
-        for (QubbleCube cube : cubes) {
+    public void addCubeDeclarations(List<QubbleCuboid> cubes, QubbleCuboid parent, List<String> list) {
+        for (QubbleCuboid cube : cubes) {
             String field = this.getFieldName(cube);
             list.add("        this." + field + " = new ModelRenderer(this, " + cube.getTextureX() + ", " + cube.getTextureY() + ");");
             list.add("        this." + field + ".setRotationPoint(" + cube.getPositionX() + "F, " + cube.getPositionY() + "F, " + cube.getPositionZ() + "F);");
@@ -90,8 +90,8 @@ public class JavaExporter implements IModelExporter<List<String>> {
         }
     }
 
-    public void addRenderCalls(List<QubbleCube> cubes, List<String> list) {
-        for (QubbleCube cube : cubes) {
+    public void addRenderCalls(List<QubbleCuboid> cubes, List<String> list) {
+        for (QubbleCuboid cube : cubes) {
             String field = this.getFieldName(cube);
             boolean scale = cube.getRotationX() != 0.0F || cube.getRotationY() != 0.0F || cube.getRotationZ() != 0.0F;
             boolean blend = cube.getOpacity() != 100.0F;
@@ -126,7 +126,7 @@ public class JavaExporter implements IModelExporter<List<String>> {
         list.add("    }");
     }
 
-    public String getFieldName(QubbleCube cube) {
+    public String getFieldName(QubbleCuboid cube) {
         return cube.getName().replaceAll("[^A-Za-z0-9_$]", "");
     }
 

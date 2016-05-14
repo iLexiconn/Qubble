@@ -2,7 +2,7 @@ package net.ilexiconn.qubble.server.model.exporter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.model.BlockModelContainer;
 import org.lwjgl.util.vector.Vector3f;
@@ -29,7 +29,7 @@ public class JsonExporter implements IModelExporter<BlockModelContainer> {
     public BlockModelContainer export(QubbleModel model, String... arguments) {
         model.unparent();
         BlockModelContainer blockModel = new BlockModelContainer();
-        for (QubbleCube cube : model.getCubes()) {
+        for (QubbleCuboid cube : model.getCuboids()) {
             BlockModelContainer.Element element = new BlockModelContainer.Element();
             int dimensionX = cube.getDimensionX();
             int dimensionY = cube.getDimensionY();

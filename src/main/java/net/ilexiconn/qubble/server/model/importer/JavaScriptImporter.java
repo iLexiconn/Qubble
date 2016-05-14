@@ -1,6 +1,6 @@
 package net.ilexiconn.qubble.server.model.importer;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import org.apache.commons.io.FileUtils;
 
@@ -22,7 +22,7 @@ public class JavaScriptImporter implements IModelImporter<List<String>> {
 
     @Override
     public QubbleModel getModel(String fileName, List<String> model) {
-        List<QubbleCube> cubes = new ArrayList<>();
+        List<QubbleCuboid> cubes = new ArrayList<>();
         int textureWidth = 64;
         int textureHeight = 32;
         int textureOffsetX = 0;
@@ -49,7 +49,7 @@ public class JavaScriptImporter implements IModelImporter<List<String>> {
                 String[] values = line.substring(line.indexOf("(") + 1, line.length() - 2).split(",");
                 int[] dimension = {Integer.parseInt(values[3].trim()), Integer.parseInt(values[4].trim()), Integer.parseInt(values[5].trim())};
                 float[] position = {Float.parseFloat(values[0].trim()), Float.parseFloat(values[1].trim()), Float.parseFloat(values[2].trim())};
-                QubbleCube cube = QubbleCube.create(cubeName);
+                QubbleCuboid cube = QubbleCuboid.create(cubeName);
                 cube.setDimensions(dimension[0], dimension[1], dimension[2]);
                 cube.setPosition(position[0], position[1], position[2]);
                 cube.setTexture(textureOffsetX, textureOffsetY);
@@ -62,7 +62,7 @@ public class JavaScriptImporter implements IModelImporter<List<String>> {
         }
         QubbleModel qubble = QubbleModel.create(name, author, textureWidth, textureHeight);
         qubble.setFileName(fileName);
-        qubble.getCubes().addAll(cubes);
+        qubble.getCuboids().addAll(cubes);
         return qubble;
     }
 

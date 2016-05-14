@@ -1,8 +1,8 @@
 package net.ilexiconn.qubble.client.gui.element;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.LLibrary;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
-import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
 import net.ilexiconn.qubble.client.gui.Project;
@@ -29,7 +29,7 @@ public class TextureMapElement extends Element<QubbleGUI> {
             GlStateManager.translate(this.getPosX(), this.getPosY(), 0.0F);
             QubbleModel model = selectedProject.getModel();
             String dimensions = model.getTextureWidth() + "x" + model.getTextureHeight();
-            fontRenderer.drawString(dimensions, this.getWidth() - fontRenderer.getStringWidth(dimensions) - 1, this.getHeight() - fontRenderer.FONT_HEIGHT, Qubble.CONFIG.getTextColor());
+            fontRenderer.drawString(dimensions, this.getWidth() - fontRenderer.getStringWidth(dimensions) - 1, this.getHeight() - fontRenderer.FONT_HEIGHT, LLibrary.CONFIG.getTextColor());
             float scale = this.getScale(model);
             GlStateManager.scale(scale, scale, 1.0F);
             if (texture != null) {
@@ -39,17 +39,17 @@ public class TextureMapElement extends Element<QubbleGUI> {
                 this.getGUI().drawTexturedRectangle(1.0F, 1.0F, model.getTextureWidth(), model.getTextureHeight(), 0xFFFFFFFF);
             }
             boolean alpha = texture != null;
-            for (QubbleCube cube : model.getCubes()) {
+            for (QubbleCuboid cube : model.getCuboids()) {
                 this.drawCube(cube, alpha);
             }
-            QubbleCube selectedCube = selectedProject.getSelectedCube();
+            QubbleCuboid selectedCube = selectedProject.getSelectedCube();
             if (selectedCube != null) {
                 int textureX = selectedCube.getTextureX();
                 int textureY = selectedCube.getTextureY();
                 int dimensionX = selectedCube.getDimensionX();
                 int dimensionY = selectedCube.getDimensionY();
                 int dimensionZ = selectedCube.getDimensionZ();
-                int outlineColor = Qubble.CONFIG.getAccentColor();
+                int outlineColor = LLibrary.CONFIG.getAccentColor();
                 this.fillRect(textureX, textureY + dimensionZ - 0.5F, dimensionZ, 0.5F, outlineColor);
                 this.fillRect(textureX + dimensionX + dimensionZ + dimensionX, textureY + dimensionZ - 0.5F, dimensionZ, 0.5F, outlineColor);
                 this.fillRect(textureX, textureY + dimensionZ + dimensionY, dimensionZ + dimensionX + dimensionZ + dimensionX, 0.5F, outlineColor);
@@ -61,7 +61,7 @@ public class TextureMapElement extends Element<QubbleGUI> {
             }
         } else {
             String text = "No Project Loaded";
-            fontRenderer.drawString(text, this.getPosX() + (this.getWidth() / 2) - (fontRenderer.getStringWidth(text) / 2), this.getPosY() + (this.getHeight() / 2) - (fontRenderer.FONT_HEIGHT / 2), Qubble.CONFIG.getTextColor(), false);
+            fontRenderer.drawString(text, this.getPosX() + (this.getWidth() / 2) - (fontRenderer.getStringWidth(text) / 2), this.getPosY() + (this.getHeight() / 2) - (fontRenderer.FONT_HEIGHT / 2), LLibrary.CONFIG.getTextColor(), false);
         }
         GlStateManager.popMatrix();
     }
@@ -81,7 +81,7 @@ public class TextureMapElement extends Element<QubbleGUI> {
         if (this.isSelected(mouseX, mouseY)) {
             Project selectedProject = this.getGUI().getSelectedProject();
             if (selectedProject != null) {
-                QubbleCube selectedCube = this.getSelectedCube(mouseX, mouseY, selectedProject);
+                QubbleCuboid selectedCube = this.getSelectedCube(mouseX, mouseY, selectedProject);
                 selectedProject.setSelectedCube(selectedCube);
                 if (selectedCube != null) {
                     float scale = this.getScale(selectedProject.getModel());
@@ -99,7 +99,7 @@ public class TextureMapElement extends Element<QubbleGUI> {
         if (this.isSelected(mouseX, mouseY)) {
             Project selectedProject = this.getGUI().getSelectedProject();
             if (selectedProject != null) {
-                QubbleCube selectedCube = selectedProject.getSelectedCube();
+                QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 if (selectedCube != null) {
                     float scale = this.getScale(selectedProject.getModel());
                     selectedCube.setTexture((int) ((mouseX - this.getPosX()) / scale) + this.dragOffsetX, (int) ((mouseY - this.getPosY()) / scale) + this.dragOffsetY);
@@ -112,11 +112,11 @@ public class TextureMapElement extends Element<QubbleGUI> {
         return false;
     }
 
-    private QubbleCube getSelectedCube(float mouseX, float mouseY, Project selectedProject) {
+    private QubbleCuboid getSelectedCube(float mouseX, float mouseY, Project selectedProject) {
         float scale = this.getScale(selectedProject.getModel());
-        QubbleCube selected = null;
-        for (QubbleCube cube : selectedProject.getModel().getCubes()) {
-            QubbleCube clicked = this.checkCubeClick(cube, mouseX, mouseY, scale);
+        QubbleCuboid selected = null;
+        for (QubbleCuboid cube : selectedProject.getModel().getCuboids()) {
+            QubbleCuboid clicked = this.checkCubeClick(cube, mouseX, mouseY, scale);
             if (clicked != null) {
                 selected = clicked;
                 break;
@@ -125,7 +125,7 @@ public class TextureMapElement extends Element<QubbleGUI> {
         return selected;
     }
 
-    private QubbleCube checkCubeClick(QubbleCube cube, float mouseX, float mouseY, float scale) {
+    private QubbleCuboid checkCubeClick(QubbleCuboid cube, float mouseX, float mouseY, float scale) {
         int textureX = cube.getTextureX();
         int textureY = cube.getTextureY();
         int dimensionX = cube.getDimensionX();
@@ -134,8 +134,8 @@ public class TextureMapElement extends Element<QubbleGUI> {
         if (this.check(mouseX, mouseY, textureX, textureY + dimensionZ, dimensionX + dimensionZ + dimensionX + dimensionZ, dimensionY, scale) || this.check(mouseX, mouseY, textureX + dimensionZ, textureY, dimensionX + dimensionX, dimensionZ, scale)) {
             return cube;
         }
-        for (QubbleCube child : cube.getChildren()) {
-            QubbleCube clicked = this.checkCubeClick(child, mouseX, mouseY, scale);
+        for (QubbleCuboid child : cube.getChildren()) {
+            QubbleCuboid clicked = this.checkCubeClick(child, mouseX, mouseY, scale);
             if (clicked != null) {
                 return clicked;
             }
@@ -143,7 +143,7 @@ public class TextureMapElement extends Element<QubbleGUI> {
         return null;
     }
 
-    private void drawCube(QubbleCube cube, boolean alpha) {
+    private void drawCube(QubbleCuboid cube, boolean alpha) {
         int textureX = cube.getTextureX();
         int textureY = cube.getTextureY();
         int dimensionX = cube.getDimensionX();
@@ -155,7 +155,7 @@ public class TextureMapElement extends Element<QubbleGUI> {
         this.fillRect(textureX + dimensionZ, textureY + dimensionZ, dimensionX, dimensionY, alpha ? 0x220000FF : 0xFF0000FF);
         this.fillRect(textureX + dimensionX + dimensionZ, textureY + dimensionZ, dimensionZ, dimensionY, alpha ? 0x22AA0000 : 0xFFAA0000);
         this.fillRect(textureX + dimensionX + dimensionZ + dimensionZ, textureY + dimensionZ, dimensionX, dimensionY, alpha ? 0x220000AA : 0xFF0000AA);
-        for (QubbleCube child : cube.getChildren()) {
+        for (QubbleCuboid child : cube.getChildren()) {
             this.drawCube(child, alpha);
         }
     }

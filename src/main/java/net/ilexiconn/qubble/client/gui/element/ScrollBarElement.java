@@ -1,7 +1,6 @@
 package net.ilexiconn.qubble.client.gui.element;
 
-import net.ilexiconn.qubble.Qubble;
-import net.ilexiconn.qubble.server.util.IGetter;
+import net.ilexiconn.llibrary.LLibrary;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -9,20 +8,22 @@ import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
 
+import java.util.function.Supplier;
+
 public class ScrollBarElement<T extends GuiScreen> extends Element<T> {
     private int maxScroll;
     private float scrollPerEntry;
-    private IGetter<Integer> entryCount;
+    private Supplier<Integer> entryCount;
     private float entryHeight;
-    private IGetter<Float> offsetX;
-    private IGetter<Float> offsetY;
-    private IGetter<Float> displayHeight;
+    private Supplier<Float> offsetX;
+    private Supplier<Float> offsetY;
+    private Supplier<Float> displayHeight;
 
     private int scroll;
     private int scrollYOffset;
     private boolean scrolling;
 
-    public ScrollBarElement(T gui, Element<T> parent, IGetter<Float> posX, IGetter<Float> posY, IGetter<Float> displayHeight, int entryHeight, IGetter<Integer> entryCount) {
+    public ScrollBarElement(T gui, Element<T> parent, Supplier<Float> posX, Supplier<Float> posY, Supplier<Float> displayHeight, int entryHeight, Supplier<Integer> entryCount) {
         super(gui, posX.get(), posY.get(), 4, 0);
         this.withParent(parent);
         this.offsetX = posX;
@@ -35,7 +36,7 @@ public class ScrollBarElement<T extends GuiScreen> extends Element<T> {
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
         if (this.maxScroll > 0) {
-            this.drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight() - 3, this.scrolling ? Qubble.CONFIG.getAccentColor() : Qubble.CONFIG.getSecondaryColor());
+            this.drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight() - 3, this.scrolling ? LLibrary.CONFIG.getAccentColor() : LLibrary.CONFIG.getSecondaryColor());
         }
     }
 

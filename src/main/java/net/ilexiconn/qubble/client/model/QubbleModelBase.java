@@ -1,9 +1,9 @@
 package net.ilexiconn.qubble.client.model;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.LLibrary;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.model.tools.AdvancedModelBase;
-import net.ilexiconn.qubble.Qubble;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -19,31 +19,31 @@ import java.util.*;
 @SideOnly(Side.CLIENT)
 public class QubbleModelBase extends AdvancedModelBase {
     private List<QubbleModelRenderer> rootCubes = new ArrayList<>();
-    private Map<Integer, QubbleCube> ids = new HashMap<>();
-    private Map<QubbleCube, QubbleModelRenderer> cubes = new HashMap<>();
+    private Map<Integer, QubbleCuboid> ids = new HashMap<>();
+    private Map<QubbleCuboid, QubbleModelRenderer> cubes = new HashMap<>();
     private int id;
 
     public QubbleModelBase(QubbleModel model) {
         this.textureWidth = model.getTextureWidth();
         this.textureHeight = model.getTextureHeight();
-        for (QubbleCube cube : model.getCubes()) {
+        for (QubbleCuboid cube : model.getCuboids()) {
             this.parseCube(cube, null);
         }
     }
 
-    private void parseCube(QubbleCube cube, QubbleModelRenderer parent) {
+    private void parseCube(QubbleCuboid cube, QubbleModelRenderer parent) {
         QubbleModelRenderer box = this.createCube(cube);
         if (parent != null) {
             parent.addChild(box);
         } else {
             this.rootCubes.add(box);
         }
-        for (QubbleCube child : cube.getChildren()) {
+        for (QubbleCuboid child : cube.getChildren()) {
             this.parseCube(child, box);
         }
     }
 
-    private QubbleModelRenderer createCube(QubbleCube cube) {
+    private QubbleModelRenderer createCube(QubbleCuboid cube) {
         QubbleModelRenderer box = new QubbleModelRenderer(this, cube.getName(), cube.getTextureX(), cube.getTextureY(), this.id);
         box.setRotationPoint(cube.getPositionX(), cube.getPositionY(), cube.getPositionZ());
         box.addBox(cube.getOffsetX(), cube.getOffsetY(), cube.getOffsetZ(), cube.getDimensionX(), cube.getDimensionY(), cube.getDimensionZ(), 0.0F);
@@ -68,7 +68,7 @@ public class QubbleModelBase extends AdvancedModelBase {
     public void renderSelectedOutline(QubbleModelRenderer selected, float scale) {
         GlStateManager.pushMatrix();
         selected.parentedPostRender(scale);
-        int accent = Qubble.CONFIG.getAccentColor();
+        int accent = LLibrary.CONFIG.getAccentColor();
         float r = (float) (accent >> 16 & 0xFF) / 255.0F;
         float g = (float) (accent >> 8 & 0xFF) / 255.0F;
         float b = (float) (accent & 0xFF) / 255.0F;
@@ -116,15 +116,15 @@ public class QubbleModelBase extends AdvancedModelBase {
         tessellator.draw();
     }
 
-    public QubbleCube getCube(int id) {
+    public QubbleCuboid getCube(int id) {
         return this.ids.get(id);
     }
 
-    public QubbleModelRenderer getCube(QubbleCube cube) {
+    public QubbleModelRenderer getCube(QubbleCuboid cube) {
         return this.cubes.get(cube);
     }
 
-    public Set<Map.Entry<QubbleCube, QubbleModelRenderer>> getCubes() {
+    public Set<Map.Entry<QubbleCuboid, QubbleModelRenderer>> getCubes() {
         return this.cubes.entrySet();
     }
 }

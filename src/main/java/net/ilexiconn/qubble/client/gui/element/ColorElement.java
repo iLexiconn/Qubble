@@ -1,6 +1,6 @@
 package net.ilexiconn.qubble.client.gui.element;
 
-import net.ilexiconn.qubble.Qubble;
+import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.init.SoundEvents;
@@ -24,7 +24,7 @@ public class ColorElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        this.getGUI().drawRectangle(this.getPosX() + 1, this.getPosY() + 1, this.getWidth() - 1, this.getHeight() - 1, Qubble.CONFIG.getSecondaryColor());
+        this.getGUI().drawRectangle(this.getPosX() + 1, this.getPosY() + 1, this.getWidth() - 1, this.getHeight() - 1, LLibrary.CONFIG.getSecondaryColor());
         float offsetX = this.getWidth() / 2 - (this.horizontalRows * 23 + 4) / 2;
         float offsetY = this.getHeight() / 2 - (this.colors.length / this.horizontalRows * 23 + 4) / 2;
         for (int i = 0; i < this.colors.length; i++) {
@@ -32,11 +32,11 @@ public class ColorElement extends Element<QubbleGUI> {
             int x = i % this.horizontalRows * 23 + 4;
             int y = i / this.horizontalRows * 23 + 4;
             this.getGUI().drawRectangle(this.getPosX() + x + offsetX, this.getPosY() + y + offsetY, 20, 20, color);
-            if (color == Qubble.CONFIG.getAccentColor()) {
+            if (color == LLibrary.CONFIG.getAccentColor()) {
                 if (selectedColor == -1) {
                     selectedColor = i;
                 }
-                this.getGUI().drawOutline(this.getPosX() + x + offsetX, this.getPosY() + y + offsetY, 20, 20, Qubble.CONFIG.getTextColor(), 2);
+                this.getGUI().drawOutline(this.getPosX() + x + offsetX, this.getPosY() + y + offsetY, 20, 20, LLibrary.CONFIG.getTextColor(), 2);
             }
         }
     }

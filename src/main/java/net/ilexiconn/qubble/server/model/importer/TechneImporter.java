@@ -1,6 +1,6 @@
 package net.ilexiconn.qubble.server.model.importer;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.model.techne.TechneCube;
 import net.ilexiconn.llibrary.client.model.techne.TechneModel;
@@ -23,7 +23,7 @@ public class TechneImporter implements IModelImporter<TechneModel> {
     public QubbleModel getModel(String fileName, TechneModel model) {
         QubbleModel qubble = QubbleModel.create(model.getFileName(), null, model.getTextureWidth(), model.getTextureHeight());
         for (TechneCube cube : model.getCubes()) {
-            QubbleCube qubbleCube = QubbleCube.create(cube.getName());
+            QubbleCuboid qubbleCube = QubbleCuboid.create(cube.getName());
             qubbleCube.setDimensions(cube.getDimensionX(), cube.getDimensionY(), cube.getDimensionZ());
             qubbleCube.setPosition(cube.getPositionX(), cube.getPositionY(), cube.getPositionZ());
             qubbleCube.setOffset(cube.getOffsetX(), cube.getOffsetY(), cube.getOffsetZ());
@@ -32,7 +32,7 @@ public class TechneImporter implements IModelImporter<TechneModel> {
             qubbleCube.setTextureMirrored(cube.isTextureMirrored());
             qubbleCube.setTexture(cube.getTextureX(), cube.getTextureY());
             qubbleCube.setOpacity(100.0F);
-            qubble.getCubes().add(qubbleCube);
+            qubble.getCuboids().add(qubbleCube);
         }
         return qubble;
     }

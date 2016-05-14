@@ -1,6 +1,6 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCube;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 
 import java.io.File;
@@ -41,7 +41,7 @@ public class JavaScriptExporter implements IModelExporter<List<String>> {
         list.add("    rightLeg.setTextureSize(" + model.getTextureWidth() + ", " + model.getTextureHeight() + ");");
         list.add("    leftLeg.setTextureSize(" + model.getTextureWidth() + ", " + model.getTextureHeight() + ");");
         list.add("");
-        this.addCubeDeclarations(model.getCubes(), list);
+        this.addCubeDeclarations(model.getCuboids(), list);
         list.add("}");
         return list;
     }
@@ -53,8 +53,8 @@ public class JavaScriptExporter implements IModelExporter<List<String>> {
         writer.close();
     }
 
-    public void addCubeDeclarations(List<QubbleCube> cubes, List<String> list) {
-        for (QubbleCube cube : cubes) {
+    public void addCubeDeclarations(List<QubbleCuboid> cubes, List<String> list) {
+        for (QubbleCuboid cube : cubes) {
             String name = cube.getName();
             String bodyPart = this.getBodyPart(name);
             list.add("    //" + name);
