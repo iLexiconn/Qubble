@@ -26,11 +26,7 @@ public class ButtonElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        if (this.enabled && this.isSelected(mouseX, mouseY)) {
-            this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), getHeight(), this.colorScheme.getSecondaryColor());
-        } else {
-            this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), getHeight(), this.colorScheme.getPrimaryColor());
-        }
+        this.getGUI().drawRectangle(this.getPosX(), this.getPosY(), this.getWidth(), this.getHeight(), this.enabled && this.isSelected(mouseX, mouseY) ? this.colorScheme.getSecondaryColor() : this.colorScheme.getPrimaryColor());
         FontRenderer fontRenderer = this.getGUI().mc.fontRendererObj;
         if (this.text.length() == 1) {
             fontRenderer.drawString(this.text, this.getPosX() + (this.getWidth() / 2) - (fontRenderer.getStringWidth(this.text) / 2) + 0.0625F, this.getPosY() + (this.getHeight() / 2) - (fontRenderer.FONT_HEIGHT / 2) + 0.0625F, Qubble.CONFIG.getTextColor(), false);

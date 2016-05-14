@@ -37,6 +37,8 @@ public class QubbleGUI extends GuiScreen {
     private List<Project> openProjects = new ArrayList<>();
     private int selectedProject;
 
+    private int ticks;
+
     private ModelMode mode = ModelMode.MODEL;
 
     public QubbleGUI(GuiScreen parent) {
@@ -57,6 +59,20 @@ public class QubbleGUI extends GuiScreen {
     @Override
     public void updateScreen() {
         ElementHandler.INSTANCE.update(this);
+        if (ticks % 40 == 0) {
+            Project selectedProject = this.getSelectedProject();
+            if (selectedProject != null) {
+                ModelTexture baseTexture = selectedProject.getBaseTexture();
+                if (baseTexture != null) {
+                    baseTexture.update();
+                }
+                ModelTexture overlay = selectedProject.getOverlayTexture();
+                if (overlay != null) {
+                    overlay.update();
+                }
+            }
+        }
+        ticks++;
     }
 
     @Override
@@ -149,6 +165,27 @@ public class QubbleGUI extends GuiScreen {
         this.drawRectangle(x + width - outlineSize, y, outlineSize, height - outlineSize, color);
         this.drawRectangle(x, y + height - outlineSize, width, outlineSize, color);
         this.drawRectangle(x, y, outlineSize, height - outlineSize, color);
+    }
+
+    public void drawTexturedRectangle(double x, double y, double width, double height, int color) {
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        float a = (float) (color >> 24 & 0xFF) / 255.0F;
+        float r = (float) (color >> 16 & 0xFF) / 255.0F;
+        float g = (float) (color >> 8 & 0xFF) / 255.0F;
+        float b = (float) (color & 0xFF) / 255.0F;
+        Tessellator tessellator = Tessellator.getInstance();
+        VertexBuffer vertexBuffer = tessellator.getBuffer();
+        vertexBuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        vertexBuffer.pos(x, y + height, 0.0).tex(0.0F, 1.0F).color(r, g, b, a).endVertex();
+        vertexBuffer.pos(x + width, y + height, 0.0).tex(1.0F, 1.0F).color(r, g, b, a).endVertex();
+        vertexBuffer.pos(x + width, y, 0.0).tex(1.0F, 0.0F).color(r, g, b, a).endVertex();
+        vertexBuffer.pos(x, y, 0.0).tex(0.0F, 0.0F).color(r, g, b, a).endVertex();
+        tessellator.draw();
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.disableTexture2D();
     }
 
     public void selectModel(String name, IModelImporter importer) {

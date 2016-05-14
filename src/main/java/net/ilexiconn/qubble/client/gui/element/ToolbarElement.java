@@ -33,6 +33,8 @@ public class ToolbarElement extends Element<QubbleGUI> {
     private ButtonElement textureButton;
     private ButtonElement animateButton;
 
+    private WindowElement textureWindow;
+
     public ToolbarElement(QubbleGUI gui) {
         super(gui, 0, 0, gui.width, 20);
     }
@@ -308,6 +310,18 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
     private void setMode(ModelMode mode) {
         this.getGUI().setMode(mode);
+
+        if (mode == ModelMode.TEXTURE) {
+            if (this.textureWindow == null) {
+                this.textureWindow = new WindowElement(this.getGUI(), "Texture Map", 200, 214);
+                new TextureMapElement(this.getGUI(), 0.0F, 14.0F, 200, 200).withParent(this.textureWindow);
+                ElementHandler.INSTANCE.addElement(this.getGUI(), this.textureWindow);
+            }
+        } else if (this.textureWindow != null) {
+            ElementHandler.INSTANCE.removeElement(this.getGUI(), this.textureWindow);
+            this.textureWindow = null;
+        }
+
         this.modelButton.withColorScheme(mode == ModelMode.MODEL ? ColorScheme.TAB_ACTIVE : ColorScheme.DEFAULT);
         this.textureButton.withColorScheme(mode == ModelMode.TEXTURE ? ColorScheme.TAB_ACTIVE : ColorScheme.DEFAULT);
         this.animateButton.withColorScheme(mode == ModelMode.ANIMATE ? ColorScheme.TAB_ACTIVE : ColorScheme.DEFAULT);

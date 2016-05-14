@@ -59,9 +59,9 @@ public class SidebarElement extends Element<QubbleGUI> {
                     ModelTexture texture = selectedProject != null ? selectedProject.getBaseTexture() : null;
                     ModelTexture overlayTexture = selectedProject != null ? selectedProject.getOverlayTexture() : null;
                     this.texture.clearText();
-                    this.texture.writeText(texture != null ? texture.getDisplayName() : "");
+                    this.texture.writeText(texture != null ? texture.getName() : "");
                     this.overlayTexture.clearText();
-                    this.overlayTexture.writeText(overlayTexture != null ? overlayTexture.getDisplayName() : "");
+                    this.overlayTexture.writeText(overlayTexture != null ? overlayTexture.getName() : "");
                     break;
                 }
                 case ANIMATE: {
@@ -341,22 +341,18 @@ public class SidebarElement extends Element<QubbleGUI> {
         List<String> files = this.getFiles(ClientProxy.QUBBLE_TEXTURE_DIRECTORY, ".png");
         files.add(0, "None");
         selectTextureWindow.addElement(new ListElement(this.getGUI(), 2, 16, 96, 82, files, (selection) -> {
-            try {
-                Project project = this.getGUI().getSelectedProject();
-                if (project != null) {
-                    ModelTexture texture = null;
-                    if (!selection.equals("None")) {
-                        texture = new ModelTexture(ImageIO.read(new File(ClientProxy.QUBBLE_TEXTURE_DIRECTORY, selection + ".png")), selection);
-                    }
-                    if (base) {
-                        project.setBaseTexture(texture);
-                    } else {
-                        project.setOverlayTexture(texture);
-                    }
-                    ElementHandler.INSTANCE.removeElement(this.getGUI(), selectTextureWindow);
+            Project project = this.getGUI().getSelectedProject();
+            if (project != null) {
+                ModelTexture texture = null;
+                if (!selection.equals("None")) {
+                    texture = new ModelTexture(new File(ClientProxy.QUBBLE_TEXTURE_DIRECTORY, selection + ".png"), selection);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+                if (base) {
+                    project.setBaseTexture(texture);
+                } else {
+                    project.setOverlayTexture(texture);
+                }
+                ElementHandler.INSTANCE.removeElement(this.getGUI(), selectTextureWindow);
             }
             return true;
         }));
