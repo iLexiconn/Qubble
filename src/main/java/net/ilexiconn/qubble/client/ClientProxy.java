@@ -99,6 +99,9 @@ public class ClientProxy extends ServerProxy {
             try {
                 entity = entry.getKey().getConstructor(World.class).newInstance(new DummyWorld());
                 entityName = entity.getName();
+                if (entityName.startsWith("entity.") && entityName.endsWith(".name")) {
+                    entityName = entityName.split("entity.")[1].split(".name")[0];
+                }
             } catch (Exception e) {
             }
             for (Field field : this.getAllFields(renderer.getClass())) {
@@ -121,7 +124,7 @@ public class ClientProxy extends ServerProxy {
                     } else if (ResourceLocation.class.isAssignableFrom(field.getType()) && !GAME_TEXTURES.containsKey(entityName)) {
                         field.setAccessible(true);
                         ResourceLocation texture = (ResourceLocation) field.get(renderer);
-                        if (!texture.toString().contains("shadow")) {
+                        if (texture != null && !texture.toString().contains("shadow")) {
                             GAME_TEXTURES.put(entityName, texture);
                         }
                     }

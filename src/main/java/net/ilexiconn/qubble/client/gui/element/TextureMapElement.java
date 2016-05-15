@@ -37,7 +37,7 @@ public class TextureMapElement extends Element<QubbleGUI> {
                 ResourceLocation textureLocation = texture.getLocation();
                 ClientProxy.MINECRAFT.getTextureManager().bindTexture(textureLocation);
                 GlStateManager.enableTexture2D();
-                this.drawTexturedRectangle(1.0F, 1.0F, model.getTextureWidth(), model.getTextureHeight(), 0xFFFFFFFF);
+                this.drawTexturedRectangle(0.0F, 0.0F, model.getTextureWidth(), model.getTextureHeight(), 0xFFFFFFFF);
             }
             boolean alpha = texture != null;
             for (QubbleCuboid cube : model.getCuboids()) {
@@ -51,14 +51,14 @@ public class TextureMapElement extends Element<QubbleGUI> {
                 int dimensionY = selectedCube.getDimensionY();
                 int dimensionZ = selectedCube.getDimensionZ();
                 int outlineColor = LLibrary.CONFIG.getAccentColor();
-                this.fillRect(textureX, textureY + dimensionZ - 0.5F, dimensionZ, 0.5F, outlineColor);
-                this.fillRect(textureX + dimensionX + dimensionZ + dimensionX, textureY + dimensionZ - 0.5F, dimensionZ, 0.5F, outlineColor);
-                this.fillRect(textureX, textureY + dimensionZ + dimensionY, dimensionZ + dimensionX + dimensionZ + dimensionX, 0.5F, outlineColor);
-                this.fillRect(textureX - 0.5F, textureY + dimensionZ - 0.5F, 0.5F, dimensionY + 1, outlineColor);
-                this.fillRect(textureX + dimensionX + dimensionZ + dimensionX + dimensionZ, textureY + dimensionZ - 0.5F, 0.5F, dimensionY + 1, outlineColor);
-                this.fillRect(textureX + dimensionZ, textureY - 0.5F, dimensionX + dimensionX, 0.5F, outlineColor);
-                this.fillRect(textureX + dimensionZ - 0.5F, textureY - 0.5F, 0.5F, dimensionZ + 0.5F, outlineColor);
-                this.fillRect(textureX + dimensionZ + dimensionX + dimensionX, textureY - 0.5F, 0.5F, dimensionZ + 0.5F, outlineColor);
+                this.fillRect(textureX, textureY + dimensionZ, dimensionZ, 0.5F, outlineColor);
+                this.fillRect(textureX + dimensionX + dimensionZ + dimensionX, textureY + dimensionZ, dimensionZ, 0.5F, outlineColor);
+                this.fillRect(textureX, textureY + dimensionZ + dimensionY - 0.5F, dimensionZ + dimensionX + dimensionZ + dimensionX, 0.5F, outlineColor);
+                this.fillRect(textureX, textureY + dimensionZ, 0.5F, dimensionY, outlineColor);
+                this.fillRect(textureX + dimensionX + dimensionZ + dimensionX + dimensionZ - 0.5F, textureY + dimensionZ, 0.5F, dimensionY, outlineColor);
+                this.fillRect(textureX + dimensionZ, textureY, dimensionX + dimensionX, 0.5F, outlineColor);
+                this.fillRect(textureX + dimensionZ, textureY + 0.5F, 0.5F, dimensionZ, outlineColor);
+                this.fillRect(textureX + dimensionZ + dimensionX + dimensionX - 0.5F, textureY, 0.5F, dimensionZ + 0.5F, outlineColor);
             }
         } else {
             String text = "No Project Loaded";
@@ -103,7 +103,9 @@ public class TextureMapElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 if (selectedCube != null) {
                     float scale = this.getScale(selectedProject.getModel());
-                    selectedCube.setTexture((int) ((mouseX - this.getPosX()) / scale) + this.dragOffsetX, (int) ((mouseY - this.getPosY()) / scale) + this.dragOffsetY);
+                    int textureX = (int) ((mouseX - this.getPosX()) / scale) + this.dragOffsetX;
+                    int textureY = (int) ((mouseY - this.getPosY()) / scale) + this.dragOffsetY;
+                    selectedCube.setTexture(Math.max(0, Math.min(textureX, selectedProject.getModel().getTextureWidth() - (selectedCube.getDimensionX() * 2 + selectedCube.getDimensionZ() * 2))), Math.max(0, Math.min(textureY, selectedProject.getModel().getTextureHeight() - (selectedCube.getDimensionY() + selectedCube.getDimensionZ()))));
                     this.getGUI().getModelView().updatePart(selectedCube);
                     this.getGUI().getSidebar().populateFields(selectedCube);
                 }
@@ -166,12 +168,12 @@ public class TextureMapElement extends Element<QubbleGUI> {
         y *= scale;
         width *= scale;
         height *= scale;
-        x += this.getPosX() + 1;
-        y += this.getPosY() + 1;
+        x += this.getPosX();
+        y += this.getPosY();
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
 
     private void fillRect(float x, float y, float width, float height, int color) {
-        this.drawRectangle(x + 1, y + 1, width, height, color);
+        this.drawRectangle(x, y, width, height, color);
     }
 }

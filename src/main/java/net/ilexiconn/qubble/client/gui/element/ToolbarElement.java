@@ -302,7 +302,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
         if (mode == ModelMode.TEXTURE) {
             if (this.textureWindow == null) {
-                this.textureWindow = new WindowElement<>(this.getGUI(), "Texture Map", 200, 214);
+                this.textureWindow = new WindowElement<>(this.getGUI(), "Texture Map", 200, 214, false);
                 new TextureMapElement(this.getGUI(), 0.0F, 14.0F, 200, 200).withParent(this.textureWindow);
                 ElementHandler.INSTANCE.addElement(this.getGUI(), this.textureWindow);
             }
