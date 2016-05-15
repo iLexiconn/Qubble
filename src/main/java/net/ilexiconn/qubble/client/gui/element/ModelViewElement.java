@@ -170,11 +170,11 @@ public class ModelViewElement extends Element<QubbleGUI> {
                 GlStateManager.depthMask(false);
                 Tessellator tessellator = Tessellator.getInstance();
                 VertexBuffer buffer = tessellator.getBuffer();
-                this.drawGrid(tessellator, buffer, 0.25F, 0.0F);
-                this.drawGrid(tessellator, buffer, 0.5F, 0.15F);
-                this.drawGrid(tessellator, buffer, 1.0F, 0.225F);
-                this.drawGrid(tessellator, buffer, 2.0F, 0.45F);
-                this.drawGrid(tessellator, buffer, 4.0F, 0.9F);
+                this.drawGrid(tessellator, buffer, 0.25F);
+                this.drawGrid(tessellator, buffer, 0.5F);
+                this.drawGrid(tessellator, buffer, 1.0F);
+                this.drawGrid(tessellator, buffer, 2.0F);
+                this.drawGrid(tessellator, buffer, 4.0F);
                 GlStateManager.depthMask(true);
                 GlStateManager.enableLighting();
                 GlStateManager.popMatrix();
@@ -192,23 +192,27 @@ public class ModelViewElement extends Element<QubbleGUI> {
         }
     }
 
-    private void drawGrid(Tessellator tessellator, VertexBuffer buffer, float size, float color) {
+    private void drawGrid(Tessellator tessellator, VertexBuffer buffer, float size) {
         float scale = size / 4.0F;
         float lineWidth = 16.0F * (this.zoom / 4.0F) * (scale / 2.0F);
         GlStateManager.glLineWidth(lineWidth);
-        float alpha = Math.max(0.0F, Math.min(1.0F, lineWidth - 0.35F));
         float gridY = 24.0F * 0.0625F;
         size /= scale;
+        int color = LLibrary.CONFIG.getTextColor();
+        float r = (float)(color >> 16 & 255) / 255.0F;
+        float g = (float)(color >> 8 & 255) / 255.0F;
+        float b = (float)(color & 255) / 255.0F;
+        float a = Math.max(0.0F, Math.min(1.0F, lineWidth - 0.35F));
         for (float x = -size; x < size + scale; x += scale) {
             buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
-            buffer.pos(x, gridY, -size).color(color, color, color, alpha).endVertex();
-            buffer.pos(x, gridY, size).color(color, color, color, alpha).endVertex();
+            buffer.pos(x, gridY, -size).color(r, g, b, a).endVertex();
+            buffer.pos(x, gridY, size).color(r, g, b, a).endVertex();
             tessellator.draw();
         }
         for (float z = -size; z < size + scale; z += scale) {
             buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
-            buffer.pos(-size, gridY, z).color(color, color, color, alpha).endVertex();
-            buffer.pos(size, gridY, z).color(color, color, color, alpha).endVertex();
+            buffer.pos(-size, gridY, z).color(r, g, b, a).endVertex();
+            buffer.pos(size, gridY, z).color(r, g, b, a).endVertex();
             tessellator.draw();
         }
     }
