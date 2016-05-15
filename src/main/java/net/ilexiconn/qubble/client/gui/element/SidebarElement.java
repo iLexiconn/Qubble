@@ -307,7 +307,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                         return true;
                     }
                     return false;
-                }));
+                }).withColorScheme(ColorSchemes.DEFAULT));
                 this.addChild(new LabelElement<>(this.getGUI(), "Texture overlay", 4, 94));
                 this.addChild(this.overlayTexture = new InputElement<>(this.getGUI(), "", 4, 103, 104, (i) -> {}));
                 this.addChild(new ButtonElement<>(this.getGUI(), "...", 108, 103, 12, 12, (button) -> {
@@ -316,7 +316,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                         return true;
                     }
                     return false;
-                }));
+                }).withColorScheme(ColorSchemes.DEFAULT));
                 break;
             }
             case ANIMATE: {

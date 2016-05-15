@@ -37,9 +37,7 @@ public class ProjectBarElement extends Element<QubbleGUI> {
         float posY = this.getPosY();
         int width = this.getWidth();
         int height = this.getHeight();
-        GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        float scaleFactor = this.getGUI().getResolution().getScaleFactor();
-        GL11.glScissor((int) (posX * scaleFactor), (int) (((this.getGUI().height - (posY + height))) * scaleFactor), (int) (width * scaleFactor), (int) (height * scaleFactor));
+        this.startScissor();
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
         this.drawRectangle(posX, posY, width, height, LLibrary.CONFIG.getPrimaryColor());
         float projectX = -this.scroll;
@@ -58,7 +56,7 @@ public class ProjectBarElement extends Element<QubbleGUI> {
             fontRenderer.drawString(model.getName(), posX + projectX + 2, posY + 2, LLibrary.CONFIG.getTextColor(), false);
             projectX += projectWidth;
         }
-        GL11.glDisable(GL11.GL_SCISSOR_TEST);
+        this.endScissor();
     }
 
     @Override

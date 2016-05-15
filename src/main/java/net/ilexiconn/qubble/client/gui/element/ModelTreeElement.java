@@ -55,14 +55,14 @@ public class ModelTreeElement extends Element<QubbleGUI> {
             }).withColorScheme(ColorSchemes.WINDOW));
             ElementHandler.INSTANCE.addElement(this.getGUI(), createCubeWindow);
             return true;
-        }));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "-", this.getPosX() + 16, this.getPosY() + this.getHeight(), 16, 16, (button) -> {
+        }).withColorScheme(ColorSchemes.DEFAULT));
+        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "-", this.getPosX() + 16, this.getPosY() + this.getHeight(), 16, 16, (button) -> {
             Project selectedProject = this.getGUI().getSelectedProject();
             if (selectedProject != null && selectedProject.getModel() != null && selectedProject.getSelectedCube() != null) {
                 this.removeCube(selectedProject);
             }
             return true;
-        }));
+        }).withColorScheme(ColorSchemes.DEFAULT));
     }
 
     @Override

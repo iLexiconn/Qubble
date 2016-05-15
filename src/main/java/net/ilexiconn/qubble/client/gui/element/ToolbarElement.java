@@ -44,20 +44,20 @@ public class ToolbarElement extends Element<QubbleGUI> {
     public void init() {
         ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "New", 0, 0, 30, 20, (v) -> {
             return false; //TODO
-        }));
+        }).withColorScheme(ColorSchemes.DEFAULT));
         ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "Open", 30, 0, 30, 20, (v) -> {
             this.openModelWindow(null);
             return true;
-        }));
+        }).withColorScheme(ColorSchemes.DEFAULT));
         ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "Save", 60, 0, 30, 20, (v) -> {
             if (this.getGUI().getSelectedProject() != null) {
                 this.openSaveWindow();
                 return true;
             }
             return false;
-        }));
+        }).withColorScheme(ColorSchemes.DEFAULT));
 
-        ElementHandler.INSTANCE.addElement(this.getGUI(), this.modelButton = (ButtonElement<QubbleGUI>) new ButtonElement(this.getGUI(), "Model", this.getGUI().width - 262, 0, 40, 20, (v) -> {
+        ElementHandler.INSTANCE.addElement(this.getGUI(), this.modelButton = (ButtonElement<QubbleGUI>) new ButtonElement<>(this.getGUI(), "Model", this.getGUI().width - 262, 0, 40, 20, (v) -> {
             if (this.modelButton.getColorScheme() != ColorSchemes.TAB_ACTIVE) {
                 this.setMode(ModelMode.MODEL);
                 return true;
@@ -65,29 +65,29 @@ public class ToolbarElement extends Element<QubbleGUI> {
                 return false;
             }
         }).withColorScheme(ColorSchemes.TAB_ACTIVE));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), this.textureButton = new ButtonElement(this.getGUI(), "Texture", this.getGUI().width - 222, 0, 50, 20, (v) -> {
+        ElementHandler.INSTANCE.addElement(this.getGUI(), this.textureButton = (ButtonElement<QubbleGUI>) new ButtonElement<>(this.getGUI(), "Texture", this.getGUI().width - 222, 0, 50, 20, (v) -> {
             if (this.textureButton.getColorScheme() != ColorSchemes.TAB_ACTIVE) {
                 this.setMode(ModelMode.TEXTURE);
                 return true;
             } else {
                 return false;
             }
-        }));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), this.animateButton = new ButtonElement(this.getGUI(), "Animate", this.getGUI().width - 172, 0, 50, 20, (v) -> {
+        }).withColorScheme(ColorSchemes.DEFAULT));
+        ElementHandler.INSTANCE.addElement(this.getGUI(), this.animateButton = (ButtonElement<QubbleGUI>) new ButtonElement<>(this.getGUI(), "Animate", this.getGUI().width - 172, 0, 50, 20, (v) -> {
             if (this.animateButton.getColorScheme() != ColorSchemes.TAB_ACTIVE) {
                 this.setMode(ModelMode.ANIMATE);
                 return true;
             } else {
                 return false;
             }
-        }));
+        }).withColorScheme(ColorSchemes.DEFAULT));
         this.setMode(ModelMode.MODEL);
 
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "o", this.getGUI().width - 40, 0, 20, 20, (v) -> {
+        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "o", this.getGUI().width - 40, 0, 20, 20, (v) -> {
             this.openOptionsWindow();
             return true;
         }).withColorScheme(ColorSchemes.OPTIONS));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "x", this.getGUI().width - 20, 0, 20, 20, (v) -> {
+        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "x", this.getGUI().width - 20, 0, 20, 20, (v) -> {
             this.getGUI().mc.displayGuiScreen(this.getGUI().getParent());
             return true;
         }).withColorScheme(ButtonElement.CLOSE));
@@ -245,8 +245,8 @@ public class ToolbarElement extends Element<QubbleGUI> {
             }
         }));
 
-        final CheckboxElement dark = new CheckboxElement(this.getGUI(), 32.5F, 174.5F).withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.DARK.getName()));
-        final CheckboxElement light = new CheckboxElement(this.getGUI(), 122.5F, 174.5F).withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.LIGHT.getName()));
+        final CheckboxElement dark = new CheckboxElement<>(this.getGUI(), 32.5F, 174.5F).withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.DARK.getName()));
+        final CheckboxElement light = new CheckboxElement<>(this.getGUI(), 122.5F, 174.5F).withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.LIGHT.getName()));
         optionsWindow.addElement(dark/*.withActionHandler((selected) -> {
             if (!Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.DARK.getName())) {
                 LLibrary.CONFIG.setColorMode(ColorMode.DARK.getName());
@@ -302,7 +302,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
         if (mode == ModelMode.TEXTURE) {
             if (this.textureWindow == null) {
-                this.textureWindow = new WindowElement(this.getGUI(), "Texture Map", 200, 214);
+                this.textureWindow = new WindowElement<>(this.getGUI(), "Texture Map", 200, 214);
                 new TextureMapElement(this.getGUI(), 0.0F, 14.0F, 200, 200).withParent(this.textureWindow);
                 ElementHandler.INSTANCE.addElement(this.getGUI(), this.textureWindow);
             }
@@ -311,8 +311,8 @@ public class ToolbarElement extends Element<QubbleGUI> {
             this.textureWindow = null;
         }
 
-        this.modelButton.withColorScheme(mode == ModelMode.MODEL ? ColorSchemes.TAB_ACTIVE : Element.DEFAULT);
-        this.textureButton.withColorScheme(mode == ModelMode.TEXTURE ? ColorSchemes.TAB_ACTIVE : Element.DEFAULT);
-        this.animateButton.withColorScheme(mode == ModelMode.ANIMATE ? ColorSchemes.TAB_ACTIVE : Element.DEFAULT);
+        this.modelButton.withColorScheme(mode == ModelMode.MODEL ? ColorSchemes.TAB_ACTIVE : ColorSchemes.DEFAULT);
+        this.textureButton.withColorScheme(mode == ModelMode.TEXTURE ? ColorSchemes.TAB_ACTIVE : ColorSchemes.DEFAULT);
+        this.animateButton.withColorScheme(mode == ModelMode.ANIMATE ? ColorSchemes.TAB_ACTIVE : ColorSchemes.DEFAULT);
     }
 }
