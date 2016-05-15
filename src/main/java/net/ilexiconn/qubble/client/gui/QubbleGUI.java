@@ -1,22 +1,16 @@
 package net.ilexiconn.qubble.client.gui;
 
-import net.ilexiconn.llibrary.LLibrary;
+import net.ilexiconn.llibrary.client.gui.ElementGUI;
+import net.ilexiconn.llibrary.client.gui.element.ElementHandler;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.element.*;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
-public class QubbleGUI extends GuiScreen {
+public class QubbleGUI extends ElementGUI {
     private GuiScreen parent;
     private ScaledResolution resolution;
     private ToolbarElement toolbar;
@@ -46,19 +40,17 @@ public class QubbleGUI extends GuiScreen {
     }
 
     @Override
-    public void initGui() {
-        ElementHandler.INSTANCE.clearGUI(this);
+    public void initElements() {
         ElementHandler.INSTANCE.addElement(this, this.modelView = new ModelViewElement(this));
         ElementHandler.INSTANCE.addElement(this, this.modelTree = new ModelTreeElement(this));
         ElementHandler.INSTANCE.addElement(this, this.sidebar = new SidebarElement(this));
         ElementHandler.INSTANCE.addElement(this, this.toolbar = new ToolbarElement(this));
         ElementHandler.INSTANCE.addElement(this, this.projectBar = new ProjectBarElement(this));
-        ElementHandler.INSTANCE.init(this);
     }
 
     @Override
     public void updateScreen() {
-        ElementHandler.INSTANCE.update(this);
+        super.updateScreen();
         if (ticks % 40 == 0) {
             Project selectedProject = this.getSelectedProject();
             if (selectedProject != null) {
@@ -76,55 +68,8 @@ public class QubbleGUI extends GuiScreen {
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        Gui.drawRect(0, 0, this.width, this.height, LLibrary.CONFIG.getTertiaryColor());
+    public void drawScreen(float v, float v1, float v2) {
         this.resolution = new ScaledResolution(this.mc);
-        float preciseMouseX = this.getPreciseMouseX();
-        float preciseMouseY = this.getPreciseMouseY();
-        ElementHandler.INSTANCE.render(this, preciseMouseX, preciseMouseY, partialTicks);
-    }
-
-    @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        float preciseMouseX = this.getPreciseMouseX();
-        float preciseMouseY = this.getPreciseMouseY();
-        ElementHandler.INSTANCE.mouseClicked(this, preciseMouseX, preciseMouseY, mouseButton);
-        super.mouseClicked(mouseX, mouseY, mouseButton);
-    }
-
-    @Override
-    protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
-        float preciseMouseX = this.getPreciseMouseX();
-        float preciseMouseY = this.getPreciseMouseY();
-        ElementHandler.INSTANCE.mouseDragged(this, preciseMouseX, preciseMouseY, clickedMouseButton, timeSinceLastClick);
-        super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
-    }
-
-    @Override
-    protected void mouseReleased(int mouseX, int mouseY, int state) {
-        float preciseMouseX = this.getPreciseMouseX();
-        float preciseMouseY = this.getPreciseMouseY();
-        ElementHandler.INSTANCE.mouseReleased(this, preciseMouseX, preciseMouseY, state);
-        super.mouseReleased(mouseX, mouseY, state);
-    }
-
-    @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        ElementHandler.INSTANCE.keyPressed(this, typedChar, keyCode);
-        super.keyTyped(typedChar, keyCode);
-    }
-
-    @Override
-    public void onGuiClosed() {
-        ElementHandler.INSTANCE.clearGUI(this);
-    }
-
-    private float getPreciseMouseX() {
-        return (float) Mouse.getX() / resolution.getScaleFactor();
-    }
-
-    private float getPreciseMouseY() {
-        return this.height - (float) Mouse.getY() * this.height / (float) this.mc.displayHeight - 1.0F;
     }
 
     public GuiScreen getParent() {
@@ -137,55 +82,6 @@ public class QubbleGUI extends GuiScreen {
 
     public ToolbarElement getToolbar() {
         return toolbar;
-    }
-
-    public void drawRectangle(double x, double y, double width, double height, int color) {
-        GlStateManager.disableTexture2D();
-        GlStateManager.enableBlend();
-        GlStateManager.disableAlpha();
-        float a = (float) (color >> 24 & 0xFF) / 255.0F;
-        float r = (float) (color >> 16 & 0xFF) / 255.0F;
-        float g = (float) (color >> 8 & 0xFF) / 255.0F;
-        float b = (float) (color & 0xFF) / 255.0F;
-        Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexBuffer = tessellator.getBuffer();
-        vertexBuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        vertexBuffer.pos(x, y + height, 0.0).color(r, g, b, a).endVertex();
-        vertexBuffer.pos(x + width, y + height, 0.0).color(r, g, b, a).endVertex();
-        vertexBuffer.pos(x + width, y, 0.0).color(r, g, b, a).endVertex();
-        vertexBuffer.pos(x, y, 0.0).color(r, g, b, a).endVertex();
-        tessellator.draw();
-        GlStateManager.disableBlend();
-        GlStateManager.enableAlpha();
-        GlStateManager.enableTexture2D();
-    }
-
-    public void drawOutline(double x, double y, double width, double height, int color, double outlineSize) {
-        this.drawRectangle(x, y, width - outlineSize, outlineSize, color);
-        this.drawRectangle(x + width - outlineSize, y, outlineSize, height - outlineSize, color);
-        this.drawRectangle(x, y + height - outlineSize, width, outlineSize, color);
-        this.drawRectangle(x, y, outlineSize, height - outlineSize, color);
-    }
-
-    public void drawTexturedRectangle(double x, double y, double width, double height, int color) {
-        GlStateManager.enableTexture2D();
-        GlStateManager.enableBlend();
-        GlStateManager.disableAlpha();
-        float a = (float) (color >> 24 & 0xFF) / 255.0F;
-        float r = (float) (color >> 16 & 0xFF) / 255.0F;
-        float g = (float) (color >> 8 & 0xFF) / 255.0F;
-        float b = (float) (color & 0xFF) / 255.0F;
-        Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexBuffer = tessellator.getBuffer();
-        vertexBuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-        vertexBuffer.pos(x, y + height, 0.0).tex(0.0F, 1.0F).color(r, g, b, a).endVertex();
-        vertexBuffer.pos(x + width, y + height, 0.0).tex(1.0F, 1.0F).color(r, g, b, a).endVertex();
-        vertexBuffer.pos(x + width, y, 0.0).tex(1.0F, 0.0F).color(r, g, b, a).endVertex();
-        vertexBuffer.pos(x, y, 0.0).tex(0.0F, 0.0F).color(r, g, b, a).endVertex();
-        tessellator.draw();
-        GlStateManager.disableBlend();
-        GlStateManager.enableAlpha();
-        GlStateManager.disableTexture2D();
     }
 
     public void selectModel(String name, IModelImporter importer) {

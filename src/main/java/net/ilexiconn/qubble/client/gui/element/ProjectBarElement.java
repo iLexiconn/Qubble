@@ -1,6 +1,7 @@
 package net.ilexiconn.qubble.client.gui.element;
 
 import net.ilexiconn.llibrary.LLibrary;
+import net.ilexiconn.llibrary.client.gui.element.Element;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.Project;
@@ -32,27 +33,26 @@ public class ProjectBarElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        QubbleGUI gui = this.getGUI();
         float posX = this.getPosX();
         float posY = this.getPosY();
         int width = this.getWidth();
         int height = this.getHeight();
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        float scaleFactor = gui.getResolution().getScaleFactor();
-        GL11.glScissor((int) (posX * scaleFactor), (int) (((gui.height - (posY + height))) * scaleFactor), (int) (width * scaleFactor), (int) (height * scaleFactor));
+        float scaleFactor = this.getGUI().getResolution().getScaleFactor();
+        GL11.glScissor((int) (posX * scaleFactor), (int) (((this.getGUI().height - (posY + height))) * scaleFactor), (int) (width * scaleFactor), (int) (height * scaleFactor));
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
-        gui.drawRectangle(posX, posY, width, height, LLibrary.CONFIG.getPrimaryColor());
+        this.drawRectangle(posX, posY, width, height, LLibrary.CONFIG.getPrimaryColor());
         float projectX = -this.scroll;
-        List<Project> openProjects = gui.getOpenProjects();
+        List<Project> openProjects = this.getGUI().getOpenProjects();
         for (int projectIndex = 0; projectIndex < openProjects.size(); projectIndex++) {
             QubbleModel model = openProjects.get(projectIndex).getModel();
             float projectWidth = fontRenderer.getStringWidth(model.getName()) + 15.0F;
             boolean hover = this.isSelected(mouseX, mouseY) && mouseX >= posX + projectX + projectWidth - 12 && mouseX <= posX + projectX + projectWidth;
-            if (projectIndex == gui.getSelectedProjectIndex()) {
-                gui.drawRectangle(posX + projectX, posY, projectWidth, height, LLibrary.CONFIG.getTertiaryColor());
-                gui.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : LLibrary.CONFIG.getTertiaryColor());
+            if (projectIndex == this.getGUI().getSelectedProjectIndex()) {
+                this.drawRectangle(posX + projectX, posY, projectWidth, height, LLibrary.CONFIG.getTertiaryColor());
+                this.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : LLibrary.CONFIG.getTertiaryColor());
             } else {
-                gui.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : LLibrary.CONFIG.getPrimaryColor());
+                this.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : LLibrary.CONFIG.getPrimaryColor());
             }
             fontRenderer.drawString("x", posX + projectX + projectWidth - 9, posY + 2, LLibrary.CONFIG.getTextColor(), false);
             fontRenderer.drawString(model.getName(), posX + projectX + 2, posY + 2, LLibrary.CONFIG.getTextColor(), false);

@@ -1,12 +1,13 @@
 package net.ilexiconn.qubble.client.gui.element;
 
 import net.ilexiconn.llibrary.LLibrary;
+import net.ilexiconn.llibrary.client.gui.element.*;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
-import net.ilexiconn.qubble.server.color.ColorScheme;
+import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Keyboard;
@@ -23,7 +24,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
     private int entryCount;
     private List<QubbleCuboid> expandedCubes = new ArrayList<>();
 
-    private ScrollBarElement scroller;
+    private ScrollbarElement<QubbleGUI> scroller;
 
     private QubbleCuboid parenting;
 
@@ -33,12 +34,12 @@ public class ModelTreeElement extends Element<QubbleGUI> {
 
     @Override
     public void init() {
-        ElementHandler.INSTANCE.addElement(this.getGUI(), this.scroller = new ScrollBarElement(this.getGUI(), this, () -> this.getWidth() - 8.0F, () -> 2.0F, () -> (float) this.getHeight(), 12, () -> this.entryCount));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement(this.getGUI(), "+", this.getPosX(), this.getPosY() + this.getHeight(), 16, 16, (button) -> {
-            WindowElement createCubeWindow = new WindowElement(this.getGUI(), "Create Cube", 100, 42);
-            InputElement nameElement = new InputElement(this.getGUI(), "Cube Name", 2, 16, 96);
+        ElementHandler.INSTANCE.addElement(this.getGUI(), this.scroller = new ScrollbarElement<>(this, () -> this.getWidth() - 8.0F, () -> 2.0F, () -> (float) this.getHeight(), 12, () -> this.entryCount));
+        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "+", this.getPosX(), this.getPosY() + this.getHeight(), 16, 16, (button) -> {
+            WindowElement<QubbleGUI> createCubeWindow = new WindowElement<>(this.getGUI(), "Create Cube", 100, 42);
+            InputElement<QubbleGUI> nameElement = new InputElement<>(this.getGUI(), "Cube Name", 2, 16, 96, (i) -> {});
             createCubeWindow.addElement(nameElement);
-            createCubeWindow.addElement(new ButtonElement(this.getGUI(), "Create", 2, 30, 96, 10, (element) -> {
+            createCubeWindow.addElement(new ButtonElement<>(this.getGUI(), "Create", 2, 30, 96, 10, (element) -> {
                 Project selectedProject = this.getGUI().getSelectedProject();
                 if (selectedProject != null && selectedProject.getModel() != null && nameElement.getText().length() > 0) {
                     QubbleCuboid cube = QubbleCuboid.create(nameElement.getText());
@@ -51,7 +52,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
                     return true;
                 }
                 return false;
-            }).withColorScheme(ColorScheme.WINDOW));
+            }).withColorScheme(ColorSchemes.WINDOW));
             ElementHandler.INSTANCE.addElement(this.getGUI(), createCubeWindow);
             return true;
         }));
@@ -66,46 +67,36 @@ public class ModelTreeElement extends Element<QubbleGUI> {
 
     @Override
     public void render(float mouseX, float mouseY, float partialTicks) {
-        QubbleGUI gui = this.getGUI();
         float posX = this.getPosX();
         float posY = this.getPosY();
         float width = this.getWidth();
         float height = this.getHeight();
-
         this.startScissor();
-
         int i = 0;
         float offset = this.scroller.getScrollOffset();
         for (float y = -offset; y < height + offset; y += 12.0F) {
-            gui.drawRectangle(posX, posY + y, width, 12.0F, i % 2 == 0 ? LLibrary.CONFIG.getSecondarySubcolor() : LLibrary.CONFIG.getPrimarySubcolor());
+            this.drawRectangle(posX, posY + y, width, 12.0F, i % 2 == 0 ? LLibrary.CONFIG.getSecondarySubcolor() : LLibrary.CONFIG.getPrimarySubcolor());
             i++;
         }
-
         this.cubeY = 0;
-
-        if (gui.getSelectedProject() != null) {
-            QubbleModel model = gui.getSelectedProject().getModel();
+        if (this.getGUI().getSelectedProject() != null) {
+            QubbleModel model = this.getGUI().getSelectedProject().getModel();
             for (QubbleCuboid cube : model.getCuboids()) {
                 this.drawCubeEntry(cube, 0);
             }
         }
-
         this.entryCount = this.cubeY;
-
-        gui.drawRectangle(posX + width - 2, posY, 2, height, LLibrary.CONFIG.getAccentColor());
-
+        this.drawRectangle(posX + width - 2, posY, 2, height, LLibrary.CONFIG.getAccentColor());
         this.endScissor();
-
         if (this.parenting != null) {
             FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
             String name = this.parenting.getName();
             float entryX = mouseX - 12;
             float entryY = mouseY - 2;
-            this.getGUI().drawRectangle(entryX + 9, entryY - 1, fontRenderer.getStringWidth(name) + 1, fontRenderer.FONT_HEIGHT + 1, LLibrary.CONFIG.getSecondaryColor());
+            this.drawRectangle(entryX + 9, entryY - 1, fontRenderer.getStringWidth(name) + 1, fontRenderer.FONT_HEIGHT + 1, LLibrary.CONFIG.getSecondaryColor());
             fontRenderer.drawString(name, entryX + 10, entryY, LLibrary.CONFIG.getAccentColor(), false);
         }
-
-        gui.drawRectangle(posX, posY + height, this.getWidth(), 16, LLibrary.CONFIG.getAccentColor());
+        this.drawRectangle(posX, posY + height, this.getWidth(), 16, LLibrary.CONFIG.getAccentColor());
     }
 
     @Override
@@ -202,7 +193,6 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         Matrix4d matrix = this.getParentTransformationMatrix(model, newParent, true, false);
         matrix.invert();
         matrix.mul(this.getParentTransformationMatrix(model, parenting, false, false));
-
         float[][] parentTransformation = this.getParentTransformation(matrix);
         this.applyTransformation(parenting, parentTransformation);
     }
@@ -260,15 +250,15 @@ public class ModelTreeElement extends Element<QubbleGUI> {
             }
         }
         int outlineColor = 0xFF9E9E9E;
-        this.getGUI().drawRectangle(entryX - 5, entryY + 3.5, 11, 0.75, outlineColor);
+        this.drawRectangle(entryX - 5, entryY + 3.5, 11, 0.75, outlineColor);
         if (cube.getChildren().size() > 0) {
             if (expanded) {
-                this.getGUI().drawRectangle(entryX + 1, entryY + 3.5, 0.75, size * 12.0F, outlineColor);
+                this.drawRectangle(entryX + 1, entryY + 3.5, 0.75, size * 12.0F, outlineColor);
             }
-            this.getGUI().drawRectangle(entryX + 2, entryY + 2, 4, 4, 0xFF464646);
-            this.getGUI().drawRectangle(entryX + 3, entryY + 3.5, 2, 0.75, outlineColor);
+            this.drawRectangle(entryX + 2, entryY + 2, 4, 4, 0xFF464646);
+            this.drawRectangle(entryX + 3, entryY + 3.5, 2, 0.75, outlineColor);
             if (!expanded) {
-                this.getGUI().drawRectangle(entryX + 3.75, entryY + 3, 0.75, 2, outlineColor);
+                this.drawRectangle(entryX + 3.75, entryY + 3, 0.75, 2, outlineColor);
             }
         }
     }

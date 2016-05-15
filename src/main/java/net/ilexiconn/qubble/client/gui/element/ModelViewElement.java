@@ -1,6 +1,8 @@
 package net.ilexiconn.qubble.client.gui.element;
 
 import net.ilexiconn.llibrary.LLibrary;
+import net.ilexiconn.llibrary.client.gui.element.Element;
+import net.ilexiconn.llibrary.client.gui.element.ElementHandler;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.util.ClientUtils;
@@ -303,6 +305,6 @@ public class ModelViewElement extends Element<QubbleGUI> {
         ModelTreeElement modelTree = this.getGUI().getModelTree();
         ToolbarElement toolbar = this.getGUI().getToolbar();
         ProjectBarElement projectBar = this.getGUI().getProjectBar();
-        return ElementHandler.INSTANCE.isOnTop(this.getGUI(), this, mouseX, mouseY) && mouseX > modelTree.getPosX() + modelTree.getWidth() && mouseY >= toolbar.getPosY() + toolbar.getHeight() + (projectBar.isVisible() ? projectBar.getHeight() : 0);
+        return ElementHandler.INSTANCE.isElementOnTop(this.getGUI(), this) && mouseX > modelTree.getPosX() + modelTree.getWidth() && mouseY >= toolbar.getPosY() + toolbar.getHeight() + (projectBar.isVisible() ? projectBar.getHeight() : 0);
     }
 }
