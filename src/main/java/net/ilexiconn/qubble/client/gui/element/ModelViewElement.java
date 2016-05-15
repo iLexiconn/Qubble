@@ -74,20 +74,18 @@ public class ModelViewElement extends Element<QubbleGUI> {
         GlStateManager.enableTexture2D();
         this.prevMouseX = mouseX;
         this.prevMouseY = mouseY;
-        int scroll = Mouse.getDWheel();
-        this.zoomVelocity += (scroll / 120.0F) * 0.05F;
-        this.zoom += this.zoomVelocity;
         this.prevCameraOffsetX = this.cameraOffsetX;
         this.prevCameraOffsetY = this.cameraOffsetY;
         this.prevRotationYaw = this.rotationYaw;
         this.prevRotationPitch = this.rotationPitch;
+        this.partialTicks = partialTicks;
+        this.zoom += this.zoomVelocity;
         this.zoomVelocity *= 0.6F;
         if (this.zoom < 0.5F) {
             this.zoom = 0.5F;
         } else if (this.zoom > 10.0F) {
             this.zoom = 10.0F;
         }
-        this.partialTicks = partialTicks;
     }
 
     private void renderModel(float partialTicks, ScaledResolution scaledResolution, boolean selection) {
@@ -247,6 +245,12 @@ public class ModelViewElement extends Element<QubbleGUI> {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean mouseScrolled(float mouseX, float mouseY, int amount) {
+        this.zoomVelocity += (amount / 120.0F) * 0.05F;
+        return true;
     }
 
     public void updateModel() {
