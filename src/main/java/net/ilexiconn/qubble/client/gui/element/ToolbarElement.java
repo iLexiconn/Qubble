@@ -247,7 +247,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
         final CheckboxElement dark = new CheckboxElement<>(this.getGUI(), 32.5F, 174.5F).withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.DARK.getName()));
         final CheckboxElement light = new CheckboxElement<>(this.getGUI(), 122.5F, 174.5F).withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.LIGHT.getName()));
-        optionsWindow.addElement(dark/*.withActionHandler((selected) -> {
+        optionsWindow.addElement(dark.withFunction((selected) -> {
             if (!Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.DARK.getName())) {
                 LLibrary.CONFIG.setColorMode(ColorMode.DARK.getName());
                 light.withSelection(false);
@@ -256,8 +256,8 @@ public class ToolbarElement extends Element<QubbleGUI> {
             } else {
                 return false;
             }
-        })*/);
-        optionsWindow.addElement(light/*.withActionHandler((selected) -> {
+        }));
+        optionsWindow.addElement(light.withFunction((selected) -> {
             if (!Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.LIGHT.getName())) {
                 LLibrary.CONFIG.setColorMode(ColorMode.LIGHT.getName());
                 dark.withSelection(false);
@@ -266,7 +266,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
             } else {
                 return false;
             }
-        })*/);
+        }));
 
         optionsWindow.addElement(new LabelElement<>(this.getGUI(), "Dark", 50, 178));
         optionsWindow.addElement(new LabelElement<>(this.getGUI(), "Light", 140, 178));
