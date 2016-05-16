@@ -42,7 +42,7 @@ public class Project {
     public void setSelectedCube(QubbleCuboid cube) {
         this.selectedCube = cube;
         if (this.selectedCube != null) {
-            this.gui.getSidebar().populateFields(selectedCube);
+            this.gui.getSidebar().populateFields(this.getModel(), selectedCube);
         } else {
             this.gui.getSidebar().clearFields();
         }

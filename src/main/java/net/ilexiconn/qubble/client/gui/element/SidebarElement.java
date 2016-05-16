@@ -3,6 +3,7 @@ package net.ilexiconn.qubble.client.gui.element;
 import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.gui.element.*;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
+import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
 import net.ilexiconn.qubble.client.gui.Project;
@@ -25,6 +26,7 @@ public class SidebarElement extends Element<QubbleGUI> {
     private SliderElement<QubbleGUI> scaleX, scaleY, scaleZ;
     private SliderElement<QubbleGUI> rotationX, rotationY, rotationZ;
     private SliderElement<QubbleGUI> textureX, textureY;
+    private SliderElement<QubbleGUI> textureWidth, textureHeight;
     private ButtonElement<QubbleGUI> mirror;
     private InputElement<QubbleGUI> texture;
     private InputElement<QubbleGUI> overlayTexture;
@@ -40,7 +42,7 @@ public class SidebarElement extends Element<QubbleGUI> {
         this.initFields();
         Project selectedProject = this.getGUI().getSelectedProject();
         if (selectedProject != null && selectedProject.getSelectedCube() != null) {
-            this.populateFields(selectedProject.getSelectedCube());
+            this.populateFields(selectedProject.getModel(), selectedProject.getSelectedCube());
         } else {
             this.clearFields();
         }
@@ -90,7 +92,7 @@ public class SidebarElement extends Element<QubbleGUI> {
         return null;
     }
 
-    public void populateFields(QubbleCuboid cube) {
+    public void populateFields(QubbleModel model, QubbleCuboid cube) {
         this.nameInput.clearText();
         this.nameInput.writeText(cube.getName());
         this.nameInput.setEditable(true);
@@ -135,6 +137,10 @@ public class SidebarElement extends Element<QubbleGUI> {
                 this.textureY.setEditable(true);
                 this.mirror.withColorScheme(cube.isTextureMirrored() ? ColorSchemes.TOGGLE_ON : ColorSchemes.TOGGLE_OFF);
                 this.mirror.setEnabled(true);
+                this.textureWidth.withValue(model.getTextureWidth());
+                this.textureWidth.setEditable(true);
+                this.textureHeight.withValue(model.getTextureHeight());
+                this.textureHeight.setEditable(true);
                 break;
             }
             case ANIMATE: {
@@ -317,6 +323,19 @@ public class SidebarElement extends Element<QubbleGUI> {
                     }
                     return false;
                 }).withColorScheme(ColorSchemes.DEFAULT));
+                this.addChild(new LabelElement<>(this.getGUI(), "Texture size", 4, 120));
+                this.addChild(this.textureWidth = new SliderElement<>(this.getGUI(), 4, 129, true, value -> {
+                    QubbleModel model = this.getGUI().getSelectedProject().getModel();
+                    model.setTextureWidth(value.intValue());
+                    this.getGUI().getModelView().updateModel();
+                    return true;
+                }));
+                this.addChild(this.textureHeight = new SliderElement<>(this.getGUI(), 42, 129, true, value -> {
+                    QubbleModel model = this.getGUI().getSelectedProject().getModel();
+                    model.setTextureHeight(value.intValue());
+                    this.getGUI().getModelView().updateModel();
+                    return true;
+                }));
                 break;
             }
             case ANIMATE: {

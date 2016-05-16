@@ -107,7 +107,7 @@ public class TextureMapElement extends Element<QubbleGUI> {
                     int textureY = (int) ((mouseY - this.getPosY()) / scale) + this.dragOffsetY;
                     selectedCube.setTexture(Math.max(0, Math.min(textureX, selectedProject.getModel().getTextureWidth() - (selectedCube.getDimensionX() * 2 + selectedCube.getDimensionZ() * 2))), Math.max(0, Math.min(textureY, selectedProject.getModel().getTextureHeight() - (selectedCube.getDimensionY() + selectedCube.getDimensionZ()))));
                     this.getGUI().getModelView().updatePart(selectedCube);
-                    this.getGUI().getSidebar().populateFields(selectedCube);
+                    this.getGUI().getSidebar().populateFields(selectedProject.getModel(), selectedCube);
                 }
                 return true;
             }

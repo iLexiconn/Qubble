@@ -108,7 +108,7 @@ public class QubbleGUI extends ElementGUI {
         this.modelView.updateModel();
         Project selectedProject = this.getSelectedProject();
         if (selectedProject != null && selectedProject.getSelectedCube() != null) {
-            this.sidebar.populateFields(selectedProject.getSelectedCube());
+            this.sidebar.populateFields(selectedProject.getModel(), selectedProject.getSelectedCube());
         } else {
             this.sidebar.clearFields();
         }
@@ -151,7 +151,7 @@ public class QubbleGUI extends ElementGUI {
         this.mode = mode;
         this.getSidebar().initFields();
         if (this.getSelectedProject() != null && this.getSelectedProject().getSelectedCube() != null) {
-            this.getSidebar().populateFields(this.getSelectedProject().getSelectedCube());
+            this.getSidebar().populateFields(this.getSelectedProject().getModel(), this.getSelectedProject().getSelectedCube());
         } else {
             this.getSidebar().clearFields();
         }
