@@ -131,6 +131,9 @@ public class ModelViewElement extends Element<QubbleGUI> {
                 GlStateManager.enableTexture2D();
                 textureManager.bindTexture(project.getBaseTexture().getLocation());
             }
+            if (!selection && LLibrary.CONFIG.getColorMode().equals("light")) {
+                GlStateManager.color(0.5F, 0.5F, 0.5F, 1.0F);
+            }
             this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F, selection);
             if (!selection && project.getOverlayTexture() != null) {
                 GlStateManager.enableTexture2D();
@@ -188,7 +191,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
 
     private void drawGrid(Tessellator tessellator, VertexBuffer buffer, float size) {
         float scale = size / 4.0F;
-        float lineWidth = 16.0F * (this.zoom / 4.0F) * (scale / 2.0F);
+        float lineWidth = Math.min(1.25F, 16.0F * (this.zoom / 4.0F) * (scale / 2.0F));
         GlStateManager.glLineWidth(lineWidth);
         float gridY = 24.0F * 0.0625F;
         size /= scale;
