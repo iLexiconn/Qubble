@@ -137,30 +137,6 @@ public class ModelViewElement extends Element<QubbleGUI> {
                 textureManager.bindTexture(project.getOverlayTexture().getLocation());
                 this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
             }
-            if (selectedBox != null && !selection) {
-                GlStateManager.disableTexture2D();
-                GlStateManager.disableLighting();
-                GlStateManager.depthMask(false);
-                this.currentModel.renderSelectedOutline(selectedBox, 0.0625F);
-                GlStateManager.depthMask(true);
-                GlStateManager.enableLighting();
-                GlStateManager.pushMatrix();
-                if (selectedBox.getParent() != null) {
-                    selectedBox.getParent().parentedPostRender(0.0625F);
-                }
-                if (project.getBaseTexture() != null) {
-                    GlStateManager.enableTexture2D();
-                    textureManager.bindTexture(project.getBaseTexture().getLocation());
-                }
-                selectedBox.renderSingle(0.0625F, false);
-                if (project.getOverlayTexture() != null) {
-                    GlStateManager.enableTexture2D();
-                    textureManager.bindTexture(project.getOverlayTexture().getLocation());
-                    selectedBox.renderSingle(0.0625F, false);
-                }
-                GlStateManager.popMatrix();
-            }
-
             if (!selection) {
                 GlStateManager.pushMatrix();
                 GlStateManager.disableTexture2D();
@@ -174,8 +150,28 @@ public class ModelViewElement extends Element<QubbleGUI> {
                 this.drawGrid(tessellator, buffer, 2.0F);
                 this.drawGrid(tessellator, buffer, 4.0F);
                 GlStateManager.depthMask(true);
-                GlStateManager.enableLighting();
                 GlStateManager.popMatrix();
+                if (selectedBox != null) {
+                    GlStateManager.depthMask(false);
+                    this.currentModel.renderSelectedOutline(selectedBox, 0.0625F);
+                    GlStateManager.depthMask(true);
+                    GlStateManager.enableLighting();
+                    GlStateManager.pushMatrix();
+                    if (selectedBox.getParent() != null) {
+                        selectedBox.getParent().parentedPostRender(0.0625F);
+                    }
+                    if (project.getBaseTexture() != null) {
+                        GlStateManager.enableTexture2D();
+                        textureManager.bindTexture(project.getBaseTexture().getLocation());
+                    }
+                    selectedBox.renderSingle(0.0625F, false);
+                    if (project.getOverlayTexture() != null) {
+                        GlStateManager.enableTexture2D();
+                        textureManager.bindTexture(project.getOverlayTexture().getLocation());
+                        selectedBox.renderSingle(0.0625F, false);
+                    }
+                    GlStateManager.popMatrix();
+                }
             }
             GlStateManager.enableTexture2D();
             GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
