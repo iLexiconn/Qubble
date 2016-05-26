@@ -303,6 +303,9 @@ public class SidebarElement extends Element<QubbleGUI> {
                     } else {
                         button.withColorScheme(ColorSchemes.TOGGLE_OFF);
                     }
+                    QubbleCuboid selectedCube = this.getGUI().getSelectedProject().getSelectedCube();
+                    selectedCube.setTextureMirrored(button.getColorScheme() != ColorSchemes.TOGGLE_OFF);
+                    this.getGUI().getModelView().updatePart(selectedCube);
                     return true;
                 }));
                 this.addChild(new LabelElement<>(this.getGUI(), "Texture", 4, 69));
