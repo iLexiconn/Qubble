@@ -8,7 +8,7 @@ import net.minecraft.world.storage.WorldInfo;
 
 public class DummyWorld extends World {
     public DummyWorld() {
-        super(new SaveHandlerMP(), new WorldInfo(new WorldSettings(0, WorldSettings.GameType.SURVIVAL, false, false, WorldType.DEFAULT), ""), new WorldProviderSurface(), new Profiler(), true);
+        super(new SaveHandlerMP(), new WorldInfo(new WorldSettings(0, GameType.SURVIVAL, false, false, WorldType.DEFAULT), ""), new WorldProviderSurface(), new Profiler(), true);
     }
 
     @Override
