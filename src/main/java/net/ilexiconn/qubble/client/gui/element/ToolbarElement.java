@@ -5,6 +5,8 @@ import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.gui.element.*;
 import net.ilexiconn.llibrary.client.gui.element.color.ColorMode;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
+import net.ilexiconn.llibrary.server.config.ConfigHandler;
+import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.ModelMode;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
@@ -44,7 +46,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
     public void init() {
         ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "New", 0, 0, 30, 20, (v) -> {
             this.openNewWindow();
-            return true; //TODO
+            return true;
         }).withColorScheme(ColorSchemes.DEFAULT));
         ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "Open", 30, 0, 30, 20, (v) -> {
             this.openModelWindow(null);
@@ -97,7 +99,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
     public void openNewWindow() {
         WindowElement<QubbleGUI> newWindow = new WindowElement<>(this.getGUI(), "New", 100, 44);
-        final String[] string = new String[1];
+        final String[] string = new String[]{""};
         newWindow.addElement(new InputElement<>(this.getGUI(), "", 2, 16, 96, e -> string[0] = e.getText()));
         newWindow.addElement(new ButtonElement<>(this.getGUI(), "Done", 2, 30, 96, 12, (v) -> {
             if (!string[0].isEmpty()) {
@@ -224,7 +226,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
         int argumentY = 18;
         String[] argumentNames = modelExporter.getArgumentNames();
         String[] defaultArguments = modelExporter.getDefaultArguments(copy);
-        InputElement<QubbleGUI>[] argumentTextBoxes = new InputElement[argumentNames.length];
+        InputElement[] argumentTextBoxes = new InputElement[argumentNames.length];
         int height = argumentNames.length * 28 + 32;
         WindowElement<QubbleGUI> window = new WindowElement<>(this.getGUI(), "Export " + modelExporter.getName(), 100, height);
         for (int argumentIndex = 0; argumentIndex < argumentNames.length; argumentIndex++) {
@@ -252,7 +254,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
     }
 
     public void openOptionsWindow() {
-        WindowElement<QubbleGUI> optionsWindow = new WindowElement<>(this.getGUI(), "Options", 200, 200);
+        WindowElement<QubbleGUI> optionsWindow = new WindowElement<>(this.getGUI(), "Options", 200, 220);
         optionsWindow.addElement(new ColorElement<>(this.getGUI(), 2, 16, 195, 149, (color) -> {
             if (LLibrary.CONFIG.getAccentColor() != color.getColor()) {
                 LLibrary.CONFIG.setAccentColor(color.getColor());
@@ -263,8 +265,8 @@ public class ToolbarElement extends Element<QubbleGUI> {
             }
         }));
 
-        final CheckboxElement dark = new CheckboxElement<>(this.getGUI(), 32.5F, 174.5F).withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.DARK.getName()));
-        final CheckboxElement light = new CheckboxElement<>(this.getGUI(), 122.5F, 174.5F).withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.LIGHT.getName()));
+        final CheckboxElement<QubbleGUI> dark = new CheckboxElement<>(this.getGUI(), 32.5F, 174.5F).withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.DARK.getName()));
+        final CheckboxElement<QubbleGUI> light = new CheckboxElement<>(this.getGUI(), 122.5F, 174.5F).withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.LIGHT.getName()));
         optionsWindow.addElement(dark.withFunction((selected) -> {
             if (!Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.DARK.getName())) {
                 LLibrary.CONFIG.setColorMode(ColorMode.DARK.getName());
@@ -288,6 +290,15 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
         optionsWindow.addElement(new LabelElement<>(this.getGUI(), "Dark", 50, 178));
         optionsWindow.addElement(new LabelElement<>(this.getGUI(), "Light", 140, 178));
+        optionsWindow.addElement(new LabelElement<>(this.getGUI(), "Show Grid", 50, 198));
+
+        final CheckboxElement<QubbleGUI> grid = new CheckboxElement<>(this.getGUI(), 32.5F, 194.5F).withSelection(Qubble.CONFIG.showGrid);
+        optionsWindow.addElement(grid.withFunction(element -> {
+            Qubble.CONFIG.showGrid = !Qubble.CONFIG.showGrid;
+            grid.withSelection(Qubble.CONFIG.showGrid);
+            ConfigHandler.INSTANCE.saveConfigForID(Qubble.MODID);
+            return true;
+        }));
 
         ElementHandler.INSTANCE.addElement(this.getGUI(), optionsWindow);
     }

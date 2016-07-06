@@ -7,6 +7,7 @@ import net.ilexiconn.llibrary.client.model.VoxelModel;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.util.ClientUtils;
+import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
@@ -144,19 +145,21 @@ public class ModelViewElement extends Element<QubbleGUI> {
                 this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
             }
             if (!selection) {
-                GlStateManager.pushMatrix();
-                GlStateManager.disableTexture2D();
-                GlStateManager.disableLighting();
-                GlStateManager.depthMask(false);
-                Tessellator tessellator = Tessellator.getInstance();
-                VertexBuffer buffer = tessellator.getBuffer();
-                this.drawGrid(tessellator, buffer, 0.25F);
-                this.drawGrid(tessellator, buffer, 0.5F);
-                this.drawGrid(tessellator, buffer, 1.0F);
-                this.drawGrid(tessellator, buffer, 2.0F);
-                this.drawGrid(tessellator, buffer, 4.0F);
-                GlStateManager.depthMask(true);
-                GlStateManager.popMatrix();
+                if (Qubble.CONFIG.showGrid) {
+                    GlStateManager.pushMatrix();
+                    GlStateManager.disableTexture2D();
+                    GlStateManager.disableLighting();
+                    GlStateManager.depthMask(false);
+                    Tessellator tessellator = Tessellator.getInstance();
+                    VertexBuffer buffer = tessellator.getBuffer();
+                    this.drawGrid(tessellator, buffer, 0.25F);
+                    this.drawGrid(tessellator, buffer, 0.5F);
+                    this.drawGrid(tessellator, buffer, 1.0F);
+                    this.drawGrid(tessellator, buffer, 2.0F);
+                    this.drawGrid(tessellator, buffer, 4.0F);
+                    GlStateManager.depthMask(true);
+                    GlStateManager.popMatrix();
+                }
                 if (selectedBox != null) {
                     GlStateManager.depthMask(false);
                     this.currentModel.renderSelectedOutline(selectedBox, 0.0625F);
