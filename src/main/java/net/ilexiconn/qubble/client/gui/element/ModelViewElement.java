@@ -3,6 +3,7 @@ package net.ilexiconn.qubble.client.gui.element;
 import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.gui.element.Element;
 import net.ilexiconn.llibrary.client.gui.element.ElementHandler;
+import net.ilexiconn.llibrary.client.model.VoxelModel;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.util.ClientUtils;
@@ -46,6 +47,8 @@ public class ModelViewElement extends Element<QubbleGUI> {
     private boolean dragged;
 
     private float partialTicks;
+
+    private VoxelModel voxel = new VoxelModel();
 
     public ModelViewElement(QubbleGUI gui) {
         super(gui, 0.0F, 0.0F, gui.width, gui.height);
@@ -174,6 +177,27 @@ public class ModelViewElement extends Element<QubbleGUI> {
                         selectedBox.renderSingle(0.0625F, false);
                     }
                     GlStateManager.popMatrix();
+                    GlStateManager.pushMatrix();
+                    GlStateManager.disableTexture2D();
+                    int accent = LLibrary.CONFIG.getAccentColor();
+                    GlStateManager.disableDepth();
+                    GlStateManager.disableLighting();
+                    float r = (float) (accent >> 16 & 0xFF) / 255.0F;
+                    float g = (float) (accent >> 8 & 0xFF) / 255.0F;
+                    float b = (float) (accent & 0xFF) / 255.0F;
+                    GlStateManager.color(r, g, b, 1.0F);
+                    selectedBox.parentedPostRender(0.0625F);
+                    GlStateManager.translate(-0.5F * 0.0625F, -0.5F * 0.0625F, -0.5F * 0.0625F);
+                    GlStateManager.scale(0.15F, 0.15F, 0.15F);
+                    GlStateManager.translate(3.0F * 0.0625F, -18.0F * 0.0625F, 3.0F * 0.0625F);
+                    this.voxel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
+                    GlStateManager.scale(0.8F, 0.8F, 0.8F);
+                    GlStateManager.translate(0.0F, 0.33F, 0.0F);
+                    GlStateManager.color(r * 0.6F, g * 0.6F, b * 0.6F, 1.0F);
+                    this.voxel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
+                    GlStateManager.popMatrix();
+                    GlStateManager.enableLighting();
+                    GlStateManager.enableDepth();
                 }
             }
             GlStateManager.enableTexture2D();
