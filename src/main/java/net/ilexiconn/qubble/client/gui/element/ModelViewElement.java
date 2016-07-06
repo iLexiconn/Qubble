@@ -275,6 +275,9 @@ public class ModelViewElement extends Element<QubbleGUI> {
             box.rotateAngleY = (float) Math.toRadians(cube.getRotationY());
             box.rotateAngleZ = (float) Math.toRadians(cube.getRotationZ());
             box.mirror = cube.isTextureMirrored();
+            box.scaleX = cube.getScaleX();
+            box.scaleY = cube.getScaleY();
+            box.scaleZ = cube.getScaleZ();
             box.compileDisplayList(0.0625F);
         }
     }

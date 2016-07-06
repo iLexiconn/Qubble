@@ -51,6 +51,9 @@ public class QubbleModelBase extends AdvancedModelBase {
         box.rotateAngleY = (float) Math.toRadians(cube.getRotationY());
         box.rotateAngleZ = (float) Math.toRadians(cube.getRotationZ());
         box.mirror = cube.isTextureMirrored();
+        box.scaleX = cube.getScaleX();
+        box.scaleY = cube.getScaleY();
+        box.scaleZ = cube.getScaleZ();
         this.cubes.put(cube, box);
         this.ids.put(this.id, cube);
         this.id++;
