@@ -14,10 +14,10 @@ import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class QubbleModelRenderer extends AdvancedModelRenderer {
+    public int sizeX, sizeY, sizeZ;
     private int displayList;
     private boolean compiled;
     private float r, g, b;
-    public int sizeX, sizeY, sizeZ;
 
     public QubbleModelRenderer(AdvancedModelBase model, String name, int textureX, int textureY, int id) {
         super(model, name);

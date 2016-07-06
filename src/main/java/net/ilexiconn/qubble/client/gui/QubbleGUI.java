@@ -147,6 +147,10 @@ public class QubbleGUI extends ElementGUI {
         return this.openProjects;
     }
 
+    public ModelMode getMode() {
+        return this.mode;
+    }
+
     public void setMode(ModelMode mode) {
         this.mode = mode;
         this.getSidebar().initFields();
@@ -155,9 +159,5 @@ public class QubbleGUI extends ElementGUI {
         } else {
             this.getSidebar().clearFields();
         }
-    }
-
-    public ModelMode getMode() {
-        return this.mode;
     }
 }

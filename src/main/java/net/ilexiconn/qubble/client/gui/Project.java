@@ -19,20 +19,20 @@ public class Project {
         return this.model;
     }
 
-    public void setBaseTexture(ModelTexture texture) {
-        this.baseTexture = texture;
-    }
-
-    public void setOverlayTexture(ModelTexture texture) {
-        this.overlayTexture = texture;
-    }
-
     public ModelTexture getBaseTexture() {
         return this.baseTexture;
     }
 
+    public void setBaseTexture(ModelTexture texture) {
+        this.baseTexture = texture;
+    }
+
     public ModelTexture getOverlayTexture() {
         return this.overlayTexture;
+    }
+
+    public void setOverlayTexture(ModelTexture texture) {
+        this.overlayTexture = texture;
     }
 
     public QubbleCuboid getSelectedCube() {

@@ -43,7 +43,8 @@ public class ToolbarElement extends Element<QubbleGUI> {
     @Override
     public void init() {
         ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "New", 0, 0, 30, 20, (v) -> {
-            return false; //TODO
+            this.openNewWindow();
+            return true; //TODO
         }).withColorScheme(ColorSchemes.DEFAULT));
         ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "Open", 30, 0, 30, 20, (v) -> {
             this.openModelWindow(null);
@@ -57,7 +58,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
             return false;
         }).withColorScheme(ColorSchemes.DEFAULT));
 
-        ElementHandler.INSTANCE.addElement(this.getGUI(), this.modelButton = (ButtonElement<QubbleGUI>) new ButtonElement<>(this.getGUI(), "Model", this.getGUI().width - 262, 0, 40, 20, (v) -> {
+        ElementHandler.INSTANCE.addElement(this.getGUI(), this.modelButton = (ButtonElement<QubbleGUI>) new ButtonElement<>(this.getGUI(), "Model", this.getGUI().width - 212, 0, 40, 20, (v) -> {
             if (this.modelButton.getColorScheme() != ColorSchemes.TAB_ACTIVE) {
                 this.setMode(ModelMode.MODEL);
                 return true;
@@ -65,7 +66,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
                 return false;
             }
         }).withColorScheme(ColorSchemes.TAB_ACTIVE));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), this.textureButton = (ButtonElement<QubbleGUI>) new ButtonElement<>(this.getGUI(), "Texture", this.getGUI().width - 222, 0, 50, 20, (v) -> {
+        ElementHandler.INSTANCE.addElement(this.getGUI(), this.textureButton = (ButtonElement<QubbleGUI>) new ButtonElement<>(this.getGUI(), "Texture", this.getGUI().width - 172, 0, 50, 20, (v) -> {
             if (this.textureButton.getColorScheme() != ColorSchemes.TAB_ACTIVE) {
                 this.setMode(ModelMode.TEXTURE);
                 return true;
@@ -73,14 +74,15 @@ public class ToolbarElement extends Element<QubbleGUI> {
                 return false;
             }
         }).withColorScheme(ColorSchemes.DEFAULT));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), this.animateButton = (ButtonElement<QubbleGUI>) new ButtonElement<>(this.getGUI(), "Animate", this.getGUI().width - 172, 0, 50, 20, (v) -> {
+        /*ElementHandler.INSTANCE.addElement(this.getGUI(), */
+        this.animateButton = (ButtonElement<QubbleGUI>) new ButtonElement<>(this.getGUI(), "Animate", this.getGUI().width - 172, 0, 50, 20, (v) -> {
             if (this.animateButton.getColorScheme() != ColorSchemes.TAB_ACTIVE) {
                 this.setMode(ModelMode.ANIMATE);
                 return true;
             } else {
                 return false;
             }
-        }).withColorScheme(ColorSchemes.DEFAULT));
+        }).withColorScheme(ColorSchemes.DEFAULT)/*)*/;
         this.setMode(ModelMode.MODEL);
 
         ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "o", this.getGUI().width - 40, 0, 20, 20, (v) -> {
@@ -91,6 +93,20 @@ public class ToolbarElement extends Element<QubbleGUI> {
             this.getGUI().mc.displayGuiScreen(this.getGUI().getParent());
             return true;
         }).withColorScheme(ButtonElement.CLOSE));
+    }
+
+    public void openNewWindow() {
+        WindowElement<QubbleGUI> newWindow = new WindowElement<>(this.getGUI(), "New", 100, 44);
+        final String[] string = new String[1];
+        newWindow.addElement(new InputElement<>(this.getGUI(), "", 2, 16, 96, e -> string[0] = e.getText()));
+        newWindow.addElement(new ButtonElement<>(this.getGUI(), "Done", 2, 30, 96, 12, (v) -> {
+            if (!string[0].isEmpty()) {
+                this.getGUI().selectModel(QubbleModel.create(string[0], "Unknown", 64, 32));
+                ElementHandler.INSTANCE.removeElement(this.getGUI(), newWindow);
+            }
+            return true;
+        }).withColorScheme(ColorSchemes.WINDOW));
+        ElementHandler.INSTANCE.addElement(this.getGUI(), newWindow);
     }
 
     public void openModelWindow(IModelImporter modelImporter) {
@@ -167,9 +183,10 @@ public class ToolbarElement extends Element<QubbleGUI> {
     public void openSaveWindow() {
         WindowElement<QubbleGUI> saveWindow = new WindowElement<>(this.getGUI(), "Save", 100, 64);
         saveWindow.addElement(new LabelElement<>(this.getGUI(), "File name", 4, 19));
-        InputElement fileName;
+        InputElement<QubbleGUI> fileName;
         QubbleModel selectedModel = this.getGUI().getSelectedProject().getModel();
-        saveWindow.addElement(fileName = new InputElement<>(this.getGUI(), selectedModel.getFileName() == null ? selectedModel.getName() : selectedModel.getFileName(), 2, 30, 96, (i) -> {}));
+        saveWindow.addElement(fileName = new InputElement<>(this.getGUI(), selectedModel.getFileName() == null ? selectedModel.getName() : selectedModel.getFileName(), 2, 30, 96, (i) -> {
+        }));
         saveWindow.addElement(new ButtonElement<>(this.getGUI(), "Save", 2, 50, 47, 12, (v) -> {
             try {
                 CompressedStreamTools.writeCompressed(selectedModel.copy().serializeNBT(), new FileOutputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, fileName.getText() + ".qbl")));
@@ -212,7 +229,8 @@ public class ToolbarElement extends Element<QubbleGUI> {
         WindowElement<QubbleGUI> window = new WindowElement<>(this.getGUI(), "Export " + modelExporter.getName(), 100, height);
         for (int argumentIndex = 0; argumentIndex < argumentNames.length; argumentIndex++) {
             window.addElement(new LabelElement<>(this.getGUI(), argumentNames[argumentIndex], 2, argumentY));
-            InputElement<QubbleGUI> input = new InputElement<>(this.getGUI(), defaultArguments[argumentIndex], 1, argumentY + 9, 97, (i) -> {});
+            InputElement<QubbleGUI> input = new InputElement<>(this.getGUI(), defaultArguments[argumentIndex], 1, argumentY + 9, 97, (i) -> {
+            });
             window.addElement(input);
             argumentTextBoxes[argumentIndex] = input;
             argumentY += 28;

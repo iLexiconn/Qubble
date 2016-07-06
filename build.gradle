@@ -15,14 +15,14 @@ apply plugin: "net.minecraftforge.gradle.forge"
 def mod_file = getModFile()
 version = getVersion("VERSION", mod_file)
 def llibrary_version = getVersion("LLIBRARY_VERSION", mod_file)
-group = mod_file.split("\\.").dropRight(2)
+group = "net.ilexiconn"
 archivesBaseName = "qubble"
 sourceCompatibility = targetCompatibility = "1.8"
 
 minecraft {
-    version = "1922"
+    version = "1.10.2-12.18.0.2002-1.10.0"
     runDir = "minecraft"
-    mappings = "snapshot_20160518"
+    mappings = "snapshot_20160628"
 }
 
 repositories {
@@ -34,7 +34,7 @@ repositories {
 }
 
 dependencies {
-    //compile "net.ilexiconn:llibrary:$llibrary_version-1.9:dev"
+    compile "net.ilexiconn:llibrary:$llibrary_version-1.10.2:dev"
 }
 
 processResources {

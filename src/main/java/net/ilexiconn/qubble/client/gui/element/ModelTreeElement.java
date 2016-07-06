@@ -37,7 +37,8 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         ElementHandler.INSTANCE.addElement(this.getGUI(), this.scroller = new ScrollbarElement<>(this, () -> this.getWidth() - 8.0F, () -> 2.0F, () -> (float) this.getHeight(), 12, () -> this.entryCount));
         ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "+", this.getPosX(), this.getPosY() + this.getHeight(), 16, 16, (button) -> {
             WindowElement<QubbleGUI> createCubeWindow = new WindowElement<>(this.getGUI(), "Create Cube", 100, 42);
-            InputElement<QubbleGUI> nameElement = new InputElement<>(this.getGUI(), "Cube Name", 2, 16, 96, (i) -> {});
+            InputElement<QubbleGUI> nameElement = new InputElement<>(this.getGUI(), "Cube Name", 2, 16, 96, (i) -> {
+            });
             createCubeWindow.addElement(nameElement);
             createCubeWindow.addElement(new ButtonElement<>(this.getGUI(), "Create", 2, 30, 96, 10, (element) -> {
                 Project selectedProject = this.getGUI().getSelectedProject();

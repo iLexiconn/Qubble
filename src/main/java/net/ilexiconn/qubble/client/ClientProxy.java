@@ -55,6 +55,24 @@ public class ClientProxy extends ServerProxy {
     private static Field TEXTURE_QUADS_FIELD;
     private static Method GET_ENTITY_TEXTURE_METHOD;
 
+    public static List<String> getGameModels() {
+        List<String> gameModels = new LinkedList<>();
+        for (Map.Entry<String, QubbleModel> entry : GAME_MODELS.entrySet()) {
+            gameModels.add(entry.getKey());
+        }
+        Collections.sort(gameModels);
+        return gameModels;
+    }
+
+    public static List<String> getGameBlockModels() {
+        List<String> gameModels = new LinkedList<>();
+        for (Map.Entry<String, QubbleModel> entry : GAME_JSON_MODELS.entrySet()) {
+            gameModels.add(entry.getKey());
+        }
+        Collections.sort(gameModels);
+        return gameModels;
+    }
+
     @Override
     public void onPreInit() {
         super.onPreInit();
@@ -365,23 +383,5 @@ public class ClientProxy extends ServerProxy {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public static List<String> getGameModels() {
-        List<String> gameModels = new LinkedList<>();
-        for (Map.Entry<String, QubbleModel> entry : GAME_MODELS.entrySet()) {
-            gameModels.add(entry.getKey());
-        }
-        Collections.sort(gameModels);
-        return gameModels;
-    }
-
-    public static List<String> getGameBlockModels() {
-        List<String> gameModels = new LinkedList<>();
-        for (Map.Entry<String, QubbleModel> entry : GAME_JSON_MODELS.entrySet()) {
-            gameModels.add(entry.getKey());
-        }
-        Collections.sort(gameModels);
-        return gameModels;
     }
 }

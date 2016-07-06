@@ -46,12 +46,12 @@ public class TextureMapExporter implements IModelExporter<BufferedImage> {
 
     @Override
     public String[] getArgumentNames() {
-        return new String[] {};
+        return new String[]{};
     }
 
     @Override
     public String[] getDefaultArguments(QubbleModel currentModel) {
-        return new String[] {};
+        return new String[]{};
     }
 
     private void fill(BufferedImage image, int x, int y, int width, int height, int color) {

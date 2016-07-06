@@ -309,7 +309,8 @@ public class SidebarElement extends Element<QubbleGUI> {
                     return true;
                 }));
                 this.addChild(new LabelElement<>(this.getGUI(), "Texture", 4, 69));
-                this.addChild(this.texture = new InputElement<>(this.getGUI(), "", 4, 78, 104, (i) -> {}));
+                this.addChild(this.texture = new InputElement<>(this.getGUI(), "", 4, 78, 104, (i) -> {
+                }));
                 this.addChild(new ButtonElement<>(this.getGUI(), "...", 108, 78, 12, 12, (button) -> {
                     if (this.getGUI().getSelectedProject() != null) {
                         this.openSelectTextureWindow("Select Texture", true);
@@ -318,7 +319,8 @@ public class SidebarElement extends Element<QubbleGUI> {
                     return false;
                 }).withColorScheme(ColorSchemes.DEFAULT));
                 this.addChild(new LabelElement<>(this.getGUI(), "Texture overlay", 4, 94));
-                this.addChild(this.overlayTexture = new InputElement<>(this.getGUI(), "", 4, 103, 104, (i) -> {}));
+                this.addChild(this.overlayTexture = new InputElement<>(this.getGUI(), "", 4, 103, 104, (i) -> {
+                }));
                 this.addChild(new ButtonElement<>(this.getGUI(), "...", 108, 103, 12, 12, (button) -> {
                     if (this.getGUI().getSelectedProject() != null) {
                         this.openSelectTextureWindow("Select Overlay Texture", false);

@@ -28,6 +28,11 @@ public class ModelTexture {
         }
     }
 
+    public ModelTexture(ResourceLocation texture) {
+        this.location = texture;
+        this.name = texture.toString();
+    }
+
     private void load() throws IOException {
         if (this.file != null) {
             FileInputStream in = new FileInputStream(this.file);
@@ -36,11 +41,6 @@ public class ModelTexture {
             BufferedImage image = ImageIO.read(this.file);
             this.location = ClientProxy.MINECRAFT.getTextureManager().getDynamicTextureLocation(Qubble.MODID + ":" + this.name, new DynamicTexture(image));
         }
-    }
-
-    public ModelTexture(ResourceLocation texture) {
-        this.location = texture;
-        this.name = texture.toString();
     }
 
     public ResourceLocation getLocation() {

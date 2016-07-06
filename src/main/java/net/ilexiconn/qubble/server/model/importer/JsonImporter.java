@@ -26,15 +26,15 @@ public class JsonImporter implements IModelImporter<BlockModelContainer> {
         QubbleModel qubbleModel = QubbleModel.create(fileName, "Unknown", 64, 32);
         for (BlockModelContainer.Element element : model.elements) {
             QubbleCuboid cube = QubbleCuboid.create(element.name == null ? "Part " + partIndex++ : element.name);
-            float[] position = new float[] {element.from[0], element.from[1], element.from[2]};
+            float[] position = new float[]{element.from[0], element.from[1], element.from[2]};
             float[] offset = new float[3];
             float[] rotation = new float[3];
-            int[] dimensions = new int[] {(int) (element.to[0] - position[0]), (int) (element.to[1] - position[1]), (int) (element.to[2] - position[2])};
+            int[] dimensions = new int[]{(int) (element.to[0] - position[0]), (int) (element.to[1] - position[1]), (int) (element.to[2] - position[2])};
             if (element.rotation != null) {
                 BlockModelContainer.ElementRotation elementRotation = element.rotation;
                 float[] origin = elementRotation.origin;
                 if (origin == null) {
-                    origin = new float[] {8, 8, 8};
+                    origin = new float[]{8, 8, 8};
                 }
                 offset[0] = position[0] - origin[0];
                 offset[1] = position[1] - origin[1];

@@ -196,9 +196,9 @@ public class ModelViewElement extends Element<QubbleGUI> {
         float gridY = 24.0F * 0.0625F;
         size /= scale;
         int color = LLibrary.CONFIG.getTextColor();
-        float r = (float)(color >> 16 & 255) / 255.0F;
-        float g = (float)(color >> 8 & 255) / 255.0F;
-        float b = (float)(color & 255) / 255.0F;
+        float r = (float) (color >> 16 & 255) / 255.0F;
+        float g = (float) (color >> 8 & 255) / 255.0F;
+        float b = (float) (color & 255) / 255.0F;
         float a = Math.max(0.0F, Math.min(1.0F, lineWidth - 0.35F));
         for (float x = -size; x < size + scale; x += scale) {
             buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
