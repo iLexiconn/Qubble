@@ -17,7 +17,7 @@ public class JsonExporter implements IModelExporter<BlockModelContainer> {
 
     @Override
     public String getName() {
-        return "Block JSON";
+        return "JSON";
     }
 
     @Override
@@ -53,6 +53,8 @@ public class JsonExporter implements IModelExporter<BlockModelContainer> {
             } else if (cube.getRotationX() != 0.0F) {
                 rotation.axis = "x";
                 rotation.angle = -((int) (cube.getRotationX() / 16)) * 22.5F;
+            } else {
+                rotation = null;
             }
             element.rotation = rotation;
             blockModel.elements.add(element);

@@ -12,7 +12,7 @@ import java.io.IOException;
 public class JsonImporter implements IModelImporter<BlockModelContainer> {
     @Override
     public String getName() {
-        return "Block JSON";
+        return "JSON";
     }
 
     @Override
