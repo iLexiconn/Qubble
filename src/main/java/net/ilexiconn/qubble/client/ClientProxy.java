@@ -29,6 +29,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.BlockStateLoader;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -110,9 +111,12 @@ public class ClientProxy extends ServerProxy {
     @Override
     public void onPostInit() {
         super.onPostInit();
-        for (Map.Entry<Class<? extends Entity>, Render<? extends Entity>> entry : MINECRAFT.getRenderManager().entityRenderMap.entrySet()) {
+        Map<Class<? extends Entity>, Render<? extends Entity>> map = MINECRAFT.getRenderManager().entityRenderMap;
+        ProgressManager.ProgressBar bar = ProgressManager.push("Parsing entity models", map.size());
+        for (Map.Entry<Class<? extends Entity>, Render<? extends Entity>> entry : map.entrySet()) {
             Render<? extends Entity> renderer = entry.getValue();
             String entityName = entry.getKey().getSimpleName().replaceAll("Entity", "");
+            bar.step(entityName);
             Entity entity = null;
             try {
                 entity = entry.getKey().getConstructor(World.class).newInstance(new DummyWorld());
@@ -161,9 +165,12 @@ public class ClientProxy extends ServerProxy {
                 }
             }
         }
+        ProgressManager.pop(bar);
+        bar = ProgressManager.push("Parsing block entity models", TileEntityRendererDispatcher.instance.mapSpecialRenderers.size());
         for (Map.Entry<Class<? extends TileEntity>, TileEntitySpecialRenderer<? extends TileEntity>> entry : TileEntityRendererDispatcher.instance.mapSpecialRenderers.entrySet()) {
             TileEntitySpecialRenderer<? extends TileEntity> renderer = entry.getValue();
             String tileName = entry.getKey().getSimpleName();
+            bar.step(tileName);
             for (Field field : this.getAllFields(renderer.getClass())) {
                 try {
                     if (ModelBase.class.isAssignableFrom(field.getType())) {
@@ -194,12 +201,15 @@ public class ClientProxy extends ServerProxy {
                 }
             }
         }
+        ProgressManager.pop(bar);
         Map<IBlockState, ModelResourceLocation> blockModels = MINECRAFT.getRenderItem().getItemModelMesher().getModelManager().getBlockModelShapes().getBlockStateMapper().putAllStateModelLocations();
         Gson gson = (new GsonBuilder()).registerTypeAdapter(ModelBlockDefinition.class, new ModelBlockDefinition.Deserializer()).registerTypeAdapter(Variant.class, new Variant.Deserializer()).registerTypeAdapter(VariantList.class, new VariantList.Deserializer()).registerTypeAdapter(Multipart.class, new Multipart.Deserializer()).registerTypeAdapter(Selector.class, new Selector.Deserializer()).create();
         IResourceManager resourceManager = MINECRAFT.getResourceManager();
         IModelImporter<BlockModelContainer> importer = (IModelImporter<BlockModelContainer>) ModelImporters.BLOCK_JSON.getModelImporter();
+        bar = ProgressManager.push("Parsing block models", blockModels.size());
         for (Map.Entry<IBlockState, ModelResourceLocation> entry : blockModels.entrySet()) {
             String name = entry.getKey().getBlock().getLocalizedName();
+            bar.step(name);
             ModelResourceLocation modelResource = entry.getValue();
             try {
                 ResourceLocation blockStateResource = new ResourceLocation(modelResource.getResourceDomain(), "blockstates/" + modelResource.getResourcePath() + ".json");
@@ -219,6 +229,7 @@ public class ClientProxy extends ServerProxy {
                 System.err.println(e.toString());
             }
         }
+        ProgressManager.pop(bar);
     }
 
     private QubbleModel parseJsonModel(Gson gson, IResourceManager resourceManager, IModelImporter<BlockModelContainer> importer, String name, ResourceLocation resource) throws IOException {
