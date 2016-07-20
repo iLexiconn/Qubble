@@ -40,10 +40,10 @@ public class JsonExporter implements IModelExporter<BlockModelContainer> {
             float positionZ = cube.getPositionZ() + cube.getOffsetZ() + 8;
             Vector3f from = new Vector3f(positionX, positionY, positionZ);
             Vector3f to = new Vector3f(positionX + dimensionX, positionY + dimensionY, positionZ + dimensionZ);
-            element.from = new float[]{this.clampPosition(from.getX()), this.clampPosition(from.getY()), this.clampPosition(from.getZ())};
-            element.to = new float[]{this.clampPosition(to.getX()), this.clampPosition(to.getY()), this.clampPosition(to.getZ())};
+            element.from = new float[] { this.clampPosition(from.getX()), this.clampPosition(from.getY()), this.clampPosition(from.getZ()) };
+            element.to = new float[] { this.clampPosition(to.getX()), this.clampPosition(to.getY()), this.clampPosition(to.getZ()) };
             BlockModelContainer.ElementRotation rotation = new BlockModelContainer.ElementRotation();
-            rotation.origin = new float[]{this.clampPosition(positionX - cube.getOffsetX()), this.clampPosition(positionY - cube.getOffsetY()), this.clampPosition(positionZ - cube.getOffsetZ())};
+            rotation.origin = new float[] { this.clampPosition(positionX - cube.getOffsetX()), this.clampPosition(positionY - cube.getOffsetY()), this.clampPosition(positionZ - cube.getOffsetZ()) };
             if (cube.getRotationZ() != 0.0F) {
                 rotation.axis = "z";
                 rotation.angle = -((int) (cube.getRotationZ() / 16)) * 22.5F;
@@ -55,9 +55,24 @@ public class JsonExporter implements IModelExporter<BlockModelContainer> {
                 rotation.angle = -((int) (cube.getRotationX() / 16)) * 22.5F;
             }
             element.rotation = rotation;
+
+            element.faces.put("down", this.createFace());
+            element.faces.put("up", this.createFace());
+            element.faces.put("north", this.createFace());
+            element.faces.put("south", this.createFace());
+            element.faces.put("west", this.createFace());
+            element.faces.put("east", this.createFace());
+
             blockModel.elements.add(element);
         }
         return blockModel;
+    }
+
+    private BlockModelContainer.ElementFace createFace() {
+        BlockModelContainer.ElementFace face = new BlockModelContainer.ElementFace();
+        face.texture = "#all";
+        face.uv = new float[] {0, 0, 1, 1};
+        return face;
     }
 
     @Override
@@ -69,12 +84,12 @@ public class JsonExporter implements IModelExporter<BlockModelContainer> {
 
     @Override
     public String[] getArgumentNames() {
-        return new String[]{};
+        return new String[] {};
     }
 
     @Override
     public String[] getDefaultArguments(QubbleModel currentModel) {
-        return new String[]{};
+        return new String[] {};
     }
 
     private float clampPosition(float position) {
