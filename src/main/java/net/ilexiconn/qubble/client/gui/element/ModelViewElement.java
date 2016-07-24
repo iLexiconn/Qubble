@@ -106,6 +106,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
         GlStateManager.loadIdentity();
         GlStateManager.enableBlend();
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.enableAlpha();
         if (selection) {
             GlStateManager.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
         } else {
@@ -142,7 +143,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
             if (!selection && project.getOverlayTexture() != null) {
                 GlStateManager.enableTexture2D();
                 textureManager.bindTexture(project.getOverlayTexture().getLocation());
-                this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
+                this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F, false);
             }
             if (!selection) {
                 if (Qubble.CONFIG.showGrid) {

@@ -210,23 +210,25 @@ public class ClientProxy extends ServerProxy {
         for (Map.Entry<IBlockState, ModelResourceLocation> entry : blockModels.entrySet()) {
             String name = entry.getKey().getBlock().getLocalizedName();
             bar.step(name);
-            ModelResourceLocation modelResource = entry.getValue();
-            try {
-                ResourceLocation blockStateResource = new ResourceLocation(modelResource.getResourceDomain(), "blockstates/" + modelResource.getResourcePath() + ".json");
-                ModelBlockDefinition state = BlockStateLoader.load(new InputStreamReader(resourceManager.getResource(blockStateResource).getInputStream()), gson);
-                outer:
-                for (VariantList variantList : state.getMultipartVariants()) {
-                    for (Variant variant : variantList.getVariantList()) {
-                        ResourceLocation resource = variant.getModelLocation();
-                        QubbleModel qubbleModel = parseJsonModel(gson, resourceManager, importer, name, new ResourceLocation(resource.getResourceDomain(), "models/" + resource.getResourcePath() + ".json"));
-                        if (qubbleModel != null) {
-                            GAME_JSON_MODELS.put(name, qubbleModel);
+            if (!GAME_JSON_MODELS.containsKey(name)) {
+                ModelResourceLocation modelResource = entry.getValue();
+                try {
+                    ResourceLocation blockStateResource = new ResourceLocation(modelResource.getResourceDomain(), "blockstates/" + modelResource.getResourcePath() + ".json");
+                    ModelBlockDefinition state = BlockStateLoader.load(new InputStreamReader(resourceManager.getResource(blockStateResource).getInputStream()), gson);
+                    outer:
+                    for (VariantList variantList : state.getMultipartVariants()) {
+                        for (Variant variant : variantList.getVariantList()) {
+                            ResourceLocation resource = variant.getModelLocation();
+                            QubbleModel qubbleModel = parseJsonModel(gson, resourceManager, importer, name, new ResourceLocation(resource.getResourceDomain(), "models/" + resource.getResourcePath() + ".json"));
+                            if (qubbleModel != null) {
+                                GAME_JSON_MODELS.put(name, qubbleModel);
+                            }
+                            break outer;
                         }
-                        break outer;
                     }
+                } catch (Exception e) {
+                    System.err.println(e.toString());
                 }
-            } catch (IOException e) {
-                System.err.println(e.toString());
             }
         }
         ProgressManager.pop(bar);
