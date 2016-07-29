@@ -12,8 +12,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 @Mod(modid = Qubble.MODID, name = "Qubble", version = Qubble.VERSION, dependencies = "required-after:llibrary@[" + Qubble.LLIBRARY_VERSION + ",)", clientSideOnly = true)
 public class Qubble {
     public static final String MODID = "qubble";
-    public static final String VERSION = "0.1.1-develop";
-    public static final String LLIBRARY_VERSION = "1.4.2";
+    public static final String VERSION = "0.1.1";
+    public static final String LLIBRARY_VERSION = "1.5.0";
 
     @Mod.Instance(Qubble.MODID)
     public static Qubble INSTANCE;
