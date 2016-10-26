@@ -24,7 +24,7 @@ public class TextureMapElement extends Element<QubbleGUI> {
     public void render(float mouseX, float mouseY, float partialTicks) {
         GlStateManager.pushMatrix();
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
-        Project selectedProject = this.getGUI().getSelectedProject();
+        Project selectedProject = this.gui.getSelectedProject();
         if (selectedProject != null) {
             ModelTexture texture = selectedProject.getBaseTexture();
             GlStateManager.translate(this.getPosX(), this.getPosY(), 0.0F);
@@ -80,7 +80,7 @@ public class TextureMapElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
         if (this.isSelected(mouseX, mouseY)) {
-            Project selectedProject = this.getGUI().getSelectedProject();
+            Project selectedProject = this.gui.getSelectedProject();
             if (selectedProject != null) {
                 QubbleCuboid selectedCube = this.getSelectedCube(mouseX, mouseY, selectedProject);
                 selectedProject.setSelectedCube(selectedCube);
@@ -98,7 +98,7 @@ public class TextureMapElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
         if (this.isSelected(mouseX, mouseY)) {
-            Project selectedProject = this.getGUI().getSelectedProject();
+            Project selectedProject = this.gui.getSelectedProject();
             if (selectedProject != null) {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 if (selectedCube != null) {
@@ -106,8 +106,8 @@ public class TextureMapElement extends Element<QubbleGUI> {
                     int textureX = (int) ((mouseX - this.getPosX()) / scale) + this.dragOffsetX;
                     int textureY = (int) ((mouseY - this.getPosY()) / scale) + this.dragOffsetY;
                     selectedCube.setTexture(Math.max(0, Math.min(textureX, selectedProject.getModel().getTextureWidth() - (selectedCube.getDimensionX() * 2 + selectedCube.getDimensionZ() * 2))), Math.max(0, Math.min(textureY, selectedProject.getModel().getTextureHeight() - (selectedCube.getDimensionY() + selectedCube.getDimensionZ()))));
-                    this.getGUI().getModelView().updatePart(selectedCube);
-                    this.getGUI().getSidebar().populateFields(selectedProject.getModel(), selectedCube);
+                    this.gui.getModelView().updatePart(selectedCube);
+                    this.gui.getSidebar().populateFields(selectedProject.getModel(), selectedCube);
                 }
                 return true;
             }

@@ -2,7 +2,6 @@ package net.ilexiconn.qubble.client.gui.element;
 
 import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.gui.element.Element;
-import net.ilexiconn.llibrary.client.gui.element.ElementHandler;
 import net.ilexiconn.llibrary.client.model.VoxelModel;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
@@ -57,8 +56,8 @@ public class ModelViewElement extends Element<QubbleGUI> {
 
     @Override
     public void init() {
-        this.setWidth(getGUI().width);
-        this.setHeight(getGUI().height);
+        this.setWidth(this.gui.width);
+        this.setHeight(this.gui.height);
     }
 
     @Override
@@ -66,7 +65,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
         GlStateManager.disableLighting();
         GlStateManager.disableTexture2D();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        QubbleGUI gui = this.getGUI();
+        QubbleGUI gui = this.gui;
         ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         int scaleFactor = scaledResolution.getScaleFactor();
@@ -120,7 +119,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
         }
         GlStateManager.clear(GL11.GL_COLOR_BUFFER_BIT);
         this.setupCamera(10.0F, partialTicks);
-        Project project = this.getGUI().getSelectedProject();
+        Project project = this.gui.getSelectedProject();
         if (project != null) {
             if (this.currentModel == null) {
                 this.updateModel();
@@ -255,7 +254,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
 
     @Override
     public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
-        if (!this.getGUI().getModelTree().isParenting() && this.isSelected(mouseX, mouseY)) {
+        if (!this.gui.getModelTree().isParenting() && this.isSelected(mouseX, mouseY)) {
             float xMovement = mouseX - this.prevMouseX;
             float yMovement = mouseY - this.prevMouseY;
             if (button == 0) {
@@ -281,7 +280,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
     }
 
     public void updateModel() {
-        Project selectedProject = this.getGUI().getSelectedProject();
+        Project selectedProject = this.gui.getSelectedProject();
         if (selectedProject != null && selectedProject.getModel() != null) {
             QubbleModel newModel = selectedProject.getModel();
             this.currentModel = new QubbleModelBase(newModel);
@@ -313,7 +312,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseReleased(float mouseX, float mouseY, int button) {
         if (button == 0) {
-            if (!this.dragged && this.getGUI().getSelectedProject() != null && this.currentModel != null && this.isSelected(mouseX, mouseY)) {
+            if (!this.dragged && this.gui.getSelectedProject() != null && this.currentModel != null && this.isSelected(mouseX, mouseY)) {
                 ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
                 this.renderModel(this.partialTicks, scaledResolution, true);
                 FloatBuffer buffer = BufferUtils.createFloatBuffer(3);
@@ -322,14 +321,14 @@ public class ModelViewElement extends Element<QubbleGUI> {
                 int g = (int) (buffer.get(1) * 255.0F);
                 int b = (int) (buffer.get(2) * 255.0F);
                 int id = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF));
-                QubbleCuboid cube = this.getGUI().getSelectedProject().getSelectedCube();
+                QubbleCuboid cube = this.gui.getSelectedProject().getSelectedCube();
                 if (cube != null) {
-                    this.getGUI().getSelectedProject().setSelectedCube(null);
+                    this.gui.getSelectedProject().setSelectedCube(null);
                 }
                 QubbleCuboid newCube = this.currentModel.getCube(id);
-                this.getGUI().getSelectedProject().setSelectedCube(newCube);
+                this.gui.getSelectedProject().setSelectedCube(newCube);
                 if (newCube != null) {
-                    this.getGUI().getSelectedProject().setSelectedCube(newCube);
+                    this.gui.getSelectedProject().setSelectedCube(newCube);
                     return true;
                 }
                 return false;
@@ -341,9 +340,9 @@ public class ModelViewElement extends Element<QubbleGUI> {
 
     @Override
     protected boolean isSelected(float mouseX, float mouseY) {
-        ModelTreeElement modelTree = this.getGUI().getModelTree();
-        ToolbarElement toolbar = this.getGUI().getToolbar();
-        ProjectBarElement projectBar = this.getGUI().getProjectBar();
-        return ElementHandler.INSTANCE.isElementOnTop(this.getGUI(), this) && mouseX > modelTree.getPosX() + modelTree.getWidth() && mouseY >= toolbar.getPosY() + toolbar.getHeight() + (projectBar.isVisible() ? projectBar.getHeight() : 0);
+        ModelTreeElement modelTree = this.gui.getModelTree();
+        ToolbarElement toolbar = this.gui.getToolbar();
+        ProjectBarElement projectBar = this.gui.getProjectBar();
+        return this.gui.isElementOnTop(this) && mouseX > modelTree.getPosX() + modelTree.getWidth() && mouseY >= toolbar.getPosY() + toolbar.getHeight() + (projectBar.isVisible() ? projectBar.getHeight() : 0);
     }
 }

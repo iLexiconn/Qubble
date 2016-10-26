@@ -1,10 +1,13 @@
 package net.ilexiconn.qubble.client.gui;
 
 import net.ilexiconn.llibrary.client.gui.ElementGUI;
-import net.ilexiconn.llibrary.client.gui.element.ElementHandler;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.ClientProxy;
-import net.ilexiconn.qubble.client.gui.element.*;
+import net.ilexiconn.qubble.client.gui.element.ModelTreeElement;
+import net.ilexiconn.qubble.client.gui.element.ModelViewElement;
+import net.ilexiconn.qubble.client.gui.element.ProjectBarElement;
+import net.ilexiconn.qubble.client.gui.element.SidebarElement;
+import net.ilexiconn.qubble.client.gui.element.ToolbarElement;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
@@ -41,17 +44,18 @@ public class QubbleGUI extends ElementGUI {
 
     @Override
     public void initElements() {
-        ElementHandler.INSTANCE.addElement(this, this.modelView = new ModelViewElement(this));
-        ElementHandler.INSTANCE.addElement(this, this.modelTree = new ModelTreeElement(this));
-        ElementHandler.INSTANCE.addElement(this, this.sidebar = new SidebarElement(this));
-        ElementHandler.INSTANCE.addElement(this, this.toolbar = new ToolbarElement(this));
-        ElementHandler.INSTANCE.addElement(this, this.projectBar = new ProjectBarElement(this));
+        this.clearElements();
+        this.addElement(this.modelView = new ModelViewElement(this));
+        this.addElement(this.modelTree = new ModelTreeElement(this));
+        this.addElement(this.sidebar = new SidebarElement(this));
+        this.addElement(this.toolbar = new ToolbarElement(this));
+        this.addElement(this.projectBar = new ProjectBarElement(this));
     }
 
     @Override
     public void updateScreen() {
         super.updateScreen();
-        if (ticks % 40 == 0) {
+        if (this.ticks % 40 == 0) {
             Project selectedProject = this.getSelectedProject();
             if (selectedProject != null) {
                 ModelTexture baseTexture = selectedProject.getBaseTexture();
@@ -64,7 +68,7 @@ public class QubbleGUI extends ElementGUI {
                 }
             }
         }
-        ticks++;
+        this.ticks++;
     }
 
     @Override
@@ -73,15 +77,15 @@ public class QubbleGUI extends ElementGUI {
     }
 
     public GuiScreen getParent() {
-        return parent;
+        return this.parent;
     }
 
     public ScaledResolution getResolution() {
-        return resolution;
+        return this.resolution;
     }
 
     public ToolbarElement getToolbar() {
-        return toolbar;
+        return this.toolbar;
     }
 
     public void selectModel(String name, IModelImporter importer) {
@@ -116,7 +120,7 @@ public class QubbleGUI extends ElementGUI {
 
     public void closeModel(int index) {
         this.openProjects.remove(index);
-        this.selectModel(selectedProject);
+        this.selectModel(this.selectedProject);
     }
 
     public Project getSelectedProject() {

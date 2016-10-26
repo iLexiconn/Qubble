@@ -2,7 +2,14 @@ package net.ilexiconn.qubble.client.gui.element;
 
 import com.google.common.collect.Lists;
 import net.ilexiconn.llibrary.LLibrary;
-import net.ilexiconn.llibrary.client.gui.element.*;
+import net.ilexiconn.llibrary.client.gui.element.ButtonElement;
+import net.ilexiconn.llibrary.client.gui.element.CheckboxElement;
+import net.ilexiconn.llibrary.client.gui.element.ColorElement;
+import net.ilexiconn.llibrary.client.gui.element.Element;
+import net.ilexiconn.llibrary.client.gui.element.InputElement;
+import net.ilexiconn.llibrary.client.gui.element.LabelElement;
+import net.ilexiconn.llibrary.client.gui.element.ListElement;
+import net.ilexiconn.llibrary.client.gui.element.WindowElement;
 import net.ilexiconn.llibrary.client.gui.element.color.ColorMode;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.server.config.ConfigHandler;
@@ -12,6 +19,8 @@ import net.ilexiconn.qubble.client.gui.ModelMode;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
+import net.ilexiconn.qubble.client.gui.property.CheckboxProperty;
+import net.ilexiconn.qubble.client.gui.property.ColorProperty;
 import net.ilexiconn.qubble.server.model.ModelHandler;
 import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
 import net.ilexiconn.qubble.server.model.exporter.ModelExporters;
@@ -38,29 +47,32 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
     private WindowElement<QubbleGUI> textureWindow;
 
+    private CheckboxElement<QubbleGUI> darkCheckbox;
+    private CheckboxElement<QubbleGUI> lightCheckbox;
+
     public ToolbarElement(QubbleGUI gui) {
         super(gui, 0, 0, gui.width, 20);
     }
 
     @Override
     public void init() {
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "New", 0, 0, 30, 20, (v) -> {
+        this.gui.addElement(new ButtonElement<>(this.gui, "New", 0, 0, 30, 20, (v) -> {
             this.openNewWindow();
             return true;
         }).withColorScheme(ColorSchemes.DEFAULT));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "Open", 30, 0, 30, 20, (v) -> {
+        this.gui.addElement(new ButtonElement<>(this.gui, "Open", 30, 0, 30, 20, (v) -> {
             this.openModelWindow(null);
             return true;
         }).withColorScheme(ColorSchemes.DEFAULT));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "Save", 60, 0, 30, 20, (v) -> {
-            if (this.getGUI().getSelectedProject() != null) {
+        this.gui.addElement(new ButtonElement<>(this.gui, "Save", 60, 0, 30, 20, (v) -> {
+            if (this.gui.getSelectedProject() != null) {
                 this.openSaveWindow();
                 return true;
             }
             return false;
         }).withColorScheme(ColorSchemes.DEFAULT));
 
-        ElementHandler.INSTANCE.addElement(this.getGUI(), this.modelButton = (ButtonElement<QubbleGUI>) new ButtonElement<>(this.getGUI(), "Model", this.getGUI().width - 212, 0, 40, 20, (v) -> {
+        this.gui.addElement(this.modelButton = (ButtonElement<QubbleGUI>) new ButtonElement<>(this.gui, "Model", this.gui.width - 212, 0, 40, 20, (v) -> {
             if (this.modelButton.getColorScheme() != ColorSchemes.TAB_ACTIVE) {
                 this.setMode(ModelMode.MODEL);
                 return true;
@@ -68,7 +80,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
                 return false;
             }
         }).withColorScheme(ColorSchemes.TAB_ACTIVE));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), this.textureButton = (ButtonElement<QubbleGUI>) new ButtonElement<>(this.getGUI(), "Texture", this.getGUI().width - 172, 0, 50, 20, (v) -> {
+        this.gui.addElement(this.textureButton = (ButtonElement<QubbleGUI>) new ButtonElement<>(this.gui, "Texture", this.gui.width - 172, 0, 50, 20, (v) -> {
             if (this.textureButton.getColorScheme() != ColorSchemes.TAB_ACTIVE) {
                 this.setMode(ModelMode.TEXTURE);
                 return true;
@@ -76,8 +88,8 @@ public class ToolbarElement extends Element<QubbleGUI> {
                 return false;
             }
         }).withColorScheme(ColorSchemes.DEFAULT));
-        /*ElementHandler.INSTANCE.addElement(this.getGUI(), */
-        this.animateButton = (ButtonElement<QubbleGUI>) new ButtonElement<>(this.getGUI(), "Animate", this.getGUI().width - 172, 0, 50, 20, (v) -> {
+        /*this.gui.addElement(*/
+        this.animateButton = (ButtonElement<QubbleGUI>) new ButtonElement<>(this.gui, "Animate", this.gui.width - 172, 0, 50, 20, (v) -> {
             if (this.animateButton.getColorScheme() != ColorSchemes.TAB_ACTIVE) {
                 this.setMode(ModelMode.ANIMATE);
                 return true;
@@ -87,157 +99,158 @@ public class ToolbarElement extends Element<QubbleGUI> {
         }).withColorScheme(ColorSchemes.DEFAULT)/*)*/;
         this.setMode(ModelMode.MODEL);
 
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "o", this.getGUI().width - 40, 0, 20, 20, (v) -> {
+        this.gui.addElement(new ButtonElement<>(this.gui, "o", this.gui.width - 40, 0, 20, 20, (v) -> {
             this.openOptionsWindow();
             return true;
         }).withColorScheme(ColorSchemes.OPTIONS));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), new ButtonElement<>(this.getGUI(), "x", this.getGUI().width - 20, 0, 20, 20, (v) -> {
-            this.getGUI().mc.displayGuiScreen(this.getGUI().getParent());
+        this.gui.addElement(new ButtonElement<>(this.gui, "x", this.gui.width - 20, 0, 20, 20, (v) -> {
+            this.gui.mc.displayGuiScreen(this.gui.getParent());
             return true;
         }).withColorScheme(ButtonElement.CLOSE));
     }
 
     public void openNewWindow() {
-        WindowElement<QubbleGUI> newWindow = new WindowElement<>(this.getGUI(), "New", 100, 44);
-        final String[] string = new String[]{""};
-        newWindow.addElement(new InputElement<>(this.getGUI(), "", 2, 16, 96, e -> string[0] = e.getText()));
-        newWindow.addElement(new ButtonElement<>(this.getGUI(), "Done", 2, 30, 96, 12, (v) -> {
+        WindowElement<QubbleGUI> newWindow = new WindowElement<>(this.gui, "New", 100, 44);
+        final String[] string = new String[] { "" };
+        newWindow.addElement(new InputElement<>(this.gui, 2, 16, 96, "", e -> string[0] = e.getText()));
+        newWindow.addElement(new ButtonElement<>(this.gui, "Done", 2, 30, 96, 12, (v) -> {
             if (!string[0].isEmpty()) {
-                this.getGUI().selectModel(QubbleModel.create(string[0], "Unknown", 64, 32));
-                ElementHandler.INSTANCE.removeElement(this.getGUI(), newWindow);
+                this.gui.selectModel(QubbleModel.create(string[0], "Unknown", 64, 32));
+                this.gui.removeElement(newWindow);
             }
             return true;
         }).withColorScheme(ColorSchemes.WINDOW));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), newWindow);
+        this.gui.addElement(newWindow);
     }
 
     public void openModelWindow(IModelImporter modelImporter) {
-        WindowElement<QubbleGUI> openWindow = new WindowElement<>(this.getGUI(), (modelImporter == null ? "Open" : "Import " + modelImporter.getName()), 100, modelImporter == null ? 114 : 100);
-        openWindow.addElement(new ListElement<>(this.getGUI(), 2, 16, 96, 82, this.getModels(modelImporter), (list) -> {
-            this.getGUI().selectModel(list.getSelectedEntry(), modelImporter);
-            ElementHandler.INSTANCE.removeElement(this.getGUI(), openWindow);
+        WindowElement<QubbleGUI> openWindow = new WindowElement<>(this.gui, (modelImporter == null ? "Open" : "Import " + modelImporter.getName()), 100, modelImporter == null ? 114 : 100);
+        openWindow.addElement(new ListElement<>(this.gui, 2, 16, 96, 82, this.getModels(modelImporter), (list) -> {
+            this.gui.selectModel(list.getSelectedEntry(), modelImporter);
+            this.gui.removeElement(openWindow);
             return true;
         }));
         if (modelImporter == null) {
-            openWindow.addElement(new ButtonElement<>(this.getGUI(), "Import", 2, 100, 96, 12, (v) -> {
+            openWindow.addElement(new ButtonElement<>(this.gui, "Import", 2, 100, 96, 12, (v) -> {
                 this.openImportWindow();
-                ElementHandler.INSTANCE.removeElement(this.getGUI(), openWindow);
+                this.gui.removeElement(openWindow);
                 return true;
             }).withColorScheme(ColorSchemes.WINDOW));
         }
-        ElementHandler.INSTANCE.addElement(this.getGUI(), openWindow);
+        this.gui.addElement(openWindow);
     }
 
     public void openImportWindow() {
-        WindowElement<QubbleGUI> importWindow = new WindowElement<>(this.getGUI(), "Import", 100, 100);
+        WindowElement<QubbleGUI> importWindow = new WindowElement<>(this.gui, "Import", 100, 100);
         List<String> importers = Lists.newArrayList(ModelImporters.IMPORTERS).stream().map(IModelImporter::getName).collect(Collectors.toList());
         importers.add(0, "Game Blocks");
         importers.add(0, "Game");
-        importWindow.addElement(new ListElement<>(this.getGUI(), 2, 16, 96, 82, importers, (list) -> {
+        importWindow.addElement(new ListElement<>(this.gui, 2, 16, 96, 82, importers, (list) -> {
             if (list.getSelectedEntry().equals("Game")) {
                 this.openGameImportWindow();
-                ElementHandler.INSTANCE.removeElement(this.getGUI(), importWindow);
+                this.gui.removeElement(importWindow);
                 return true;
             } else if (list.getSelectedEntry().equals("Game Blocks")) {
                 this.openGameBlockImportWindow();
-                ElementHandler.INSTANCE.removeElement(this.getGUI(), importWindow);
+                this.gui.removeElement(importWindow);
                 return true;
             } else {
                 IModelImporter importer = ModelHandler.INSTANCE.getImporter(list.getSelectedEntry());
                 if (importer != null) {
                     this.openModelWindow(importer);
-                    ElementHandler.INSTANCE.removeElement(this.getGUI(), importWindow);
+                    this.gui.removeElement(importWindow);
                     return true;
                 } else {
                     return false;
                 }
             }
         }));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), importWindow);
+        this.gui.addElement(importWindow);
     }
 
     public void openGameImportWindow() {
-        WindowElement<QubbleGUI> openWindow = new WindowElement<>(this.getGUI(), "Import Game Model", 150, 200);
-        openWindow.addElement(new ListElement<>(this.getGUI(), 2, 16, 146, 182, ClientProxy.getGameModels(), (list) -> {
+        WindowElement<QubbleGUI> openWindow = new WindowElement<>(this.gui, "Import Game Model", 150, 200);
+        openWindow.addElement(new ListElement<>(this.gui, 2, 16, 146, 182, ClientProxy.getGameModels(), (list) -> {
             QubbleModel model = ClientProxy.GAME_MODELS.get(list.getSelectedEntry());
-            this.getGUI().selectModel(model.copy());
+            this.gui.selectModel(model.copy());
             ResourceLocation texture = ClientProxy.GAME_TEXTURES.get(list.getSelectedEntry());
             if (texture != null) {
-                this.getGUI().getSelectedProject().setBaseTexture(new ModelTexture(texture));
+                this.gui.getSelectedProject().setBaseTexture(new ModelTexture(texture));
             }
-            ElementHandler.INSTANCE.removeElement(this.getGUI(), openWindow);
+            this.gui.removeElement(openWindow);
             return true;
         }));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), openWindow);
+        this.gui.addElement(openWindow);
     }
 
     public void openGameBlockImportWindow() {
-        WindowElement<QubbleGUI> openWindow = new WindowElement<>(this.getGUI(), "Import Block Model", 150, 200);
-        openWindow.addElement(new ListElement<>(this.getGUI(), 2, 16, 146, 182, ClientProxy.getGameBlockModels(), (list) -> {
+        WindowElement<QubbleGUI> openWindow = new WindowElement<>(this.gui, "Import Block Model", 150, 200);
+        openWindow.addElement(new ListElement<>(this.gui, 2, 16, 146, 182, ClientProxy.getGameBlockModels(), (list) -> {
             QubbleModel model = ClientProxy.GAME_JSON_MODELS.get(list.getSelectedEntry());
-            this.getGUI().selectModel(model);
-            ElementHandler.INSTANCE.removeElement(this.getGUI(), openWindow);
+            this.gui.selectModel(model);
+            this.gui.removeElement(openWindow);
             return true;
         }));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), openWindow);
+        this.gui.addElement(openWindow);
     }
 
     public void openSaveWindow() {
-        WindowElement<QubbleGUI> saveWindow = new WindowElement<>(this.getGUI(), "Save", 100, 64);
-        saveWindow.addElement(new LabelElement<>(this.getGUI(), "File name", 4, 19));
+        WindowElement<QubbleGUI> saveWindow = new WindowElement<>(this.gui, "Save", 100, 64);
+        saveWindow.addElement(new LabelElement<>(this.gui, "File name", 4, 19));
         InputElement<QubbleGUI> fileName;
-        QubbleModel selectedModel = this.getGUI().getSelectedProject().getModel();
-        saveWindow.addElement(fileName = new InputElement<>(this.getGUI(), selectedModel.getFileName() == null ? selectedModel.getName() : selectedModel.getFileName(), 2, 30, 96, (i) -> {
+        QubbleModel selectedModel = this.gui.getSelectedProject().getModel();
+        String name = selectedModel.getFileName() == null ? selectedModel.getName() : selectedModel.getFileName();
+        saveWindow.addElement(fileName = new InputElement<>(this.gui, 2, 30, 96, name, (i) -> {
         }));
-        saveWindow.addElement(new ButtonElement<>(this.getGUI(), "Save", 2, 50, 47, 12, (v) -> {
+        saveWindow.addElement(new ButtonElement<>(this.gui, "Save", 2, 50, 47, 12, (v) -> {
             try {
                 CompressedStreamTools.writeCompressed(selectedModel.copy().serializeNBT(), new FileOutputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, fileName.getText() + ".qbl")));
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            ElementHandler.INSTANCE.removeElement(this.getGUI(), saveWindow);
+            this.gui.removeElement(saveWindow);
             return true;
         }).withColorScheme(ColorSchemes.WINDOW));
-        saveWindow.addElement(new ButtonElement<>(this.getGUI(), "Export", 51, 50, 47, 12, (v) -> {
+        saveWindow.addElement(new ButtonElement<>(this.gui, "Export", 51, 50, 47, 12, (v) -> {
             this.openExportWindow(fileName.getText());
-            ElementHandler.INSTANCE.removeElement(this.getGUI(), saveWindow);
+            this.gui.removeElement(saveWindow);
             return true;
         }).withColorScheme(ColorSchemes.WINDOW));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), saveWindow);
+        this.gui.addElement(saveWindow);
     }
 
     public void openExportWindow(String fileName) {
-        WindowElement<QubbleGUI> exportWindow = new WindowElement<>(this.getGUI(), "Export", 100, 100);
-        exportWindow.addElement(new ListElement<>(this.getGUI(), 2, 16, 96, 82, Lists.newArrayList(ModelExporters.EXPORTERS).stream().map(IModelExporter::getName).collect(Collectors.toList()), (list) -> {
+        WindowElement<QubbleGUI> exportWindow = new WindowElement<>(this.gui, "Export", 100, 100);
+        exportWindow.addElement(new ListElement<>(this.gui, 2, 16, 96, 82, Lists.newArrayList(ModelExporters.EXPORTERS).stream().map(IModelExporter::getName).collect(Collectors.toList()), (list) -> {
             IModelExporter exporter = ModelHandler.INSTANCE.getExporter(list.getSelectedEntry());
             if (exporter != null) {
                 this.openModelExportWindow(exporter, fileName);
-                ElementHandler.INSTANCE.removeElement(this.getGUI(), exportWindow);
+                this.gui.removeElement(exportWindow);
                 return true;
             } else {
                 return false;
             }
         }));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), exportWindow);
+        this.gui.addElement(exportWindow);
     }
 
     private void openModelExportWindow(IModelExporter modelExporter, String fileName) {
-        QubbleModel copy = this.getGUI().getSelectedProject().getModel().copy();
+        QubbleModel copy = this.gui.getSelectedProject().getModel().copy();
         int argumentY = 18;
         String[] argumentNames = modelExporter.getArgumentNames();
         String[] defaultArguments = modelExporter.getDefaultArguments(copy);
         InputElement[] argumentTextBoxes = new InputElement[argumentNames.length];
         int height = argumentNames.length * 28 + 32;
-        WindowElement<QubbleGUI> window = new WindowElement<>(this.getGUI(), "Export " + modelExporter.getName(), 100, height);
+        WindowElement<QubbleGUI> window = new WindowElement<>(this.gui, "Export " + modelExporter.getName(), 100, height);
         for (int argumentIndex = 0; argumentIndex < argumentNames.length; argumentIndex++) {
-            window.addElement(new LabelElement<>(this.getGUI(), argumentNames[argumentIndex], 2, argumentY));
-            InputElement<QubbleGUI> input = new InputElement<>(this.getGUI(), defaultArguments[argumentIndex], 1, argumentY + 9, 97, (i) -> {
+            window.addElement(new LabelElement<>(this.gui, argumentNames[argumentIndex], 2, argumentY));
+            InputElement<QubbleGUI> input = new InputElement<>(this.gui, 1, argumentY + 9, 97, defaultArguments[argumentIndex], (i) -> {
             });
             window.addElement(input);
             argumentTextBoxes[argumentIndex] = input;
             argumentY += 28;
         }
-        window.addElement(new ButtonElement<>(this.getGUI(), "Export", 48, height - 16, 50, 14, (v) -> {
+        window.addElement(new ButtonElement<>(this.gui, "Export", 48, height - 16, 50, 14, (v) -> {
             String[] arguments = new String[argumentNames.length];
             for (int i = 0; i < argumentTextBoxes.length; i++) {
                 arguments[i] = argumentTextBoxes[i].getText();
@@ -247,60 +260,68 @@ public class ToolbarElement extends Element<QubbleGUI> {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            ElementHandler.INSTANCE.removeElement(this.getGUI(), window);
+            this.gui.removeElement(window);
             return true;
         }).withColorScheme(ColorSchemes.WINDOW));
-        ElementHandler.INSTANCE.addElement(this.getGUI(), window);
+        this.gui.addElement(window);
     }
 
     public void openOptionsWindow() {
-        WindowElement<QubbleGUI> optionsWindow = new WindowElement<>(this.getGUI(), "Options", 200, 220);
-        optionsWindow.addElement(new ColorElement<>(this.getGUI(), 2, 16, 195, 149, (color) -> {
-            if (LLibrary.CONFIG.getAccentColor() != color.getColor()) {
-                LLibrary.CONFIG.setAccentColor(color.getColor());
+        WindowElement<QubbleGUI> optionsWindow = new WindowElement<>(this.gui, "Options", 200, 220);
+
+        optionsWindow.addElement(new ColorElement<>(this.gui, 2, 16, 195, 149, new ColorProperty((color) -> {
+            if (LLibrary.CONFIG.getAccentColor() != color) {
+                LLibrary.CONFIG.setAccentColor(color);
                 LLibrary.CONFIG.save();
-                return true;
-            } else {
-                return false;
             }
+        })));
+
+        this.darkCheckbox = new CheckboxElement<>(this.gui, 32.5F, 174.5F, new CheckboxProperty(state -> {
+            if (state) {
+                if (!Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.DARK.getName())) {
+                    LLibrary.CONFIG.setColorMode(ColorMode.DARK.getName());
+                    this.lightCheckbox.withSelection(false);
+                }
+            } else {
+                if (!Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.LIGHT.getName())) {
+                    LLibrary.CONFIG.setColorMode(ColorMode.LIGHT.getName());
+                    this.lightCheckbox.withSelection(true);
+                }
+            }
+            LLibrary.CONFIG.save();
+        }));
+        this.lightCheckbox = new CheckboxElement<>(this.gui, 122.5F, 174.5F, new CheckboxProperty(state -> {
+            if (state) {
+                if (!Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.LIGHT.getName())) {
+                    LLibrary.CONFIG.setColorMode(ColorMode.LIGHT.getName());
+                    this.darkCheckbox.withSelection(false);
+                }
+            } else {
+                if (!Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.DARK.getName())) {
+                    LLibrary.CONFIG.setColorMode(ColorMode.DARK.getName());
+                    this.darkCheckbox.withSelection(true);
+                }
+            }
+            LLibrary.CONFIG.save();
         }));
 
-        final CheckboxElement<QubbleGUI> dark = new CheckboxElement<>(this.getGUI(), 32.5F, 174.5F).withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.DARK.getName()));
-        final CheckboxElement<QubbleGUI> light = new CheckboxElement<>(this.getGUI(), 122.5F, 174.5F).withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.LIGHT.getName()));
-        optionsWindow.addElement(dark.withFunction((selected) -> {
-            if (!Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.DARK.getName())) {
-                LLibrary.CONFIG.setColorMode(ColorMode.DARK.getName());
-                light.withSelection(false);
-                LLibrary.CONFIG.save();
-                return true;
-            } else {
-                return false;
-            }
-        }));
-        optionsWindow.addElement(light.withFunction((selected) -> {
-            if (!Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.LIGHT.getName())) {
-                LLibrary.CONFIG.setColorMode(ColorMode.LIGHT.getName());
-                dark.withSelection(false);
-                LLibrary.CONFIG.save();
-                return true;
-            } else {
-                return false;
-            }
-        }));
+        optionsWindow.addElement(this.darkCheckbox);
+        optionsWindow.addElement(this.lightCheckbox);
 
-        optionsWindow.addElement(new LabelElement<>(this.getGUI(), "Dark", 50, 178));
-        optionsWindow.addElement(new LabelElement<>(this.getGUI(), "Light", 140, 178));
-        optionsWindow.addElement(new LabelElement<>(this.getGUI(), "Show Grid", 50, 198));
+        this.darkCheckbox.withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.DARK.getName()));
+        this.lightCheckbox.withSelection(Objects.equals(LLibrary.CONFIG.getColorMode(), ColorMode.LIGHT.getName()));
 
-        final CheckboxElement<QubbleGUI> grid = new CheckboxElement<>(this.getGUI(), 32.5F, 194.5F).withSelection(Qubble.CONFIG.showGrid);
-        optionsWindow.addElement(grid.withFunction(element -> {
-            Qubble.CONFIG.showGrid = !Qubble.CONFIG.showGrid;
-            grid.withSelection(Qubble.CONFIG.showGrid);
+        optionsWindow.addElement(new LabelElement<>(this.gui, "Dark", 50, 178));
+        optionsWindow.addElement(new LabelElement<>(this.gui, "Light", 140, 178));
+        optionsWindow.addElement(new LabelElement<>(this.gui, "Show Grid", 50, 198));
+
+        final CheckboxElement<QubbleGUI> grid = new CheckboxElement<>(this.gui, 32.5F, 194.5F, new CheckboxProperty(state -> {
+            Qubble.CONFIG.showGrid = state;
             ConfigHandler.INSTANCE.saveConfigForID(Qubble.MODID);
-            return true;
-        }));
+        })).withSelection(Qubble.CONFIG.showGrid);
+        optionsWindow.addElement(grid);
 
-        ElementHandler.INSTANCE.addElement(this.getGUI(), optionsWindow);
+        this.gui.addElement(optionsWindow);
     }
 
     @Override
@@ -327,16 +348,16 @@ public class ToolbarElement extends Element<QubbleGUI> {
     }
 
     private void setMode(ModelMode mode) {
-        this.getGUI().setMode(mode);
+        this.gui.setMode(mode);
 
         if (mode == ModelMode.TEXTURE) {
             if (this.textureWindow == null) {
-                this.textureWindow = new WindowElement<>(this.getGUI(), "Texture Map", 200, 214, false);
-                new TextureMapElement(this.getGUI(), 0.0F, 14.0F, 200, 200).withParent(this.textureWindow);
-                ElementHandler.INSTANCE.addElement(this.getGUI(), this.textureWindow);
+                this.textureWindow = new WindowElement<>(this.gui, "Texture Map", 200, 214, false);
+                new TextureMapElement(this.gui, 0.0F, 14.0F, 200, 200).withParent(this.textureWindow);
+                this.gui.addElement(this.textureWindow);
             }
         } else if (this.textureWindow != null) {
-            ElementHandler.INSTANCE.removeElement(this.getGUI(), this.textureWindow);
+            this.gui.removeElement(this.textureWindow);
             this.textureWindow = null;
         }
 

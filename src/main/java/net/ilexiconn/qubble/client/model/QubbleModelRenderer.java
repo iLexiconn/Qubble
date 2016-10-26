@@ -85,21 +85,6 @@ public class QubbleModelRenderer extends AdvancedModelRenderer {
                     GlStateManager.scale(this.scaleX, this.scaleY, this.scaleZ);
                 }
                 GlStateManager.callList(this.displayList);
-                if (!this.scaleChildren && (this.scaleX != 1.0F || this.scaleY != 1.0F || this.scaleZ != 1.0F)) {
-                    GlStateManager.popMatrix();
-                    GlStateManager.pushMatrix();
-                    GlStateManager.translate(this.offsetX, this.offsetY, this.offsetZ);
-                    GlStateManager.translate(this.rotationPointX * scale, this.rotationPointY * scale, this.rotationPointZ * scale);
-                    if (this.rotateAngleZ != 0.0F) {
-                        GlStateManager.rotate((float) Math.toDegrees(this.rotateAngleZ), 0.0F, 0.0F, 1.0F);
-                    }
-                    if (this.rotateAngleY != 0.0F) {
-                        GlStateManager.rotate((float) Math.toDegrees(this.rotateAngleY), 0.0F, 1.0F, 0.0F);
-                    }
-                    if (this.rotateAngleX != 0.0F) {
-                        GlStateManager.rotate((float) Math.toDegrees(this.rotateAngleX), 1.0F, 0.0F, 0.0F);
-                    }
-                }
                 if (this.childModels != null) {
                     for (ModelRenderer childModel : this.childModels) {
                         if (childModel instanceof QubbleModelRenderer) {

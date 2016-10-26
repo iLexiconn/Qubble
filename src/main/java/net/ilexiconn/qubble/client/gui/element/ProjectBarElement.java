@@ -24,10 +24,10 @@ public class ProjectBarElement extends Element<QubbleGUI> {
 
     @Override
     public void update() {
-        ModelTreeElement modelTree = this.getGUI().getModelTree();
-        SidebarElement sideBar = this.getGUI().getSidebar();
+        ModelTreeElement modelTree = this.gui.getModelTree();
+        SidebarElement sideBar = this.gui.getSidebar();
         this.setPosX(modelTree.getWidth());
-        this.setWidth(this.getGUI().width - modelTree.getWidth() - sideBar.getWidth());
+        this.setWidth(this.gui.width - modelTree.getWidth() - sideBar.getWidth());
     }
 
     @Override
@@ -40,12 +40,12 @@ public class ProjectBarElement extends Element<QubbleGUI> {
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
         this.drawRectangle(posX, posY, width, height, LLibrary.CONFIG.getPrimaryColor());
         float projectX = -this.scroll;
-        List<Project> openProjects = this.getGUI().getOpenProjects();
+        List<Project> openProjects = this.gui.getOpenProjects();
         for (int projectIndex = 0; projectIndex < openProjects.size(); projectIndex++) {
             QubbleModel model = openProjects.get(projectIndex).getModel();
             float projectWidth = fontRenderer.getStringWidth(model.getName()) + 15.0F;
             boolean hover = this.isSelected(mouseX, mouseY) && mouseX >= posX + projectX + projectWidth - 12 && mouseX <= posX + projectX + projectWidth;
-            if (projectIndex == this.getGUI().getSelectedProjectIndex()) {
+            if (projectIndex == this.gui.getSelectedProjectIndex()) {
                 this.drawRectangle(posX + projectX, posY, projectWidth, height, LLibrary.CONFIG.getTertiaryColor());
                 this.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : LLibrary.CONFIG.getTertiaryColor());
             } else {
@@ -61,7 +61,7 @@ public class ProjectBarElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
         if (button == 0) {
-            QubbleGUI gui = this.getGUI();
+            QubbleGUI gui = this.gui;
             float posX = this.getPosX();
             int width = this.getWidth();
             FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
@@ -97,6 +97,6 @@ public class ProjectBarElement extends Element<QubbleGUI> {
 
     @Override
     public boolean isVisible() {
-        return this.getGUI().getOpenProjects().size() > 0;
+        return this.gui.getOpenProjects().size() > 0;
     }
 }

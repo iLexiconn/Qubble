@@ -36,13 +36,13 @@ public class Project {
     }
 
     public QubbleCuboid getSelectedCube() {
-        return selectedCube;
+        return this.selectedCube;
     }
 
     public void setSelectedCube(QubbleCuboid cube) {
         this.selectedCube = cube;
         if (this.selectedCube != null) {
-            this.gui.getSidebar().populateFields(this.getModel(), selectedCube);
+            this.gui.getSidebar().populateFields(this.getModel(), this.selectedCube);
         } else {
             this.gui.getSidebar().clearFields();
         }

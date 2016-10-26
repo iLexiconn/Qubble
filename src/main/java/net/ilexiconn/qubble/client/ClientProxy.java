@@ -219,7 +219,7 @@ public class ClientProxy extends ServerProxy {
                     for (VariantList variantList : state.getMultipartVariants()) {
                         for (Variant variant : variantList.getVariantList()) {
                             ResourceLocation resource = variant.getModelLocation();
-                            QubbleModel qubbleModel = parseJsonModel(gson, resourceManager, importer, name, new ResourceLocation(resource.getResourceDomain(), "models/" + resource.getResourcePath() + ".json"));
+                            QubbleModel qubbleModel = this.parseJsonModel(gson, resourceManager, importer, name, new ResourceLocation(resource.getResourceDomain(), "models/" + resource.getResourcePath() + ".json"));
                             if (qubbleModel != null) {
                                 GAME_JSON_MODELS.put(name, qubbleModel);
                             }
@@ -299,7 +299,7 @@ public class ClientProxy extends ServerProxy {
             }
         }
         for (Map.Entry<String, ModelRenderer> entry : cuboidsWithNames.entrySet()) {
-            qubbleModel.getCuboids().addAll(parseModelRenderer(model, qubbleModel, entry.getKey(), entry.getValue(), null));
+            qubbleModel.getCuboids().addAll(this.parseModelRenderer(model, qubbleModel, entry.getKey(), entry.getValue(), null));
         }
         return qubbleModel;
     }

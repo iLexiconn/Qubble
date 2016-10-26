@@ -36,6 +36,6 @@ public enum ModelExporters {
     }
 
     public IModelExporter<?> getModelExporter() {
-        return modelExporter;
+        return this.modelExporter;
     }
 }

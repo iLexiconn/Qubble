@@ -32,6 +32,6 @@ public enum ModelImporters {
     }
 
     public IModelImporter<?> getModelImporter() {
-        return modelImporter;
+        return this.modelImporter;
     }
 }
