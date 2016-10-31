@@ -169,36 +169,40 @@ public class ClientProxy extends ServerProxy {
         bar = ProgressManager.push("Parsing block entity models", TileEntityRendererDispatcher.instance.mapSpecialRenderers.size());
         for (Map.Entry<Class<? extends TileEntity>, TileEntitySpecialRenderer<? extends TileEntity>> entry : TileEntityRendererDispatcher.instance.mapSpecialRenderers.entrySet()) {
             TileEntitySpecialRenderer<? extends TileEntity> renderer = entry.getValue();
-            String tileName = entry.getKey().getSimpleName();
-            bar.step(tileName);
-            for (Field field : this.getAllFields(renderer.getClass())) {
-                try {
-                    if (ModelBase.class.isAssignableFrom(field.getType())) {
-                        field.setAccessible(true);
-                        QubbleModel model = this.parseModel((ModelBase) field.get(renderer), entry.getKey(), tileName);
-                        if (model.getCuboids().size() > 0) {
-                            GAME_MODELS.put(tileName, model);
-                        }
-                    } else if (ResourceLocation[].class.isAssignableFrom(field.getType()) && !GAME_TEXTURES.containsKey(tileName)) {
-                        field.setAccessible(true);
-                        ResourceLocation[] textures = (ResourceLocation[]) field.get(renderer);
-                        if (textures.length > 0) {
-                            ResourceLocation texture = textures[0];
+            if (renderer != null && entry.getKey() != null) {
+                String tileName = entry.getKey().getSimpleName();
+                bar.step(tileName);
+                for (Field field : this.getAllFields(renderer.getClass())) {
+                    try {
+                        if (ModelBase.class.isAssignableFrom(field.getType())) {
+                            field.setAccessible(true);
+                            QubbleModel model = this.parseModel((ModelBase) field.get(renderer), entry.getKey(), tileName);
+                            if (model.getCuboids().size() > 0) {
+                                GAME_MODELS.put(tileName, model);
+                            }
+                        } else if (ResourceLocation[].class.isAssignableFrom(field.getType()) && !GAME_TEXTURES.containsKey(tileName)) {
+                            field.setAccessible(true);
+                            ResourceLocation[] textures = (ResourceLocation[]) field.get(renderer);
+                            if (textures.length > 0) {
+                                ResourceLocation texture = textures[0];
+                                if (!texture.toString().contains("destroy_stage")) {
+                                    GAME_TEXTURES.put(tileName, texture);
+                                }
+                            }
+                        } else if (ResourceLocation.class.isAssignableFrom(field.getType()) && !GAME_TEXTURES.containsKey(tileName)) {
+                            field.setAccessible(true);
+                            ResourceLocation texture = (ResourceLocation) field.get(renderer);
                             if (!texture.toString().contains("destroy_stage")) {
                                 GAME_TEXTURES.put(tileName, texture);
                             }
                         }
-                    } else if (ResourceLocation.class.isAssignableFrom(field.getType()) && !GAME_TEXTURES.containsKey(tileName)) {
-                        field.setAccessible(true);
-                        ResourceLocation texture = (ResourceLocation) field.get(renderer);
-                        if (!texture.toString().contains("destroy_stage")) {
-                            GAME_TEXTURES.put(tileName, texture);
-                        }
+                    } catch (Exception e) {
+                        System.err.println("Failed to load model from " + renderer.getClass() + "#" + field.getName());
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    System.err.println("Failed to load model from " + renderer.getClass() + "#" + field.getName());
-                    e.printStackTrace();
                 }
+            } else {
+                bar.step("Unknown");
             }
         }
         ProgressManager.pop(bar);
