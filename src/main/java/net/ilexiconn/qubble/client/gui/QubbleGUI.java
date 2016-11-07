@@ -164,4 +164,9 @@ public class QubbleGUI extends ElementGUI {
             this.getSidebar().clearFields();
         }
     }
+
+    @Override
+    public boolean doesGuiPauseGame() {
+        return false;
+    }
 }

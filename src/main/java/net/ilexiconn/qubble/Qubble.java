@@ -16,7 +16,7 @@ import java.util.Locale;
 @Mod(modid = Qubble.MODID, name = "Qubble", version = Qubble.VERSION, dependencies = "required-after:llibrary@[" + Qubble.LLIBRARY_VERSION + ",)", clientSideOnly = true)
 public class Qubble {
     public static final String MODID = "qubble";
-    public static final String VERSION = "0.1.2";
+    public static final String VERSION = "0.1.3";
     public static final String LLIBRARY_VERSION = "1.7.1";
 
     @Mod.Instance(Qubble.MODID)

@@ -34,8 +34,8 @@ public class ModelViewElement extends Element<QubbleGUI> {
     private float cameraOffsetY = 0.0F;
     private float rotationYaw = 225.0F;
     private float rotationPitch = -15.0F;
-    private float prevRotationYaw;
-    private float prevRotationPitch;
+    private float prevRotationYaw = this.rotationYaw;
+    private float prevRotationPitch = this.rotationPitch;
     private float prevCameraOffsetX;
     private float prevCameraOffsetY;
     private float zoom = 1.0F;
@@ -75,12 +75,6 @@ public class ModelViewElement extends Element<QubbleGUI> {
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
         GlStateManager.enableTexture2D();
-        this.prevMouseX = mouseX;
-        this.prevMouseY = mouseY;
-        this.prevCameraOffsetX = this.cameraOffsetX;
-        this.prevCameraOffsetY = this.cameraOffsetY;
-        this.prevRotationYaw = this.rotationYaw;
-        this.prevRotationPitch = this.rotationPitch;
         this.partialTicks = partialTicks;
         this.zoom += this.zoomVelocity;
         this.zoomVelocity *= 0.6F;
@@ -253,16 +247,28 @@ public class ModelViewElement extends Element<QubbleGUI> {
     }
 
     @Override
+    public boolean mouseClicked(float mouseX, float mouseY, int button) {
+        this.prevMouseX = mouseX;
+        this.prevMouseY = mouseY;
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
     public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
         if (!this.gui.getModelTree().isParenting() && this.isSelected(mouseX, mouseY)) {
+            if (!this.dragged) {
+                this.updatePrevious();
+            }
+            this.dragged = true;
             float xMovement = mouseX - this.prevMouseX;
             float yMovement = mouseY - this.prevMouseY;
+            this.prevMouseX = mouseX;
+            this.prevMouseY = mouseY;
             if (button == 0) {
                 this.rotationYaw += xMovement / this.zoom;
                 if ((this.rotationPitch > -90.0F || yMovement < 0.0F) && (this.rotationPitch < 90.0F || yMovement > 0.0F)) {
                     this.rotationPitch -= yMovement / this.zoom;
                 }
-                this.dragged = true;
                 return true;
             } else if (button == 1) {
                 this.cameraOffsetX = this.cameraOffsetX + (xMovement / this.zoom) * 0.016F;
@@ -271,6 +277,15 @@ public class ModelViewElement extends Element<QubbleGUI> {
             }
         }
         return false;
+    }
+
+    @Override
+    public void update() {
+        super.update();
+        if (!this.dragged) {
+            this.updatePrevious();
+        }
+        this.dragged = false;
     }
 
     @Override
@@ -344,5 +359,12 @@ public class ModelViewElement extends Element<QubbleGUI> {
         ToolbarElement toolbar = this.gui.getToolbar();
         ProjectBarElement projectBar = this.gui.getProjectBar();
         return this.gui.isElementOnTop(this) && mouseX > modelTree.getPosX() + modelTree.getWidth() && mouseY >= toolbar.getPosY() + toolbar.getHeight() + (projectBar.isVisible() ? projectBar.getHeight() : 0);
+    }
+
+    private void updatePrevious() {
+        this.prevCameraOffsetX = this.cameraOffsetX;
+        this.prevCameraOffsetY = this.cameraOffsetY;
+        this.prevRotationYaw = this.rotationYaw;
+        this.prevRotationPitch = this.rotationPitch;
     }
 }
