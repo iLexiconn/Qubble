@@ -8,6 +8,7 @@ import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
+import net.ilexiconn.qubble.server.model.ModelHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Keyboard;
@@ -39,20 +40,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
             WindowElement<QubbleGUI> createCubeWindow = new WindowElement<>(this.gui, "Create Cube", 100, 42);
             InputElement<QubbleGUI> nameElement = new InputElement<>(this.gui, 2, 16, 96, "Cube Name", (i) -> {});
             createCubeWindow.addElement(nameElement);
-            createCubeWindow.addElement(new ButtonElement<>(this.gui, "Create", 2, 30, 96, 10, (element) -> {
-                Project selectedProject = this.gui.getSelectedProject();
-                if (selectedProject != null && selectedProject.getModel() != null && nameElement.getText().length() > 0) {
-                    QubbleCuboid cube = QubbleCuboid.create(nameElement.getText());
-                    cube.setDimensions(1, 1, 1);
-                    cube.setScale(1.0F, 1.0F, 1.0F);
-                    selectedProject.getModel().getCuboids().add(cube);
-                    selectedProject.setSelectedCube(cube);
-                    this.gui.getModelView().updateModel();
-                    this.gui.removeElement(createCubeWindow);
-                    return true;
-                }
-                return false;
-            }).withColorScheme(ColorSchemes.WINDOW));
+            createCubeWindow.addElement(new ButtonElement<>(this.gui, "Create", 2, 30, 96, 10, (element) -> this.createCube(createCubeWindow, nameElement)).withColorScheme(ColorSchemes.WINDOW));
             this.gui.addElement(createCubeWindow);
             return true;
         }).withColorScheme(ColorSchemes.DEFAULT));
@@ -63,6 +51,31 @@ public class ModelTreeElement extends Element<QubbleGUI> {
             }
             return true;
         }).withColorScheme(ColorSchemes.DEFAULT));
+    }
+
+    private boolean createCube(WindowElement<QubbleGUI> window, InputElement<QubbleGUI> input) {
+        Project selectedProject = this.gui.getSelectedProject();
+        String name = input.getText().trim();
+        if (selectedProject != null && selectedProject.getModel() != null && name.length() > 0) {
+            QubbleModel model = selectedProject.getModel();
+            this.gui.removeElement(window);
+            if (!ModelHandler.INSTANCE.hasDuplicateName(model, name)) {
+                QubbleCuboid cube = QubbleCuboid.create(name);
+                cube.setDimensions(1, 1, 1);
+                cube.setScale(1.0F, 1.0F, 1.0F);
+                model.getCuboids().add(cube);
+                selectedProject.setSelectedCube(cube);
+                this.gui.getModelView().updateModel();
+            } else {
+                WindowElement<QubbleGUI> renameWindow = new WindowElement<>(this.gui, "Duplicate Name!", 100, 42);
+                InputElement<QubbleGUI> nameElement = new InputElement<>(this.gui, 2, 16, 96, "Cube Name", (i) -> {});
+                renameWindow.addElement(nameElement);
+                renameWindow.addElement(new ButtonElement<>(this.gui, "Create", 2, 30, 96, 10, (element) -> this.createCube(renameWindow, nameElement)).withColorScheme(ColorSchemes.WINDOW));
+                this.gui.addElement(renameWindow);
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -287,9 +300,17 @@ public class ModelTreeElement extends Element<QubbleGUI> {
     @Override
     public boolean keyPressed(char character, int key) {
         Project selectedProject = this.gui.getSelectedProject();
-        if (key == Keyboard.KEY_DELETE || key == Keyboard.KEY_BACK && selectedProject != null && selectedProject.getSelectedCube() != null) {
-            this.removeCube(selectedProject);
-            return true;
+        if (selectedProject != null && selectedProject.getSelectedCube() != null) {
+            if (key == Keyboard.KEY_DELETE || key == Keyboard.KEY_BACK) {
+                this.removeCube(selectedProject);
+                return true;
+            } else if (GuiScreen.isKeyComboCtrlC(key)) {
+                QubbleCuboid cuboid = selectedProject.getSelectedCube();
+                QubbleModel model = selectedProject.getModel();
+                model.getCuboids().add(ModelHandler.INSTANCE.copy(model, cuboid));
+                this.gui.getModelView().updateModel();
+                return true;
+            }
         }
         return false;
     }
