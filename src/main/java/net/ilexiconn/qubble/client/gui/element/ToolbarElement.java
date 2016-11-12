@@ -192,8 +192,12 @@ public class ToolbarElement extends Element<QubbleGUI> {
     public void openGameBlockImportWindow() {
         WindowElement<QubbleGUI> openWindow = new WindowElement<>(this.gui, "Import Block Model", 150, 200);
         openWindow.addElement(new ListElement<>(this.gui, 2, 16, 146, 182, ClientProxy.getGameBlockModels(), (list) -> {
-            QubbleModel model = ClientProxy.GAME_JSON_MODELS.get(list.getSelectedEntry());
-            this.gui.selectModel(model);
+            String name = list.getSelectedEntry();
+            ResourceLocation location = ClientProxy.GAME_JSON_MODEL_LOCATIONS.get(name);
+            QubbleModel model = ClientProxy.loadBlockModel(name, location);
+            if (model != null) {
+                this.gui.selectModel(model);
+            }
             this.gui.removeElement(openWindow);
             return true;
         }));
