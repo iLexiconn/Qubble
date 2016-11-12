@@ -1,6 +1,9 @@
 package net.ilexiconn.qubble.client.gui;
 
 import net.ilexiconn.llibrary.client.gui.ElementGUI;
+import net.ilexiconn.llibrary.client.gui.element.ButtonElement;
+import net.ilexiconn.llibrary.client.gui.element.LabelElement;
+import net.ilexiconn.llibrary.client.gui.element.WindowElement;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.element.ModelTreeElement;
@@ -8,18 +11,21 @@ import net.ilexiconn.qubble.client.gui.element.ModelViewElement;
 import net.ilexiconn.qubble.client.gui.element.ProjectBarElement;
 import net.ilexiconn.qubble.client.gui.element.SidebarElement;
 import net.ilexiconn.qubble.client.gui.element.ToolbarElement;
+import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @SideOnly(Side.CLIENT)
 public class QubbleGUI extends ElementGUI {
@@ -119,8 +125,27 @@ public class QubbleGUI extends ElementGUI {
     }
 
     public void closeModel(int index) {
-        this.openProjects.remove(index);
-        this.selectModel(this.selectedProject);
+        Project project = this.openProjects.get(index);
+        if (project != null && !project.isSaved()) {
+            WindowElement<QubbleGUI> window = new WindowElement<>(this, "Project not saved!", 200, 54);
+            new LabelElement<>(this, "You have unsaved changes to this", 3.0F, 16.0F).withParent(window);
+            new LabelElement<>(this, "project. Would you like to save now?", 3.0F, 26.0F).withParent(window);
+            new ButtonElement<>(this, "Save", 2.0F, 37.0F, 97, 15, (button) -> {
+                this.removeElement(window);
+                this.toolbar.openSaveWindow((saved) -> this.closeModel(index), false);
+                return true;
+            }).withParent(window).withColorScheme(ColorSchemes.WINDOW);
+            new ButtonElement<>(this, "Discard", 101.0F, 37.0F, 97, 15, (button) -> {
+                this.removeElement(window);
+                project.setSaved(true);
+                this.closeModel(index);
+                return true;
+            }).withParent(window).withColorScheme(ColorSchemes.WINDOW);
+            this.addElement(window);
+        } else {
+            this.openProjects.remove(index);
+            this.selectModel(this.selectedProject);
+        }
     }
 
     public Project getSelectedProject() {
@@ -168,5 +193,48 @@ public class QubbleGUI extends ElementGUI {
     @Override
     public boolean doesGuiPauseGame() {
         return false;
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        if (keyCode == Keyboard.KEY_ESCAPE) {
+            this.close((close) -> {
+                if (close) {
+                    this.mc.displayGuiScreen(null);
+                    if (this.mc.currentScreen == null) {
+                        this.mc.setIngameFocus();
+                    }
+                }
+            });
+            return;
+        }
+        super.keyTyped(typedChar, keyCode);
+    }
+
+    public void close(Consumer<Boolean> callback) {
+        int unsaved = 0;
+        for (Project project : this.openProjects) {
+            if (!project.isSaved()) {
+                unsaved++;
+            }
+        }
+        if (unsaved > 0) {
+            WindowElement<QubbleGUI> window = new WindowElement<>(this, "Warning!", 200, 54);
+            new LabelElement<>(this, "You have " + unsaved + " unsaved projects!", 3.0F, 16.0F).withParent(window);
+            new LabelElement<>(this, "Save them now before exiting.", 3.0F, 26.0F).withParent(window);
+            new ButtonElement<>(this, "Okay", 2.0F, 37.0F, 97, 15, (button) -> {
+                this.removeElement(window);
+                callback.accept(false);
+                return true;
+            }).withParent(window).withColorScheme(ColorSchemes.WINDOW);
+            new ButtonElement<>(this, "Discard", 101.0F, 37.0F, 97, 15, (button) -> {
+                this.removeElement(window);
+                callback.accept(true);
+                return true;
+            }).withParent(window).withColorScheme(ColorSchemes.WINDOW);
+            this.addElement(window);
+        } else {
+            callback.accept(true);
+        }
     }
 }

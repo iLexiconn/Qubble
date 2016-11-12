@@ -42,8 +42,13 @@ public class ProjectBarElement extends Element<QubbleGUI> {
         float projectX = -this.scroll;
         List<Project> openProjects = this.gui.getOpenProjects();
         for (int projectIndex = 0; projectIndex < openProjects.size(); projectIndex++) {
-            QubbleModel model = openProjects.get(projectIndex).getModel();
-            float projectWidth = fontRenderer.getStringWidth(model.getName()) + 15.0F;
+            Project project = openProjects.get(projectIndex);
+            QubbleModel model = project.getModel();
+            String name = model.getName();
+            if (!project.isSaved()) {
+                name = "* " + name;
+            }
+            float projectWidth = fontRenderer.getStringWidth(name) + 15.0F;
             boolean hover = this.isSelected(mouseX, mouseY) && mouseX >= posX + projectX + projectWidth - 12 && mouseX <= posX + projectX + projectWidth;
             if (projectIndex == this.gui.getSelectedProjectIndex()) {
                 this.drawRectangle(posX + projectX, posY, projectWidth, height, LLibrary.CONFIG.getTertiaryColor());
@@ -52,7 +57,7 @@ public class ProjectBarElement extends Element<QubbleGUI> {
                 this.drawRectangle(posX + projectX + projectWidth - 12, posY, 12, 12, hover ? 0xFFE04747 : LLibrary.CONFIG.getPrimaryColor());
             }
             fontRenderer.drawString("x", posX + projectX + projectWidth - 9, posY + 2, LLibrary.CONFIG.getTextColor(), false);
-            fontRenderer.drawString(model.getName(), posX + projectX + 2, posY + 2, LLibrary.CONFIG.getTextColor(), false);
+            fontRenderer.drawString(name, posX + projectX + 2, posY + 2, LLibrary.CONFIG.getTextColor(), false);
             projectX += projectWidth;
         }
         this.endScissor();
@@ -70,23 +75,29 @@ public class ProjectBarElement extends Element<QubbleGUI> {
                 List<Project> openProjects = gui.getOpenProjects();
                 boolean selected = false;
                 for (int projectIndex = 0; projectIndex < openProjects.size(); projectIndex++) {
-                    QubbleModel model = openProjects.get(projectIndex).getModel();
-                    String name = model.getName() + " x";
-                    float projectWidth = fontRenderer.getStringWidth(name) + 3.0F;
+                    Project project = openProjects.get(projectIndex);
+                    QubbleModel model = project.getModel();
+                    String name = model.getName();
+                    if (!project.isSaved()) {
+                        name = "* " + name;
+                    }
+                    float projectWidth = fontRenderer.getStringWidth(name) + 15.0F;
                     if (mouseX >= posX + projectX && mouseX < posX + projectX + projectWidth) {
-                        if (mouseX > posX + projectX + projectWidth - 12) {
+                        if (mouseX >= posX + projectX + projectWidth - 12) {
                             gui.closeModel(projectIndex);
                         } else {
                             gui.selectModel(projectIndex);
                         }
+                        this.gui.playClickSound();
                         if (projectX + projectWidth >= width) {
                             this.scroll = (int) ((projectX - this.scroll) - (projectWidth / 2));
                         } else if (projectX < 0.0F) {
                             this.scroll = (int) (((projectX + projectWidth) - this.scroll) + (projectWidth / 2));
                         }
                         selected = true;
+                        break;
                     }
-                    projectX += projectWidth + 1.0F;
+                    projectX += projectWidth;
                 }
                 this.scroll = Math.max(0, this.scroll);
                 return selected;

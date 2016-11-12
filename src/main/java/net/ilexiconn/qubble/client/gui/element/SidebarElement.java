@@ -69,6 +69,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setTexture(value, selectedCube.getTextureY());
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
         this.propertyTextureY = new DimensionProperty(value -> {
@@ -77,6 +78,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setTexture(selectedCube.getTextureX(), value);
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
 
@@ -86,6 +88,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleModel model = selectedProject.getModel();
                 model.setTextureWidth(value);
                 this.gui.getModelView().updateModel();
+                selectedProject.setSaved(false);
             }
         });
         this.propertyTextureHeight = new DimensionProperty(value -> {
@@ -94,6 +97,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleModel model = selectedProject.getModel();
                 model.setTextureHeight(value);
                 this.gui.getModelView().updateModel();
+                selectedProject.setSaved(false);
             }
         });
     }
@@ -105,6 +109,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setRotation(value, selectedCube.getRotationY(), selectedCube.getRotationZ());
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
         this.propertyRotationY = new RotationProperty(value -> {
@@ -113,6 +118,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setRotation(selectedCube.getRotationX(), value, selectedCube.getRotationZ());
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
         this.propertyRotationZ = new RotationProperty(value -> {
@@ -121,6 +127,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setRotation(selectedCube.getRotationX(), selectedCube.getRotationY(), value);
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
     }
@@ -132,6 +139,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setScale(value, selectedCube.getScaleY(), selectedCube.getScaleZ());
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
         this.propertyScaleY = new TransformProperty(value -> {
@@ -140,6 +148,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setScale(selectedCube.getScaleX(), value, selectedCube.getScaleZ());
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
         this.propertyScaleZ = new TransformProperty(value -> {
@@ -148,6 +157,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setScale(selectedCube.getScaleX(), selectedCube.getScaleY(), value);
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
     }
@@ -159,6 +169,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setOffset(value, selectedCube.getOffsetY(), selectedCube.getOffsetZ());
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
         this.propertyOffsetY = new TransformProperty(value -> {
@@ -167,6 +178,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setOffset(selectedCube.getOffsetX(), value, selectedCube.getOffsetZ());
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
         this.propertyOffsetZ = new TransformProperty(value -> {
@@ -175,6 +187,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setOffset(selectedCube.getOffsetX(), selectedCube.getOffsetY(), value);
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
     }
@@ -186,6 +199,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setPosition(value, selectedCube.getPositionY(), selectedCube.getPositionZ());
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
         this.propertyPositionY = new TransformProperty(value -> {
@@ -194,6 +208,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setPosition(selectedCube.getPositionX(), value, selectedCube.getPositionZ());
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
         this.propertyPositionZ = new TransformProperty(value -> {
@@ -202,6 +217,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setPosition(selectedCube.getPositionX(), selectedCube.getPositionY(), value);
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
     }
@@ -213,6 +229,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setDimensions(value, selectedCube.getDimensionY(), selectedCube.getDimensionZ());
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
         this.propertyDimensionY = new DimensionProperty(value -> {
@@ -221,6 +238,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setDimensions(selectedCube.getDimensionX(), value, selectedCube.getDimensionZ());
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
         this.propertyDimensionZ = new DimensionProperty(value -> {
@@ -229,6 +247,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setDimensions(selectedCube.getDimensionX(), selectedCube.getDimensionY(), value);
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         });
     }
@@ -410,6 +429,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setName(inputElement.getText());
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
         }).withParent(this);
         switch (this.gui.getMode()) {
@@ -449,6 +469,7 @@ public class SidebarElement extends Element<QubbleGUI> {
                 QubbleCuboid selectedCube = selectedProject.getSelectedCube();
                 selectedCube.setTextureMirrored(button.getColorScheme() != ColorSchemes.TOGGLE_OFF);
                 this.gui.getModelView().updatePart(selectedCube);
+                selectedProject.setSaved(false);
             }
             return true;
         }).withParent(this);

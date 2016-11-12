@@ -9,10 +9,12 @@ public class Project {
     private QubbleCuboid selectedCube;
     private ModelTexture baseTexture;
     private ModelTexture overlayTexture;
+    private boolean saved;
 
     public Project(QubbleGUI gui, QubbleModel model) {
         this.gui = gui;
         this.model = model;
+        this.saved = true;
     }
 
     public QubbleModel getModel() {
@@ -25,6 +27,7 @@ public class Project {
 
     public void setBaseTexture(ModelTexture texture) {
         this.baseTexture = texture;
+        this.setSaved(false);
     }
 
     public ModelTexture getOverlayTexture() {
@@ -33,6 +36,7 @@ public class Project {
 
     public void setOverlayTexture(ModelTexture texture) {
         this.overlayTexture = texture;
+        this.setSaved(false);
     }
 
     public QubbleCuboid getSelectedCube() {
@@ -46,5 +50,13 @@ public class Project {
         } else {
             this.gui.getSidebar().clearFields();
         }
+    }
+
+    public void setSaved(boolean saved) {
+        this.saved = saved;
+    }
+
+    public boolean isSaved() {
+        return this.saved;
     }
 }

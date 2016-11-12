@@ -17,6 +17,7 @@ import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.ModelMode;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
+import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
 import net.ilexiconn.qubble.client.gui.property.CheckboxProperty;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @SideOnly(Side.CLIENT)
@@ -66,7 +68,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
         }).withColorScheme(ColorSchemes.DEFAULT));
         this.gui.addElement(new ButtonElement<>(this.gui, "Save", 60, 0, 30, 20, (v) -> {
             if (this.gui.getSelectedProject() != null) {
-                this.openSaveWindow();
+                this.openSaveWindow((saved) -> {}, true);
                 return true;
             }
             return false;
@@ -104,7 +106,11 @@ public class ToolbarElement extends Element<QubbleGUI> {
             return true;
         }).withColorScheme(ColorSchemes.OPTIONS));
         this.gui.addElement(new ButtonElement<>(this.gui, "x", this.gui.width - 20, 0, 20, 20, (v) -> {
-            this.gui.mc.displayGuiScreen(this.gui.getParent());
+            this.gui.close((close) -> {
+                if (close) {
+                    this.gui.mc.displayGuiScreen(this.gui.getParent());
+                }
+            });
             return true;
         }).withColorScheme(ButtonElement.CLOSE));
     }
@@ -194,17 +200,20 @@ public class ToolbarElement extends Element<QubbleGUI> {
         this.gui.addElement(openWindow);
     }
 
-    public void openSaveWindow() {
-        WindowElement<QubbleGUI> saveWindow = new WindowElement<>(this.gui, "Save", 100, 64);
+    public void openSaveWindow(Consumer<Boolean> callback, boolean closeable) {
+        WindowElement<QubbleGUI> saveWindow = new WindowElement<>(this.gui, "Save", 100, 64, closeable);
         saveWindow.addElement(new LabelElement<>(this.gui, "File name", 4, 19));
         InputElement<QubbleGUI> fileName;
-        QubbleModel selectedModel = this.gui.getSelectedProject().getModel();
+        Project project = this.gui.getSelectedProject();
+        QubbleModel selectedModel = project.getModel();
         String name = selectedModel.getFileName() == null ? selectedModel.getName() : selectedModel.getFileName();
         saveWindow.addElement(fileName = new InputElement<>(this.gui, 2, 30, 96, name, (i) -> {
         }));
         saveWindow.addElement(new ButtonElement<>(this.gui, "Save", 2, 50, 47, 12, (v) -> {
             try {
                 CompressedStreamTools.writeCompressed(selectedModel.copy().serializeNBT(), new FileOutputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, fileName.getText() + ".qbl")));
+                project.setSaved(true);
+                callback.accept(true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -212,22 +221,24 @@ public class ToolbarElement extends Element<QubbleGUI> {
             return true;
         }).withColorScheme(ColorSchemes.WINDOW));
         saveWindow.addElement(new ButtonElement<>(this.gui, "Export", 51, 50, 47, 12, (v) -> {
-            this.openExportWindow(fileName.getText());
+            this.openExportWindow(fileName.getText(), callback);
             this.gui.removeElement(saveWindow);
             return true;
         }).withColorScheme(ColorSchemes.WINDOW));
         this.gui.addElement(saveWindow);
     }
 
-    public void openExportWindow(String fileName) {
+    public void openExportWindow(String fileName, Consumer<Boolean> callback) {
         WindowElement<QubbleGUI> exportWindow = new WindowElement<>(this.gui, "Export", 100, 100);
         exportWindow.addElement(new ListElement<>(this.gui, 2, 16, 96, 82, Lists.newArrayList(ModelExporters.EXPORTERS).stream().map(IModelExporter::getName).collect(Collectors.toList()), (list) -> {
             IModelExporter exporter = ModelHandler.INSTANCE.getExporter(list.getSelectedEntry());
             if (exporter != null) {
                 this.openModelExportWindow(exporter, fileName);
                 this.gui.removeElement(exportWindow);
+                callback.accept(true);
                 return true;
             } else {
+                callback.accept(false);
                 return false;
             }
         }));
@@ -235,7 +246,8 @@ public class ToolbarElement extends Element<QubbleGUI> {
     }
 
     private void openModelExportWindow(IModelExporter modelExporter, String fileName) {
-        QubbleModel copy = this.gui.getSelectedProject().getModel().copy();
+        Project project = this.gui.getSelectedProject();
+        QubbleModel copy = project.getModel().copy();
         int argumentY = 18;
         String[] argumentNames = modelExporter.getArgumentNames();
         String[] defaultArguments = modelExporter.getDefaultArguments(copy);
@@ -257,6 +269,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
             }
             try {
                 modelExporter.save(modelExporter.export(copy, arguments), new File(ClientProxy.QUBBLE_EXPORT_DIRECTORY, fileName + "." + modelExporter.getExtension()));
+                project.setSaved(true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
