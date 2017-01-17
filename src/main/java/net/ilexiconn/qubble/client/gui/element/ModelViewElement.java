@@ -10,6 +10,7 @@ import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
+import net.ilexiconn.qubble.client.gui.element.toolbar.ToolbarElement;
 import net.ilexiconn.qubble.client.model.QubbleModelBase;
 import net.ilexiconn.qubble.client.model.QubbleModelRenderer;
 import net.minecraft.client.gui.ScaledResolution;
@@ -44,6 +45,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
     private float prevMouseX;
     private float prevMouseY;
 
+    private boolean dragging;
     private boolean dragged;
 
     private float partialTicks;
@@ -87,7 +89,8 @@ public class ModelViewElement extends Element<QubbleGUI> {
 
     private void renderModel(float partialTicks, ScaledResolution scaledResolution, boolean selection) {
         GlStateManager.pushMatrix();
-        GlStateManager.disableCull();
+        GlStateManager.enableCull();
+        GlStateManager.cullFace(GlStateManager.CullFace.FRONT);
         GlStateManager.enableDepth();
         GlStateManager.depthMask(true);
         GlStateManager.enableNormalize();
@@ -208,6 +211,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
             GlStateManager.loadIdentity();
             GlStateManager.disableBlend();
         }
+        GlStateManager.cullFace(GlStateManager.CullFace.BACK);
     }
 
     private void drawGrid(Tessellator tessellator, VertexBuffer buffer, float size) {
@@ -256,8 +260,9 @@ public class ModelViewElement extends Element<QubbleGUI> {
     @Override
     public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
         if (!this.gui.getModelTree().isParenting() && this.isSelected(mouseX, mouseY)) {
-            if (!this.dragged) {
+            if (!this.dragging) {
                 this.updatePrevious();
+                this.dragging = true;
             }
             this.dragged = true;
             float xMovement = mouseX - this.prevMouseX;
@@ -282,10 +287,10 @@ public class ModelViewElement extends Element<QubbleGUI> {
     @Override
     public void update() {
         super.update();
-        if (!this.dragged) {
+        if (!this.dragging) {
             this.updatePrevious();
         }
-        this.dragged = false;
+        this.dragging = false;
     }
 
     @Override
@@ -350,6 +355,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
             }
         }
         this.dragged = false;
+        this.dragging = false;
         return false;
     }
 

@@ -2,15 +2,22 @@ package net.ilexiconn.qubble.client.gui.property;
 
 import net.ilexiconn.llibrary.server.property.IFloatRangeProperty;
 import net.ilexiconn.llibrary.server.property.IStringProperty;
+import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarHandler;
 
 import java.util.function.Consumer;
 
 public class DimensionProperty implements IFloatRangeProperty, IStringProperty {
     private int value;
+    private SidebarHandler handler;
     private Consumer<Integer> submit;
 
-    public DimensionProperty(Consumer<Integer> submit) {
+    public DimensionProperty(SidebarHandler handler, Consumer<Integer> submit) {
+        this.handler = handler;
         this.submit = submit;
+    }
+
+    public DimensionProperty(Consumer<Integer> submit) {
+        this(null, submit);
     }
 
     @Override
@@ -32,6 +39,9 @@ public class DimensionProperty implements IFloatRangeProperty, IStringProperty {
     public void setFloat(float value) {
         this.value = (int) value;
         this.submit.accept(this.value);
+        if (this.handler != null) {
+            this.handler.updateSliders();
+        }
     }
 
     @Override

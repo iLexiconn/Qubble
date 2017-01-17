@@ -6,6 +6,7 @@ import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
+import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarElement;
 import net.minecraft.client.gui.FontRenderer;
 
 import java.util.List;

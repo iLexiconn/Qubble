@@ -190,6 +190,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
                             prevParent.getChildren().remove(this.parenting);
                         }
                         this.gui.getModelView().updateModel();
+                        selectedProject.setSaved(false);
                     }
                 }
             }
@@ -309,6 +310,7 @@ public class ModelTreeElement extends Element<QubbleGUI> {
                 QubbleModel model = selectedProject.getModel();
                 model.getCuboids().add(ModelHandler.INSTANCE.copy(model, cuboid));
                 this.gui.getModelView().updateModel();
+                selectedProject.setSaved(false);
                 return true;
             }
         }
@@ -325,7 +327,8 @@ public class ModelTreeElement extends Element<QubbleGUI> {
         selectedProject.getModel().getCuboids().remove(selectedCube);
         selectedProject.setSelectedCube(null);
         this.gui.getModelView().updateModel();
-        this.gui.getSidebar().clearFields();
+        this.gui.getSidebar().disable();
+        selectedProject.setSaved(false);
     }
 
     private boolean removeChildCube(QubbleCuboid parent, QubbleCuboid cube) {

@@ -9,8 +9,8 @@ import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.element.ModelTreeElement;
 import net.ilexiconn.qubble.client.gui.element.ModelViewElement;
 import net.ilexiconn.qubble.client.gui.element.ProjectBarElement;
-import net.ilexiconn.qubble.client.gui.element.SidebarElement;
-import net.ilexiconn.qubble.client.gui.element.ToolbarElement;
+import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarElement;
+import net.ilexiconn.qubble.client.gui.element.toolbar.ToolbarElement;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.minecraft.client.gui.GuiScreen;
@@ -42,7 +42,7 @@ public class QubbleGUI extends ElementGUI {
 
     private int ticks;
 
-    private ModelMode mode = ModelMode.MODEL;
+    private EditMode editMode = EditMode.MODEL;
 
     public QubbleGUI(GuiScreen parent) {
         this.parent = parent;
@@ -118,9 +118,9 @@ public class QubbleGUI extends ElementGUI {
         this.modelView.updateModel();
         Project selectedProject = this.getSelectedProject();
         if (selectedProject != null && selectedProject.getSelectedCube() != null) {
-            this.sidebar.populateFields(selectedProject.getModel(), selectedProject.getSelectedCube());
+            this.sidebar.enable(selectedProject.getModel(), selectedProject.getSelectedCube());
         } else {
-            this.sidebar.clearFields();
+            this.sidebar.disable();
         }
     }
 
@@ -176,17 +176,17 @@ public class QubbleGUI extends ElementGUI {
         return this.openProjects;
     }
 
-    public ModelMode getMode() {
-        return this.mode;
+    public EditMode getEditMode() {
+        return this.editMode;
     }
 
-    public void setMode(ModelMode mode) {
-        this.mode = mode;
+    public void setEditMode(EditMode editMode) {
+        this.editMode = editMode;
         this.getSidebar().initFields();
         if (this.getSelectedProject() != null && this.getSelectedProject().getSelectedCube() != null) {
-            this.getSidebar().populateFields(this.getSelectedProject().getModel(), this.getSelectedProject().getSelectedCube());
+            this.getSidebar().enable(this.getSelectedProject().getModel(), this.getSelectedProject().getSelectedCube());
         } else {
-            this.getSidebar().clearFields();
+            this.getSidebar().disable();
         }
     }
 
@@ -236,5 +236,15 @@ public class QubbleGUI extends ElementGUI {
         } else {
             callback.accept(true);
         }
+    }
+
+    public static List<String> getFiles(File directory, String extension) {
+        List<String> list = new ArrayList<>();
+        for (File modelFile : directory.listFiles()) {
+            if (modelFile.isFile() && modelFile.getName().endsWith(extension)) {
+                list.add(modelFile.getName().split(extension)[0]);
+            }
+        }
+        return list;
     }
 }
