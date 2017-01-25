@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class JavaScriptExporter implements IModelExporter<List<String>> {
+public class JavaScriptExporter implements IModelExporter<List<String>, DefaultCuboidWrapper, DefaultModelWrapper> {
     @Override
     public String getName() {
         return "JavaScript";
@@ -22,9 +22,11 @@ public class JavaScriptExporter implements IModelExporter<List<String>> {
     }
 
     @Override
-    public List<String> export(QubbleModel model, String... arguments) {
+    public List<String> export(DefaultModelWrapper model, String... arguments) {
         List<String> list = new ArrayList<>();
         model = model.unparent();
+        int textureWidth = model.getTextureWidth();
+        int textureHeight = model.getTextureHeight();
         list.add("//" + model.getName() + " by " + model.getAuthor());
         list.add("function addEntityRenderType(renderer) {");
         list.add("    var model = renderer.getModel();");
@@ -34,12 +36,12 @@ public class JavaScriptExporter implements IModelExporter<List<String>> {
         list.add("    var leftArm = model.getPart(\"leftArm\").clear();");
         list.add("    var rightLeg = model.getPart(\"rightLeg\").clear();");
         list.add("    var leftLeg = model.getPart(\"leftLeg\").clear();");
-        list.add("    body.setTextureSize(" + model.getTextureWidth() + ", " + model.getTextureHeight() + ");");
-        list.add("    head.setTextureSize(" + model.getTextureWidth() + ", " + model.getTextureHeight() + ");");
-        list.add("    rightArm.setTextureSize(" + model.getTextureWidth() + ", " + model.getTextureHeight() + ");");
-        list.add("    leftArm.setTextureSize(" + model.getTextureWidth() + ", " + model.getTextureHeight() + ");");
-        list.add("    rightLeg.setTextureSize(" + model.getTextureWidth() + ", " + model.getTextureHeight() + ");");
-        list.add("    leftLeg.setTextureSize(" + model.getTextureWidth() + ", " + model.getTextureHeight() + ");");
+        list.add("    body.setTextureSize(" + textureWidth + ", " + textureHeight + ");");
+        list.add("    head.setTextureSize(" + textureWidth + ", " + textureHeight + ");");
+        list.add("    rightArm.setTextureSize(" + textureWidth + ", " + textureHeight + ");");
+        list.add("    leftArm.setTextureSize(" + textureWidth + ", " + textureHeight + ");");
+        list.add("    rightLeg.setTextureSize(" + textureWidth + ", " + textureHeight + ");");
+        list.add("    leftLeg.setTextureSize(" + textureWidth + ", " + textureHeight + ");");
         list.add("");
         this.addCubeDeclarations(model.getCuboids(), list);
         list.add("}");
@@ -53,8 +55,8 @@ public class JavaScriptExporter implements IModelExporter<List<String>> {
         writer.close();
     }
 
-    public void addCubeDeclarations(List<QubbleCuboid> cubes, List<String> list) {
-        for (QubbleCuboid cube : cubes) {
+    public void addCubeDeclarations(List<DefaultCuboidWrapper> cubes, List<String> list) {
+        for (DefaultCuboidWrapper cube : cubes) {
             String name = cube.getName();
             String bodyPart = this.getBodyPart(name);
             list.add("    //" + name);
@@ -93,7 +95,7 @@ public class JavaScriptExporter implements IModelExporter<List<String>> {
     }
 
     @Override
-    public String[] getDefaultArguments(QubbleModel currentModel) {
+    public String[] getDefaultArguments(DefaultModelWrapper currentModel) {
         return new String[]{};
     }
 }

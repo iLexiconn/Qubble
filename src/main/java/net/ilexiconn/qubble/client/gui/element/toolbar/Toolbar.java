@@ -41,14 +41,8 @@ public class Toolbar {
     }
 
     private void setMode(EditMode mode) {
-        if (mode != this.gui.getEditMode()) {
-            this.gui.setEditMode(mode);
-            this.removeModeElements();
-            Element[] elements = mode.createElements(this.gui);
-            for (Element element : elements) {
-                this.addModeElement(element);
-            }
-        }
+        this.gui.setEditMode(mode);
+        this.updateElements();
 
         for (Map.Entry<EditMode, ButtonElement<QubbleGUI>> entry : this.modeButtons.entrySet()) {
             EditMode buttonMode = entry.getKey();
@@ -67,5 +61,13 @@ public class Toolbar {
             this.gui.removeElement(element);
         }
         this.modeElements.clear();
+    }
+
+    public void updateElements() {
+        this.removeModeElements();
+        Element[] elements = this.gui.getEditMode().createElements(this.gui);
+        for (Element element : elements) {
+            this.addModeElement(element);
+        }
     }
 }

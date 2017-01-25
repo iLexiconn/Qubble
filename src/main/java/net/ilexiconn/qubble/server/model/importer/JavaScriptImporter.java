@@ -2,6 +2,8 @@ package net.ilexiconn.qubble.server.model.importer;
 
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -9,7 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JavaScriptImporter implements IModelImporter<List<String>> {
+public class JavaScriptImporter implements IModelImporter<List<String>, DefaultCuboidWrapper, DefaultModelWrapper> {
     @Override
     public String getName() {
         return "JavaScript";
@@ -21,7 +23,7 @@ public class JavaScriptImporter implements IModelImporter<List<String>> {
     }
 
     @Override
-    public QubbleModel getModel(String fileName, List<String> model) {
+    public DefaultModelWrapper getModel(String fileName, List<String> model) {
         List<QubbleCuboid> cubes = new ArrayList<>();
         int textureWidth = 64;
         int textureHeight = 32;
@@ -63,7 +65,7 @@ public class JavaScriptImporter implements IModelImporter<List<String>> {
         QubbleModel qubble = QubbleModel.create(name, author, textureWidth, textureHeight);
         qubble.setFileName(fileName);
         qubble.getCuboids().addAll(cubes);
-        return qubble;
+        return new DefaultModelWrapper(qubble);
     }
 
     @Override

@@ -11,22 +11,22 @@ public enum ModelExporters {
     BLOCK_JSON(new JsonExporter());
 
     public static final ModelExporters[] VALUES = values();
-    public static final IModelExporter<?>[] EXPORTERS;
+    public static final IModelExporter<?, ?, ?>[] EXPORTERS;
 
     static {
-        EXPORTERS = new IModelExporter<?>[ModelExporters.VALUES.length];
+        EXPORTERS = new IModelExporter<?, ?, ?>[ModelExporters.VALUES.length];
         for (int i = 0; i < ModelExporters.EXPORTERS.length; i++) {
             ModelExporters.EXPORTERS[i] = ModelExporters.VALUES[i].getModelExporter();
         }
     }
 
-    private IModelExporter<?> modelExporter;
+    private IModelExporter<?, ?, ?> modelExporter;
 
-    ModelExporters(IModelExporter<?> modelExporter) {
+    ModelExporters(IModelExporter<?, ?, ?> modelExporter) {
         this.modelExporter = modelExporter;
     }
 
-    public static IModelExporter<?> getBuiltinExporter(String name) {
+    public static IModelExporter<?, ?, ?> getBuiltinExporter(String name) {
         for (ModelExporters exporter : ModelExporters.VALUES) {
             if (exporter.getModelExporter().getName().equals(name)) {
                 return exporter.getModelExporter();
@@ -35,7 +35,7 @@ public enum ModelExporters {
         return null;
     }
 
-    public IModelExporter<?> getModelExporter() {
+    public IModelExporter<?, ?, ?> getModelExporter() {
         return this.modelExporter;
     }
 }

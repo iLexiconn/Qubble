@@ -5,19 +5,19 @@ import net.ilexiconn.llibrary.server.property.IStringProperty;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarHandler;
 
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class RotationProperty implements IFloatRangeProperty, IStringProperty {
     private float value;
     private SidebarHandler handler;
-    private Consumer<Float> submit;
+    private Function<Float, Float> submit;
 
-    public RotationProperty(SidebarHandler handler, Consumer<Float> submit) {
+    public RotationProperty(SidebarHandler handler, Function<Float, Float> submit) {
         this.handler = handler;
         this.submit = submit;
     }
 
-    public RotationProperty(Consumer<Float> submit) {
+    public RotationProperty(Function<Float, Float> submit) {
         this(null, submit);
     }
 
@@ -38,8 +38,7 @@ public class RotationProperty implements IFloatRangeProperty, IStringProperty {
 
     @Override
     public void setFloat(float value) {
-        this.value = Float.parseFloat(Qubble.DEFAULT_FORMAT.format(value));
-        this.submit.accept(this.value);
+        this.value = this.submit.apply(Float.parseFloat(Qubble.DEFAULT_FORMAT.format(value)));
         this.handler.updateSliders();
     }
 

@@ -1,6 +1,7 @@
 package net.ilexiconn.qubble.client.gui.element.toolbar;
 
 import com.google.common.collect.Lists;
+import com.mojang.authlib.GameProfile;
 import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.gui.element.ButtonElement;
 import net.ilexiconn.llibrary.client.gui.element.CheckboxElement;
@@ -9,26 +10,30 @@ import net.ilexiconn.llibrary.client.gui.element.Element;
 import net.ilexiconn.llibrary.client.gui.element.InputElement;
 import net.ilexiconn.llibrary.client.gui.element.LabelElement;
 import net.ilexiconn.llibrary.client.gui.element.ListElement;
+import net.ilexiconn.llibrary.client.gui.element.StateButtonElement;
 import net.ilexiconn.llibrary.client.gui.element.WindowElement;
 import net.ilexiconn.llibrary.client.gui.element.color.ColorMode;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.server.config.ConfigHandler;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
-import net.ilexiconn.qubble.client.gui.EditMode;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
 import net.ilexiconn.qubble.client.gui.property.CheckboxProperty;
 import net.ilexiconn.qubble.client.gui.property.ColorProperty;
+import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 import net.ilexiconn.qubble.server.model.ModelHandler;
 import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
 import net.ilexiconn.qubble.server.model.exporter.ModelExporters;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.ilexiconn.qubble.server.model.importer.ModelImporters;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Session;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -55,7 +60,6 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
     @Override
     public void init() {
-        this.gui.setEditMode(EditMode.MODEL);
         this.toolbar.init(this.gui.getEditMode());
 
         this.gui.addElement(new ButtonElement<>(this.gui, "New", 0, 0, 30, 20, (v) -> {
@@ -90,12 +94,26 @@ public class ToolbarElement extends Element<QubbleGUI> {
     }
 
     public void openNewWindow() {
-        WindowElement<QubbleGUI> newWindow = new WindowElement<>(this.gui, "New", 100, 44);
-        final String[] string = new String[] { "" };
-        newWindow.addElement(new InputElement<>(this.gui, 2, 16, 96, "", e -> string[0] = e.getText()));
-        newWindow.addElement(new ButtonElement<>(this.gui, "Done", 2, 30, 96, 12, (v) -> {
-            if (!string[0].isEmpty()) {
-                this.gui.selectModel(QubbleModel.create(string[0], "Unknown", 64, 32));
+        WindowElement<QubbleGUI> newWindow = new WindowElement<>(this.gui, "New", 100, 70);
+        StateButtonElement<QubbleGUI> typeState = new StateButtonElement<>(this.gui, 2, 42, 96, 12, ModelType.NAMES, button -> true);
+        newWindow.addElement(new LabelElement<>(this.gui, "Model Type", 3, 32));
+        newWindow.addElement(typeState.withColorScheme(ColorSchemes.WINDOW));
+        InputElement<QubbleGUI> nameInput = new InputElement<>(this.gui, 2, 16, 96, "", e -> {});
+        newWindow.addElement(nameInput);
+        newWindow.addElement(new ButtonElement<>(this.gui, "Done", 2, 56, 96, 12, (v) -> {
+            String name = nameInput.getText();
+            if (!name.isEmpty()) {
+                ModelType type = ModelType.values()[typeState.getState()];
+                String author = "Unknown";
+                Session session = Minecraft.getMinecraft().getSession();
+                if (session != null) {
+                    GameProfile profile = session.getProfile();
+                    if (profile != null && profile.getName() != null) {
+                        author = profile.getName();
+                    }
+                }
+                this.gui.selectModel(type.create(name, author));
+                this.gui.getSelectedProject().setSaved(false);
                 this.gui.removeElement(newWindow);
             }
             return true;
@@ -151,11 +169,13 @@ public class ToolbarElement extends Element<QubbleGUI> {
     public void openGameImportWindow() {
         WindowElement<QubbleGUI> openWindow = new WindowElement<>(this.gui, "Import Game Model", 150, 200);
         openWindow.addElement(new ListElement<>(this.gui, 2, 16, 146, 182, ClientProxy.getGameModels(), (list) -> {
-            QubbleModel model = ClientProxy.GAME_MODELS.get(list.getSelectedEntry());
+            ModelWrapper model = ClientProxy.GAME_MODELS.get(list.getSelectedEntry());
             this.gui.selectModel(model.copy());
             ResourceLocation texture = ClientProxy.GAME_TEXTURES.get(list.getSelectedEntry());
             if (texture != null) {
-                this.gui.getSelectedProject().setBaseTexture(new ModelTexture(texture));
+                Project<?, ?> selectedProject = this.gui.getSelectedProject();
+                selectedProject.setBaseTexture(new ModelTexture(texture));
+                selectedProject.setSaved(true);
             }
             this.gui.removeElement(openWindow);
             return true;
@@ -168,7 +188,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
         openWindow.addElement(new ListElement<>(this.gui, 2, 16, 146, 182, ClientProxy.getGameBlockModels(), (list) -> {
             String name = list.getSelectedEntry();
             ResourceLocation location = ClientProxy.GAME_JSON_MODEL_LOCATIONS.get(name);
-            QubbleModel model = ClientProxy.loadBlockModel(name, location);
+            ModelWrapper model = ClientProxy.loadBlockModel(name, location);
             if (model != null) {
                 this.gui.selectModel(model);
             }
@@ -183,13 +203,15 @@ public class ToolbarElement extends Element<QubbleGUI> {
         saveWindow.addElement(new LabelElement<>(this.gui, "File name", 4, 19));
         InputElement<QubbleGUI> fileName;
         Project project = this.gui.getSelectedProject();
-        QubbleModel selectedModel = project.getModel();
+        ModelWrapper selectedModel = project.getModel();
         String name = selectedModel.getFileName() == null ? selectedModel.getName() : selectedModel.getFileName();
         saveWindow.addElement(fileName = new InputElement<>(this.gui, 2, 30, 96, name, (i) -> {
         }));
         saveWindow.addElement(new ButtonElement<>(this.gui, "Save", 2, 50, 47, 12, (v) -> {
             try {
-                CompressedStreamTools.writeCompressed(selectedModel.copy().serializeNBT(), new FileOutputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, fileName.getText() + ".qbl")));
+                NBTTagCompound compound = selectedModel.copy().serializeNBT();
+                compound.setByte("type", (byte) selectedModel.getType().ordinal());
+                CompressedStreamTools.writeCompressed(compound, new FileOutputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, fileName.getText() + ".qbl")));
                 project.setSaved(true);
                 callback.accept(true);
             } catch (IOException e) {
@@ -225,7 +247,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
     private void openModelExportWindow(IModelExporter modelExporter, String fileName) {
         Project project = this.gui.getSelectedProject();
-        QubbleModel copy = project.getModel().copy();
+        ModelWrapper copy = project.getModel().copy();
         int argumentY = 18;
         String[] argumentNames = modelExporter.getArgumentNames();
         String[] defaultArguments = modelExporter.getDefaultArguments(copy);
@@ -336,5 +358,9 @@ public class ToolbarElement extends Element<QubbleGUI> {
             }
         }
         return list;
+    }
+
+    public void updateElements() {
+        this.toolbar.updateElements();
     }
 }

@@ -1,20 +1,21 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
+import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 
 import java.io.File;
 import java.io.IOException;
 
-public interface IModelExporter<T> {
+public interface IModelExporter<T, CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> {
     String getName();
 
     String getExtension();
 
-    T export(QubbleModel model, String... arguments);
+    T export(MDL model, String... arguments);
 
     void save(T model, File file) throws IOException;
 
     String[] getArgumentNames();
 
-    String[] getDefaultArguments(QubbleModel currentModel);
+    String[] getDefaultArguments(MDL currentModel);
 }

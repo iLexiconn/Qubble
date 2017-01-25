@@ -22,19 +22,19 @@ sourceCompatibility = targetCompatibility = "1.8"
 minecraft {
     version = "1.10.2-12.18.2.2099"
     runDir = "minecraft"
-    mappings = "snapshot_20161012"
+    mappings = "stable_29"
 }
 
 repositories {
 	mavenCentral()
 	maven {
 		name = "ilexiconn"
-		url = "http://maven.ilexiconn.net"
+		url = "http://maven.mcmoddev.net"
 	}
 }
 
 dependencies {
-    compile "net.ilexiconn:llibrary:$llibrary_version-1.10.2:dev"
+    //compile "net.ilexiconn:llibrary:$llibrary_version-1.10.2:dev"
 }
 
 processResources {

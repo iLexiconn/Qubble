@@ -6,6 +6,8 @@ import net.ilexiconn.llibrary.client.model.tabula.TabulaModelHandler;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaCubeContainer;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaCubeGroupContainer;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaModelContainer;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,7 +17,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class TabulaImporter implements IModelImporter<TabulaModelContainer> {
+public class TabulaImporter implements IModelImporter<TabulaModelContainer, DefaultCuboidWrapper, DefaultModelWrapper> {
     @Override
     public String getName() {
         return "Tabula";
@@ -27,7 +29,7 @@ public class TabulaImporter implements IModelImporter<TabulaModelContainer> {
     }
 
     @Override
-    public QubbleModel getModel(String fileName, TabulaModelContainer model) {
+    public DefaultModelWrapper getModel(String fileName, TabulaModelContainer model) {
         List<QubbleCuboid> cubes = new ArrayList<>();
         cubes.addAll(this.addChildren(null, model.getCubes()));
         for (TabulaCubeGroupContainer cubeGroup : model.getCubeGroups()) {
@@ -36,7 +38,7 @@ public class TabulaImporter implements IModelImporter<TabulaModelContainer> {
         QubbleModel qubble = QubbleModel.create(model.getName(), model.getAuthor(), model.getTextureWidth(), model.getTextureHeight());
         qubble.getCuboids().addAll(cubes);
         qubble.setFileName(fileName);
-        return qubble;
+        return new DefaultModelWrapper(qubble);
     }
 
     @Override

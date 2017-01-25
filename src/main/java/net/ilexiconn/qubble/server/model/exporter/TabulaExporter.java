@@ -1,10 +1,10 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
 import com.google.gson.Gson;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaCubeContainer;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaModelContainer;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.io.File;
@@ -16,7 +16,7 @@ import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class TabulaExporter implements IModelExporter<TabulaModelContainer> {
+public class TabulaExporter implements IModelExporter<TabulaModelContainer, DefaultCuboidWrapper, DefaultModelWrapper> {
     @Override
     public String getName() {
         return "Tabula";
@@ -28,20 +28,32 @@ public class TabulaExporter implements IModelExporter<TabulaModelContainer> {
     }
 
     @Override
-    public TabulaModelContainer export(QubbleModel model, String... arguments) {
+    public TabulaModelContainer export(DefaultModelWrapper model, String... arguments) {
         List<TabulaCubeContainer> tabulaCubes = new ArrayList<>();
-        for (QubbleCuboid cube : model.getCuboids()) {
-            TabulaCubeContainer tabulaCube = new TabulaCubeContainer(cube.getName(), this.generateIdentifier(cube.getName(), null), null, new int[] { cube.getDimensionX(), cube.getDimensionY(), cube.getDimensionZ() }, new double[] { cube.getPositionX(), cube.getPositionY(), cube.getPositionZ() }, new double[] { cube.getOffsetX(), cube.getOffsetY(), cube.getOffsetZ() }, new double[] { cube.getRotationX(), cube.getRotationY(), cube.getRotationZ() }, new double[] { cube.getScaleX(), cube.getScaleY(), cube.getScaleZ() }, new int[] { cube.getTextureX(), cube.getTextureY() }, cube.isTextureMirrored(), cube.getOpacity(), 0.0, false);
+        for (DefaultCuboidWrapper cube : model.getCuboids()) {
+            int[] dimensions = { (int) cube.getDimensionX(), (int) cube.getDimensionY(), (int) cube.getDimensionZ() };
+            double[] position = { cube.getPositionX(), cube.getPositionY(), cube.getPositionZ() };
+            double[] offset = { cube.getOffsetX(), cube.getOffsetY(), cube.getOffsetZ() };
+            double[] rotation = { cube.getRotationX(), cube.getRotationY(), cube.getRotationZ() };
+            double[] scale = { cube.getScaleX(), cube.getScaleY(), cube.getScaleZ() };
+            int[] textureOffset = { (int) cube.getTextureX(), (int) cube.getTextureY() };
+            TabulaCubeContainer tabulaCube = new TabulaCubeContainer(cube.getName(), this.generateIdentifier(cube.getName(), null), null, dimensions, position, offset, rotation, scale, textureOffset, cube.isTextureMirrored(), cube.getOpacity(), 0.0, false);
             tabulaCube.getChildren().addAll(this.convertChildren(cube, tabulaCube));
             tabulaCubes.add(tabulaCube);
         }
         return new TabulaModelContainer(model.getName(), model.getAuthor(), model.getTextureWidth(), model.getTextureHeight(), tabulaCubes, 4);
     }
 
-    private List<TabulaCubeContainer> convertChildren(QubbleCuboid parent, TabulaCubeContainer tabulaParent) {
+    private List<TabulaCubeContainer> convertChildren(DefaultCuboidWrapper parent, TabulaCubeContainer tabulaParent) {
         List<TabulaCubeContainer> children = new ArrayList<>();
-        for (QubbleCuboid child : parent.getChildren()) {
-            TabulaCubeContainer tabulaChild = new TabulaCubeContainer(child.getName(), this.generateIdentifier(child.getName(), parent.getName()), tabulaParent.getIdentifier(), new int[] { child.getDimensionX(), child.getDimensionY(), child.getDimensionZ() }, new double[] { child.getPositionX(), child.getPositionY(), child.getPositionZ() }, new double[] { child.getOffsetX(), child.getOffsetY(), child.getOffsetZ() }, new double[] { child.getRotationX(), child.getRotationY(), child.getRotationZ() }, new double[] { child.getScaleX(), child.getScaleY(), child.getScaleZ() }, new int[] { child.getTextureX(), child.getTextureY() }, child.isTextureMirrored(), child.getOpacity(), 0.0, false);
+        for (DefaultCuboidWrapper child : parent.getChildren()) {
+            int[] dimensions = { (int) child.getDimensionX(), (int) child.getDimensionY(), (int) child.getDimensionZ() };
+            double[] position = { child.getPositionX(), child.getPositionY(), child.getPositionZ() };
+            double[] offset = { child.getOffsetX(), child.getOffsetY(), child.getOffsetZ() };
+            double[] rotation = { child.getRotationX(), child.getRotationY(), child.getRotationZ() };
+            double[] scale = { child.getScaleX(), child.getScaleY(), child.getScaleZ() };
+            int[] textureOffset = { (int) child.getTextureX(), (int) child.getTextureY() };
+            TabulaCubeContainer tabulaChild = new TabulaCubeContainer(child.getName(), this.generateIdentifier(child.getName(), parent.getName()), tabulaParent.getIdentifier(), dimensions, position, offset, rotation, scale, textureOffset, child.isTextureMirrored(), child.getOpacity(), 0.0, false);
             tabulaChild.getChildren().addAll(this.convertChildren(child, tabulaChild));
             children.add(tabulaChild);
         }
@@ -64,7 +76,7 @@ public class TabulaExporter implements IModelExporter<TabulaModelContainer> {
     }
 
     @Override
-    public String[] getDefaultArguments(QubbleModel currentModel) {
+    public String[] getDefaultArguments(DefaultModelWrapper currentModel) {
         return new String[] {};
     }
 

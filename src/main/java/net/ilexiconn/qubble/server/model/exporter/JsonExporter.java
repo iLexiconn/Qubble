@@ -2,9 +2,9 @@ package net.ilexiconn.qubble.server.model.exporter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.model.BlockModelContainer;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.io.File;
@@ -12,12 +12,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-public class JsonExporter implements IModelExporter<BlockModelContainer> {
+//TODO Export from Vanilla models
+public class JsonExporter implements IModelExporter<BlockModelContainer, DefaultCuboidWrapper, DefaultModelWrapper> {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     @Override
     public String getName() {
-        return "JSON";
+        return "Vanilla JSON";
     }
 
     @Override
@@ -26,14 +27,14 @@ public class JsonExporter implements IModelExporter<BlockModelContainer> {
     }
 
     @Override
-    public BlockModelContainer export(QubbleModel model, String... arguments) {
+    public BlockModelContainer export(DefaultModelWrapper model, String... arguments) {
         model.unparent();
         BlockModelContainer blockModel = new BlockModelContainer();
-        for (QubbleCuboid cube : model.getCuboids()) {
+        for (DefaultCuboidWrapper cube : model.getCuboids()) {
             BlockModelContainer.Element element = new BlockModelContainer.Element();
-            int dimensionX = cube.getDimensionX();
-            int dimensionY = cube.getDimensionY();
-            int dimensionZ = cube.getDimensionZ();
+            int dimensionX = (int) cube.getDimensionX();
+            int dimensionY = (int) cube.getDimensionY();
+            int dimensionZ = (int) cube.getDimensionZ();
             element.name = cube.getName();
             float positionX = cube.getPositionX() + cube.getOffsetX() + 8;
             float positionY = 24 - (cube.getPositionY() + cube.getOffsetY() + cube.getDimensionY());
@@ -46,13 +47,13 @@ public class JsonExporter implements IModelExporter<BlockModelContainer> {
             rotation.origin = new float[] { this.clampPosition(positionX - cube.getOffsetX()), this.clampPosition(positionY - cube.getOffsetY()), this.clampPosition(positionZ - cube.getOffsetZ()) };
             if (cube.getRotationZ() != 0.0F) {
                 rotation.axis = "z";
-                rotation.angle = -((int) (cube.getRotationZ() / 16)) * 22.5F;
+                rotation.angle = -(Math.round(cube.getRotationZ() / 22.5)) * 22.5F;
             } else if (cube.getRotationY() != 0.0F) {
                 rotation.axis = "y";
-                rotation.angle = -((int) (cube.getRotationY() / 16)) * 22.5F;
+                rotation.angle = -(Math.round(cube.getRotationY() / 22.5)) * 22.5F;
             } else if (cube.getRotationX() != 0.0F) {
                 rotation.axis = "x";
-                rotation.angle = -((int) (cube.getRotationX() / 16)) * 22.5F;
+                rotation.angle = -(Math.round(cube.getRotationX() / 22.5)) * 22.5F;
             } else {
                 rotation = null;
             }
@@ -90,7 +91,7 @@ public class JsonExporter implements IModelExporter<BlockModelContainer> {
     }
 
     @Override
-    public String[] getDefaultArguments(QubbleModel currentModel) {
+    public String[] getDefaultArguments(DefaultModelWrapper currentModel) {
         return new String[] {};
     }
 

@@ -1,14 +1,14 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class TextureMapExporter implements IModelExporter<BufferedImage> {
+public class TextureMapExporter implements IModelExporter<BufferedImage, DefaultCuboidWrapper, DefaultModelWrapper> {
     @Override
     public String getName() {
         return "Texture Map";
@@ -20,15 +20,15 @@ public class TextureMapExporter implements IModelExporter<BufferedImage> {
     }
 
     @Override
-    public BufferedImage export(QubbleModel model, String... arguments) {
+    public BufferedImage export(DefaultModelWrapper model, String... arguments) {
         model.unparent();
         BufferedImage texture = new BufferedImage(model.getTextureWidth(), model.getTextureHeight(), BufferedImage.TYPE_INT_ARGB);
-        for (QubbleCuboid cube : model.getCuboids()) {
-            int textureX = cube.getTextureX();
-            int textureY = cube.getTextureY();
-            int dimensionX = cube.getDimensionX();
-            int dimensionY = cube.getDimensionY();
-            int dimensionZ = cube.getDimensionZ();
+        for (DefaultCuboidWrapper cube : model.getCuboids()) {
+            int textureX = (int) cube.getTextureX();
+            int textureY = (int) cube.getTextureY();
+            int dimensionX = (int) cube.getDimensionX();
+            int dimensionY = (int) cube.getDimensionY();
+            int dimensionZ = (int) cube.getDimensionZ();
             this.fill(texture, textureX + dimensionZ, textureY, dimensionX, dimensionZ, 0xFF00FF00);
             this.fill(texture, textureX + dimensionX + dimensionZ, textureY, dimensionX, dimensionZ, 0xFF00AA00);
             this.fill(texture, textureX, textureY + dimensionZ, dimensionZ, dimensionY, 0xFFFF0000);
@@ -50,7 +50,7 @@ public class TextureMapExporter implements IModelExporter<BufferedImage> {
     }
 
     @Override
-    public String[] getDefaultArguments(QubbleModel currentModel) {
+    public String[] getDefaultArguments(DefaultModelWrapper currentModel) {
         return new String[]{};
     }
 

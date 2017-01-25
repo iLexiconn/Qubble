@@ -7,19 +7,20 @@ import net.ilexiconn.llibrary.client.gui.element.LabelElement;
 import net.ilexiconn.llibrary.client.gui.element.ListElement;
 import net.ilexiconn.llibrary.client.gui.element.SliderElement;
 import net.ilexiconn.llibrary.client.gui.element.WindowElement;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
 import net.ilexiconn.qubble.client.gui.property.DimensionProperty;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 
 import java.io.File;
 import java.util.List;
 
-public class TextureSidebarHandler extends SidebarHandler {
+public class DefaultTextureSidebarHandler extends SidebarHandler<DefaultCuboidWrapper, DefaultModelWrapper> {
     private SliderElement<QubbleGUI, DimensionProperty> textureX, textureY;
     private SliderElement<QubbleGUI, DimensionProperty> textureWidth, textureHeight;
     private ButtonElement<QubbleGUI> mirror;
@@ -29,7 +30,7 @@ public class TextureSidebarHandler extends SidebarHandler {
     private DimensionProperty propertyTextureX, propertyTextureY;
     private DimensionProperty propertyTextureWidth, propertyTextureHeight;
 
-    public TextureSidebarHandler() {
+    public DefaultTextureSidebarHandler() {
         this.propertyTextureX = new DimensionProperty(this, value -> this.edit(cuboid -> cuboid.setTexture(value, cuboid.getTextureY())));
         this.propertyTextureY = new DimensionProperty(this, value -> this.edit(cuboid -> cuboid.setTexture(cuboid.getTextureX(), value)));
         this.propertyTextureWidth = new DimensionProperty(this, value -> this.editModel(model -> model.setTextureWidth(value)));
@@ -47,7 +48,7 @@ public class TextureSidebarHandler extends SidebarHandler {
     }
 
     @Override
-    protected void initProperties(QubbleModel model, QubbleCuboid cuboid) {
+    protected void initProperties(DefaultModelWrapper model, DefaultCuboidWrapper cuboid) {
         this.propertyTextureX.set(cuboid.getTextureX());
         this.propertyTextureY.set(cuboid.getTextureY());
         this.propertyTextureWidth.set(model.getTextureWidth());
@@ -66,10 +67,11 @@ public class TextureSidebarHandler extends SidebarHandler {
                 button.withColorScheme(ColorSchemes.TOGGLE_OFF);
             }
             Project selectedProject = this.gui.getSelectedProject();
-            if (selectedProject != null && selectedProject.getSelectedCube() != null) {
-                QubbleCuboid selectedCube = selectedProject.getSelectedCube();
+            if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
+                ModelWrapper model = selectedProject.getModel();
+                DefaultCuboidWrapper selectedCube = (DefaultCuboidWrapper) selectedProject.getSelectedCuboid();
                 selectedCube.setTextureMirrored(button.getColorScheme() != ColorSchemes.TOGGLE_OFF);
-                this.gui.getModelView().updatePart(selectedCube);
+                model.rebuildCuboid(selectedCube);
                 selectedProject.setSaved(false);
             }
             return true;
@@ -104,12 +106,8 @@ public class TextureSidebarHandler extends SidebarHandler {
     }
 
     @Override
-    protected void initElements(QubbleModel model, QubbleCuboid cuboid) {
-        this.propertyTextureX.set(cuboid.getTextureX());
-        this.propertyTextureY.set(cuboid.getTextureY());
+    protected void initElements(DefaultModelWrapper model, DefaultCuboidWrapper cuboid) {
         this.mirror.withColorScheme(cuboid.isTextureMirrored() ? ColorSchemes.TOGGLE_ON : ColorSchemes.TOGGLE_OFF);
-        this.propertyTextureWidth.set(model.getTextureWidth());
-        this.propertyTextureHeight.set(model.getTextureHeight());
     }
 
     private void openSelectTextureWindow(String name, boolean base) {

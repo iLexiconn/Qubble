@@ -4,18 +4,21 @@ import net.ilexiconn.llibrary.client.gui.ElementGUI;
 import net.ilexiconn.llibrary.client.gui.element.ButtonElement;
 import net.ilexiconn.llibrary.client.gui.element.LabelElement;
 import net.ilexiconn.llibrary.client.gui.element.WindowElement;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.element.ModelTreeElement;
 import net.ilexiconn.qubble.client.gui.element.ModelViewElement;
 import net.ilexiconn.qubble.client.gui.element.ProjectBarElement;
+import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
 import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarElement;
 import net.ilexiconn.qubble.client.gui.element.toolbar.ToolbarElement;
-import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
+import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
@@ -32,7 +35,7 @@ public class QubbleGUI extends ElementGUI {
     private GuiScreen parent;
     private ScaledResolution resolution;
     private ToolbarElement toolbar;
-    private ModelTreeElement modelTree;
+    private ModelTreeElement<?, ?> modelTree;
     private ModelViewElement modelView;
     private SidebarElement sidebar;
     private ProjectBarElement projectBar;
@@ -44,18 +47,19 @@ public class QubbleGUI extends ElementGUI {
 
     private EditMode editMode = EditMode.MODEL;
 
+    private boolean initialized;
+
     public QubbleGUI(GuiScreen parent) {
         this.parent = parent;
     }
 
     @Override
     public void initElements() {
+        this.initialized = false;
         this.clearElements();
-        this.addElement(this.modelView = new ModelViewElement(this));
-        this.addElement(this.modelTree = new ModelTreeElement(this));
-        this.addElement(this.sidebar = new SidebarElement(this));
-        this.addElement(this.toolbar = new ToolbarElement(this));
-        this.addElement(this.projectBar = new ProjectBarElement(this));
+        this.setEditMode(EditMode.MODEL);
+        this.updateProjectElements(this.getSelectedProject());
+        this.initialized = true;
     }
 
     @Override
@@ -96,9 +100,16 @@ public class QubbleGUI extends ElementGUI {
 
     public void selectModel(String name, IModelImporter importer) {
         try {
-            QubbleModel model;
+            ModelWrapper model;
             if (importer == null) {
-                model = QubbleModel.deserialize(CompressedStreamTools.readCompressed(new FileInputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, name + ".qbl"))));
+                NBTTagCompound compound = CompressedStreamTools.readCompressed(new FileInputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, name + ".qbl")));
+                ModelType type;
+                try {
+                    type = ModelType.values()[compound.getByte("type")];
+                } catch (Exception e) {
+                    type = ModelType.DEFAULT;
+                }
+                model = type.deserialize(compound);
             } else {
                 model = importer.getModel(name, importer.read(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, name + "." + importer.getExtension())));
             }
@@ -108,20 +119,23 @@ public class QubbleGUI extends ElementGUI {
         }
     }
 
-    public void selectModel(QubbleModel model) {
-        this.openProjects.add(new Project(this, model));
+    public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> void selectModel(MDL model) {
+        this.openProjects.add(new Project<>(this, model));
         this.selectModel(this.openProjects.size() - 1);
     }
 
     public void selectModel(int index) {
         this.selectedProject = Math.max(0, Math.min(this.openProjects.size() - 1, index));
-        this.modelView.updateModel();
-        Project selectedProject = this.getSelectedProject();
-        if (selectedProject != null && selectedProject.getSelectedCube() != null) {
-            this.sidebar.enable(selectedProject.getModel(), selectedProject.getSelectedCube());
+        Project<?, ?> selectedProject = this.getSelectedProject();
+        this.updateProjectElements(selectedProject);
+        if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
+            ModelWrapper model = selectedProject.getModel();
+            model.rebuildModel();
+            this.sidebar.enable(model, selectedProject.getSelectedCuboid());
         } else {
             this.sidebar.disable();
         }
+        this.toolbar.updateElements();
     }
 
     public void closeModel(int index) {
@@ -148,8 +162,35 @@ public class QubbleGUI extends ElementGUI {
         }
     }
 
-    public Project getSelectedProject() {
+    public Project<?, ?> getSelectedProject() {
         return this.openProjects.size() > this.selectedProject ? this.openProjects.get(this.selectedProject) : null;
+    }
+
+    private void updateProjectElements(Project<?, ?> selectedProject) {
+        this.removeElement(this.modelView);
+        this.removeElement(this.modelTree);
+        this.removeElement(this.sidebar);
+        this.removeElement(this.toolbar);
+        this.removeElement(this.projectBar);
+
+        if (!this.initialized) {
+            this.modelView = new ModelViewElement(this);
+            this.sidebar = new SidebarElement(this);
+            this.toolbar = new ToolbarElement(this);
+            this.projectBar = new ProjectBarElement(this);
+        }
+
+        this.addElement(this.modelView);
+        this.addElement(this.modelTree = new ModelTreeElement<>(this, selectedProject));
+        this.addElement(this.sidebar);
+        this.addElement(this.toolbar);
+        this.addElement(this.projectBar);
+
+        this.sendElementToBack(this.projectBar);
+        this.sendElementToBack(this.toolbar);
+        this.sendElementToBack(this.sidebar);
+        this.sendElementToBack(this.modelTree);
+        this.sendElementToBack(this.modelView);
     }
 
     public int getSelectedProjectIndex() {
@@ -182,11 +223,14 @@ public class QubbleGUI extends ElementGUI {
 
     public void setEditMode(EditMode editMode) {
         this.editMode = editMode;
-        this.getSidebar().initFields();
-        if (this.getSelectedProject() != null && this.getSelectedProject().getSelectedCube() != null) {
-            this.getSidebar().enable(this.getSelectedProject().getModel(), this.getSelectedProject().getSelectedCube());
-        } else {
-            this.getSidebar().disable();
+        if (this.sidebar != null) {
+            this.sidebar.initFields();
+            Project<?, ?> selectedProject = this.getSelectedProject();
+            if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
+                this.sidebar.enable(selectedProject.getModel(), selectedProject.getSelectedCuboid());
+            } else {
+                this.sidebar.disable();
+            }
         }
     }
 

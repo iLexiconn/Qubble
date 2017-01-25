@@ -7,22 +7,22 @@ public enum ModelImporters {
     BLOCK_JSON(new JsonImporter());
 
     public static final ModelImporters[] VALUES = values();
-    public static final IModelImporter<?>[] IMPORTERS;
+    public static final IModelImporter<?, ?, ?>[] IMPORTERS;
 
     static {
-        IMPORTERS = new IModelImporter<?>[ModelImporters.VALUES.length];
+        IMPORTERS = new IModelImporter<?, ?, ?>[ModelImporters.VALUES.length];
         for (int i = 0; i < ModelImporters.IMPORTERS.length; i++) {
             ModelImporters.IMPORTERS[i] = ModelImporters.VALUES[i].getModelImporter();
         }
     }
 
-    private IModelImporter<?> modelImporter;
+    private IModelImporter<?, ?, ?> modelImporter;
 
-    ModelImporters(IModelImporter<?> modelImporter) {
+    ModelImporters(IModelImporter<?, ?, ?> modelImporter) {
         this.modelImporter = modelImporter;
     }
 
-    public static IModelImporter<?> getBuiltinImporter(String name) {
+    public static IModelImporter<?, ?, ?> getBuiltinImporter(String name) {
         for (ModelImporters importer : ModelImporters.VALUES) {
             if (importer.getModelImporter().getName().equals(name)) {
                 return importer.getModelImporter();
@@ -31,7 +31,7 @@ public enum ModelImporters {
         return null;
     }
 
-    public IModelImporter<?> getModelImporter() {
+    public IModelImporter<?, ?, ?> getModelImporter() {
         return this.modelImporter;
     }
 }

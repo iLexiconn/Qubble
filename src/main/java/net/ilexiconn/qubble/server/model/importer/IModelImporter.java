@@ -1,16 +1,17 @@
 package net.ilexiconn.qubble.server.model.importer;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
+import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 
 import java.io.File;
 import java.io.IOException;
 
-public interface IModelImporter<T> {
+public interface IModelImporter<T, CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> {
     String getName();
 
     String getExtension();
 
-    QubbleModel getModel(String fileName, T model);
+    MDL getModel(String fileName, T model);
 
     T read(File file) throws IOException;
 }

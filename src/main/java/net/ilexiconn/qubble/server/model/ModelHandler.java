@@ -1,7 +1,13 @@
 package net.ilexiconn.qubble.server.model;
 
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
+import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaCuboid;
+import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
 import net.ilexiconn.qubble.server.model.exporter.ModelExporters;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
@@ -14,19 +20,19 @@ import java.util.stream.Collectors;
 public enum ModelHandler {
     INSTANCE;
 
-    private List<IModelImporter<?>> modelImporterList = new ArrayList<>();
-    private List<IModelExporter<?>> modelExporterList = new ArrayList<>();
+    private List<IModelImporter<?, ?, ?>> modelImporterList = new ArrayList<>();
+    private List<IModelExporter<?, ?, ?>> modelExporterList = new ArrayList<>();
 
-    public void registerModelImporter(IModelImporter<?> modelImporter) {
+    public void registerModelImporter(IModelImporter<?, ?, ?> modelImporter) {
         this.modelImporterList.add(modelImporter);
     }
 
-    public void registerModelExporter(IModelExporter<?> modelExporter) {
+    public void registerModelExporter(IModelExporter<?, ?, ?> modelExporter) {
         this.modelExporterList.add(modelExporter);
     }
 
-    public List<IModelImporter<?>> getImporters() {
-        List<IModelImporter<?>> list = new ArrayList<>();
+    public List<IModelImporter<?, ?, ?>> getImporters() {
+        List<IModelImporter<?, ?, ?>> list = new ArrayList<>();
         for (ModelImporters importer : ModelImporters.VALUES) {
             list.add(importer.getModelImporter());
         }
@@ -34,8 +40,8 @@ public enum ModelHandler {
         return list;
     }
 
-    public List<IModelExporter<?>> getExporters() {
-        List<IModelExporter<?>> list = new ArrayList<>();
+    public List<IModelExporter<?, ?, ?>> getExporters() {
+        List<IModelExporter<?, ?, ?>> list = new ArrayList<>();
         for (ModelExporters exporter : ModelExporters.VALUES) {
             list.add(exporter.getModelExporter());
         }
@@ -43,12 +49,12 @@ public enum ModelHandler {
         return list;
     }
 
-    public IModelImporter<?> getImporter(String name) {
-        IModelImporter<?> modelImporter = ModelImporters.getBuiltinImporter(name);
+    public IModelImporter<?, ?, ?> getImporter(String name) {
+        IModelImporter<?, ?, ?> modelImporter = ModelImporters.getBuiltinImporter(name);
         if (modelImporter != null) {
             return modelImporter;
         } else {
-            for (IModelImporter<?> importer : this.modelImporterList) {
+            for (IModelImporter<?, ?, ?> importer : this.modelImporterList) {
                 if (importer.getName().equals(name)) {
                     return importer;
                 }
@@ -57,12 +63,12 @@ public enum ModelHandler {
         return null;
     }
 
-    public IModelExporter<?> getExporter(String name) {
-        IModelExporter<?> modelExporter = ModelExporters.getBuiltinExporter(name);
+    public IModelExporter<?, ?, ?> getExporter(String name) {
+        IModelExporter<?, ?, ?> modelExporter = ModelExporters.getBuiltinExporter(name);
         if (modelExporter != null) {
             return modelExporter;
         } else {
-            for (IModelExporter<?> exporter : this.modelExporterList) {
+            for (IModelExporter<?, ?, ?> exporter : this.modelExporterList) {
                 if (exporter.getName().equals(name)) {
                     return exporter;
                 }
@@ -71,7 +77,7 @@ public enum ModelHandler {
         return null;
     }
 
-    public String getCopyName(QubbleModel model, String name) {
+    public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> String getCopyName(MDL model, String name) {
         int index = 2;
         while (this.hasDuplicateName(model, name)) {
             String newName = name + " " + index;
@@ -83,8 +89,8 @@ public enum ModelHandler {
         return name;
     }
 
-    public boolean hasDuplicateName(QubbleModel model, String name) {
-        for (QubbleCuboid cuboid : model.getCuboids()) {
+    public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> boolean hasDuplicateName(MDL model, String name) {
+        for (CBE cuboid : model.getCuboids()) {
             if (this.hasDuplicateName(cuboid, name)) {
                 return true;
             }
@@ -92,11 +98,11 @@ public enum ModelHandler {
         return false;
     }
 
-    protected boolean hasDuplicateName(QubbleCuboid cuboid, String name) {
+    protected <CBE extends CuboidWrapper<CBE>> boolean hasDuplicateName(CBE cuboid, String name) {
         if (cuboid.getName().trim().equals(name)) {
             return true;
         }
-        for (QubbleCuboid child : cuboid.getChildren()) {
+        for (CBE child : cuboid.getChildren()) {
             if (this.hasDuplicateName(child, name)) {
                 return true;
             }
@@ -104,10 +110,10 @@ public enum ModelHandler {
         return false;
     }
 
-    public QubbleCuboid copy(QubbleModel model, QubbleCuboid cuboid) {
+    public QubbleCuboid copy(DefaultModelWrapper model, DefaultCuboidWrapper cuboid) {
         QubbleCuboid copy = QubbleCuboid.create(this.getCopyName(model, cuboid.getName()));
         copy.getChildren().addAll(cuboid.getChildren().stream().map((child) -> ModelHandler.INSTANCE.copy(model, child)).collect(Collectors.toList()));
-        copy.setDimensions(cuboid.getDimensionX(), cuboid.getDimensionY(), cuboid.getDimensionZ());
+        copy.setDimensions((int) cuboid.getDimensionX(), (int) cuboid.getDimensionY(), (int) cuboid.getDimensionZ());
         copy.setPosition(cuboid.getPositionX(), cuboid.getPositionY(), cuboid.getPositionZ());
         copy.setOffset(cuboid.getOffsetX(), cuboid.getOffsetY(), cuboid.getOffsetZ());
         copy.setRotation(cuboid.getRotationX(), cuboid.getRotationY(), cuboid.getRotationZ());
@@ -115,6 +121,12 @@ public enum ModelHandler {
         copy.setTexture(cuboid.getTextureX(), cuboid.getTextureY());
         copy.setTextureMirrored(cuboid.isTextureMirrored());
         copy.setOpacity(cuboid.getOpacity());
+        return copy;
+    }
+
+    public QubbleVanillaCuboid copy(BlockModelWrapper model, BlockCuboidWrapper cuboid) {
+        QubbleVanillaCuboid copy = cuboid.getCuboid().copy();
+        copy.setName(this.getCopyName(model, copy.getName()));
         return copy;
     }
 }

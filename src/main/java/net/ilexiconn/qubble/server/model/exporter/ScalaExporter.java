@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScalaExporter implements IModelExporter<List<String>> {
+public class ScalaExporter implements IModelExporter<List<String>, DefaultCuboidWrapper, DefaultModelWrapper> {
     @Override
     public String getName() {
         return "Scala";
@@ -21,7 +21,7 @@ public class ScalaExporter implements IModelExporter<List<String>> {
     }
 
     @Override
-    public List<String> export(QubbleModel model, String... arguments) {
+    public List<String> export(DefaultModelWrapper model, String... arguments) {
         List<String> list = new ArrayList<>();
         list.add("package " + arguments[0]);
         list.add("");
@@ -57,8 +57,8 @@ public class ScalaExporter implements IModelExporter<List<String>> {
         writer.close();
     }
 
-    public void addCubeDeclarations(List<QubbleCuboid> cubes, QubbleCuboid parent, List<String> list) {
-        for (QubbleCuboid cube : cubes) {
+    public void addCubeDeclarations(List<DefaultCuboidWrapper> cubes, DefaultCuboidWrapper parent, List<String> list) {
+        for (DefaultCuboidWrapper cube : cubes) {
             String field = this.getFieldName(cube);
             list.add("  val " + field + " = new ModelRenderer(this, " + cube.getTextureX() + ", " + cube.getTextureY() + ")");
             list.add("  this." + field + ".setRotationPoint(" + cube.getPositionX() + "F, " + cube.getPositionY() + "F, " + cube.getPositionZ() + "F)");
@@ -76,8 +76,8 @@ public class ScalaExporter implements IModelExporter<List<String>> {
         }
     }
 
-    public void addRenderCalls(List<QubbleCuboid> cubes, List<String> list) {
-        for (QubbleCuboid cube : cubes) {
+    public void addRenderCalls(List<DefaultCuboidWrapper> cubes, List<String> list) {
+        for (DefaultCuboidWrapper cube : cubes) {
             String field = this.getFieldName(cube);
             boolean scale = cube.getRotationX() != 0.0F || cube.getRotationY() != 0.0F || cube.getRotationZ() != 0.0F;
             boolean blend = cube.getOpacity() != 100.0F;
@@ -112,7 +112,7 @@ public class ScalaExporter implements IModelExporter<List<String>> {
         list.add("  }");
     }
 
-    public String getFieldName(QubbleCuboid cube) {
+    public String getFieldName(DefaultCuboidWrapper cube) {
         return cube.getName().replaceAll("[^A-Za-z0-9_$]", "");
     }
 
@@ -122,7 +122,7 @@ public class ScalaExporter implements IModelExporter<List<String>> {
     }
 
     @Override
-    public String[] getDefaultArguments(QubbleModel currentModel) {
+    public String[] getDefaultArguments(DefaultModelWrapper currentModel) {
         return new String[]{"pkg", currentModel.getName()};
     }
 }

@@ -158,4 +158,18 @@ public class QubbleModelRenderer extends AdvancedModelRenderer {
         GlStateManager.glEndList();
         this.compiled = true;
     }
+
+    public void delete() {
+        if (this.compiled) {
+            GLAllocation.deleteDisplayLists(this.displayList);
+            this.compiled = false;
+        }
+        if (this.childModels != null) {
+            for (ModelRenderer child : this.childModels) {
+                if (child instanceof QubbleModelRenderer) {
+                    ((QubbleModelRenderer) child).delete();
+                }
+            }
+        }
+    }
 }

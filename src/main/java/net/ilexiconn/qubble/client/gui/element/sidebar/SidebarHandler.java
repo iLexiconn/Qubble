@@ -2,23 +2,24 @@ package net.ilexiconn.qubble.client.gui.element.sidebar;
 
 import net.ilexiconn.llibrary.client.gui.element.ButtonElement;
 import net.ilexiconn.llibrary.client.gui.element.CheckboxElement;
+import net.ilexiconn.llibrary.client.gui.element.DropdownButtonElement;
 import net.ilexiconn.llibrary.client.gui.element.InputElementBase;
 import net.ilexiconn.llibrary.client.gui.element.PropertyInputElement;
 import net.ilexiconn.llibrary.client.gui.element.SliderElement;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.server.property.IBooleanProperty;
 import net.ilexiconn.llibrary.server.property.IFloatProperty;
 import net.ilexiconn.llibrary.server.property.IStringProperty;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
+import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-public abstract class SidebarHandler {
+public abstract class SidebarHandler<CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> {
     protected QubbleGUI gui;
 
     private final List<IBooleanProperty> booleanProperties = new ArrayList<>();
@@ -28,6 +29,7 @@ public abstract class SidebarHandler {
     private final List<CheckboxElement<QubbleGUI>> checkboxes = new ArrayList<>();
     private final List<ButtonElement<QubbleGUI>> buttons = new ArrayList<>();
     private final List<InputElementBase<QubbleGUI>> inputs = new ArrayList<>();
+    private final List<DropdownButtonElement<QubbleGUI>> dropdowns = new ArrayList<>();
 
     public void create(QubbleGUI gui, SidebarElement sidebar) {
         this.gui = gui;
@@ -45,9 +47,12 @@ public abstract class SidebarHandler {
         for (InputElementBase<QubbleGUI> element : this.inputs) {
             element.withParent(sidebar);
         }
+        for (DropdownButtonElement<QubbleGUI> element : this.dropdowns) {
+            element.withParent(sidebar);
+        }
     }
 
-    public void enable(QubbleGUI gui, QubbleModel model, QubbleCuboid cuboid) {
+    public void enable(QubbleGUI gui, MDL model, CBE cuboid) {
         this.gui = gui;
 
         this.initProperties(model, cuboid);
@@ -78,11 +83,11 @@ public abstract class SidebarHandler {
 
     public abstract void update(QubbleGUI gui, Project project);
 
-    protected abstract void initProperties(QubbleModel model, QubbleCuboid cuboid);
+    protected abstract void initProperties(MDL model, CBE cuboid);
 
     protected abstract void createElements(QubbleGUI gui, SidebarElement sidebar);
 
-    protected abstract void initElements(QubbleModel model, QubbleCuboid cuboid);
+    protected abstract void initElements(MDL model, CBE cuboid);
 
     protected void addFloat(IFloatProperty... properties) {
         Collections.addAll(this.floatProperties, properties);
@@ -96,39 +101,53 @@ public abstract class SidebarHandler {
         Collections.addAll(this.stringProperties, properties);
     }
 
-    protected void add(SliderElement<QubbleGUI, ?>... sliders) {
+    @SafeVarargs
+    protected final void add(SliderElement<QubbleGUI, ?>... sliders) {
         Collections.addAll(this.sliders, sliders);
     }
 
-    protected void add(CheckboxElement<QubbleGUI>... checkboxes) {
+    @SafeVarargs
+    protected final void add(CheckboxElement<QubbleGUI>... checkboxes) {
         Collections.addAll(this.checkboxes, checkboxes);
     }
 
-    protected void add(ButtonElement<QubbleGUI>... buttons) {
+    @SafeVarargs
+    protected final void add(ButtonElement<QubbleGUI>... buttons) {
         Collections.addAll(this.buttons, buttons);
     }
 
-    protected void add(InputElementBase<QubbleGUI>... buttons) {
+    @SafeVarargs
+    protected final void add(InputElementBase<QubbleGUI>... buttons) {
         Collections.addAll(this.inputs, buttons);
     }
 
-    protected void edit(Consumer<QubbleCuboid> edit) {
-        Project selectedProject = this.gui.getSelectedProject();
-        if (selectedProject != null && selectedProject.getSelectedCube() != null) {
-            QubbleCuboid selectedCube = selectedProject.getSelectedCube();
-            edit.accept(selectedCube);
-            this.gui.getModelView().updatePart(selectedCube);
-            selectedProject.setSaved(false);
+    @SafeVarargs
+    protected final void add(DropdownButtonElement<QubbleGUI>... buttons) {
+        Collections.addAll(this.dropdowns, buttons);
+    }
+
+    protected void edit(Consumer<CBE> edit) {
+        if (this.gui != null) {
+            Project selectedProject = this.gui.getSelectedProject();
+            if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
+                MDL model = (MDL) selectedProject.getModel();
+                CBE selectedCuboid = (CBE) selectedProject.getSelectedCuboid();
+                edit.accept(selectedCuboid);
+                model.rebuildCuboid(selectedCuboid);
+                selectedProject.setSaved(false);
+            }
         }
     }
 
-    protected void editModel(Consumer<QubbleModel> edit) {
-        Project selectedProject = this.gui.getSelectedProject();
-        if (selectedProject != null) {
-            QubbleModel model = selectedProject.getModel();
-            edit.accept(model);
-            this.gui.getModelView().updateModel();
-            selectedProject.setSaved(false);
+    protected void editModel(Consumer<MDL> edit) {
+        if (this.gui != null) {
+            Project<?, ?> selectedProject = this.gui.getSelectedProject();
+            if (selectedProject != null) {
+                MDL model = (MDL) selectedProject.getModel();
+                edit.accept(model);
+                model.rebuildModel();
+                selectedProject.setSaved(false);
+            }
         }
     }
 
@@ -141,6 +160,9 @@ public abstract class SidebarHandler {
         }
         for (ButtonElement<QubbleGUI> button : this.buttons) {
             button.setEnabled(enabled);
+        }
+        for (DropdownButtonElement<QubbleGUI> dropdown : this.dropdowns) {
+            dropdown.setEnabled(enabled);
         }
         for (InputElementBase<QubbleGUI> input : this.inputs) {
             input.clearText();

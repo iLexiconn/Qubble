@@ -2,17 +2,14 @@ package net.ilexiconn.qubble.client.gui.element;
 
 import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.gui.element.Element;
-import net.ilexiconn.llibrary.client.model.VoxelModel;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.util.ClientUtils;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.toolbar.ToolbarElement;
-import net.ilexiconn.qubble.client.model.QubbleModelBase;
-import net.ilexiconn.qubble.client.model.QubbleModelRenderer;
+import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -41,16 +38,14 @@ public class ModelViewElement extends Element<QubbleGUI> {
     private float prevCameraOffsetY;
     private float zoom = 1.0F;
     private float zoomVelocity;
-    private QubbleModelBase currentModel;
     private float prevMouseX;
-    private float prevMouseY;
 
+    private float prevMouseY;
     private boolean dragging;
+
     private boolean dragged;
 
     private float partialTicks;
-
-    private VoxelModel voxel = new VoxelModel();
 
     public ModelViewElement(QubbleGUI gui) {
         super(gui, 0.0F, 0.0F, gui.width, gui.height);
@@ -87,7 +82,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
         }
     }
 
-    private void renderModel(float partialTicks, ScaledResolution scaledResolution, boolean selection) {
+    private void renderModel(float partialTicks, ScaledResolution scaledResolution, boolean clicking) {
         GlStateManager.pushMatrix();
         GlStateManager.enableCull();
         GlStateManager.cullFace(GlStateManager.CullFace.FRONT);
@@ -103,7 +98,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
         GlStateManager.enableBlend();
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.enableAlpha();
-        if (selection) {
+        if (clicking) {
             GlStateManager.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
         } else {
             int color = LLibrary.CONFIG.getTertiaryColor();
@@ -118,30 +113,30 @@ public class ModelViewElement extends Element<QubbleGUI> {
         this.setupCamera(10.0F, partialTicks);
         Project project = this.gui.getSelectedProject();
         if (project != null) {
-            if (this.currentModel == null) {
-                this.updateModel();
-            }
+            ModelWrapper wrapper = project.getModel();
             GlStateManager.translate(0.0F, -1.5F, 0.0F);
-            QubbleCuboid selectedCube = project.getSelectedCube();
-            QubbleModelRenderer selectedBox = this.currentModel.getCube(selectedCube);
-            if (selectedBox != null && !selection) {
-                GlStateManager.color(0.7F, 0.7F, 0.7F, 1.0F);
-            }
+            CuboidWrapper selectedCuboid = project.getSelectedCuboid();
             TextureManager textureManager = ClientProxy.MINECRAFT.getTextureManager();
-            if (!selection && project.getBaseTexture() != null) {
-                GlStateManager.enableTexture2D();
-                textureManager.bindTexture(project.getBaseTexture().getLocation());
+            boolean hasSelection = selectedCuboid != null;
+            if (!clicking) {
+                if (hasSelection) {
+                    GlStateManager.color(0.7F, 0.7F, 0.7F, 1.0F);
+                }
+                if (project.getBaseTexture() != null) {
+                    GlStateManager.enableTexture2D();
+                    textureManager.bindTexture(project.getBaseTexture().getLocation());
+                }
+                if (LLibrary.CONFIG.getColorMode().equals("light")) {
+                    GlStateManager.color(0.6F, 0.6F, 0.6F, 1.0F);
+                }
             }
-            if (!selection && LLibrary.CONFIG.getColorMode().equals("light")) {
-                GlStateManager.color(0.5F, 0.5F, 0.5F, 1.0F);
-            }
-            this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F, selection);
-            if (!selection && project.getOverlayTexture() != null) {
-                GlStateManager.enableTexture2D();
-                textureManager.bindTexture(project.getOverlayTexture().getLocation());
-                this.currentModel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F, false);
-            }
-            if (!selection) {
+            wrapper.render(clicking);
+            if (!clicking) {
+                if (project.getOverlayTexture() != null) {
+                    GlStateManager.enableTexture2D();
+                    textureManager.bindTexture(project.getOverlayTexture().getLocation());
+                    wrapper.render(false);
+                }
                 if (Qubble.CONFIG.showGrid) {
                     GlStateManager.pushMatrix();
                     GlStateManager.disableTexture2D();
@@ -154,50 +149,23 @@ public class ModelViewElement extends Element<QubbleGUI> {
                     this.drawGrid(tessellator, buffer, 1.0F);
                     this.drawGrid(tessellator, buffer, 2.0F);
                     this.drawGrid(tessellator, buffer, 4.0F);
+                    int accentColor = LLibrary.CONFIG.getAccentColor();
+                    float red = (float) (accentColor >> 16 & 255) / 255.0F;
+                    float green = (float) (accentColor >> 8 & 255) / 255.0F;
+                    float blue = (float) (accentColor & 255) / 255.0F;
+                    float gridY = 24.0F * 0.0625F;
+                    GlStateManager.glLineWidth(4.0F);
+                    buffer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION_COLOR);
+                    buffer.pos(-0.5F, gridY, -0.5F).color(red, green, blue, 1.0F).endVertex();
+                    buffer.pos(0.5F, gridY, -0.5F).color(red, green, blue, 1.0F).endVertex();
+                    buffer.pos(0.5F, gridY, 0.5F).color(red, green, blue, 1.0F).endVertex();
+                    buffer.pos(-0.5F, gridY, 0.5F).color(red, green, blue, 1.0F).endVertex();
+                    tessellator.draw();
                     GlStateManager.depthMask(true);
                     GlStateManager.popMatrix();
                 }
-                if (selectedBox != null) {
-                    GlStateManager.depthMask(false);
-                    this.currentModel.renderSelectedOutline(selectedBox, 0.0625F);
-                    GlStateManager.depthMask(true);
-                    GlStateManager.enableLighting();
-                    GlStateManager.pushMatrix();
-                    if (selectedBox.getParent() != null) {
-                        selectedBox.getParent().parentedPostRender(0.0625F);
-                    }
-                    if (project.getBaseTexture() != null) {
-                        GlStateManager.enableTexture2D();
-                        textureManager.bindTexture(project.getBaseTexture().getLocation());
-                    }
-                    selectedBox.renderSingle(0.0625F, false);
-                    if (project.getOverlayTexture() != null) {
-                        GlStateManager.enableTexture2D();
-                        textureManager.bindTexture(project.getOverlayTexture().getLocation());
-                        selectedBox.renderSingle(0.0625F, false);
-                    }
-                    GlStateManager.popMatrix();
-                    GlStateManager.pushMatrix();
-                    GlStateManager.disableTexture2D();
-                    int accent = LLibrary.CONFIG.getAccentColor();
-                    GlStateManager.disableDepth();
-                    GlStateManager.disableLighting();
-                    float r = (float) (accent >> 16 & 0xFF) / 255.0F;
-                    float g = (float) (accent >> 8 & 0xFF) / 255.0F;
-                    float b = (float) (accent & 0xFF) / 255.0F;
-                    GlStateManager.color(r, g, b, 1.0F);
-                    selectedBox.parentedPostRender(0.0625F);
-                    GlStateManager.translate(-0.5F * 0.0625F, -0.5F * 0.0625F, -0.5F * 0.0625F);
-                    GlStateManager.scale(0.15F, 0.15F, 0.15F);
-                    GlStateManager.translate(3.0F * 0.0625F, -18.0F * 0.0625F, 3.0F * 0.0625F);
-                    this.voxel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
-                    GlStateManager.scale(0.8F, 0.8F, 0.8F);
-                    GlStateManager.translate(0.0F, 0.33F, 0.0F);
-                    GlStateManager.color(r * 0.6F, g * 0.6F, b * 0.6F, 1.0F);
-                    this.voxel.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
-                    GlStateManager.popMatrix();
-                    GlStateManager.enableLighting();
-                    GlStateManager.enableDepth();
+                if (hasSelection) {
+                    wrapper.renderSelection(selectedCuboid, project);
                 }
             }
             GlStateManager.enableTexture2D();
@@ -220,21 +188,21 @@ public class ModelViewElement extends Element<QubbleGUI> {
         GlStateManager.glLineWidth(lineWidth);
         float gridY = 24.0F * 0.0625F;
         size /= scale;
-        int color = LLibrary.CONFIG.getTextColor();
-        float r = (float) (color >> 16 & 255) / 255.0F;
-        float g = (float) (color >> 8 & 255) / 255.0F;
-        float b = (float) (color & 255) / 255.0F;
-        float a = Math.max(0.0F, Math.min(1.0F, lineWidth - 0.35F));
+        int textColor = LLibrary.CONFIG.getTextColor();
+        float red = (float) (textColor >> 16 & 255) / 255.0F;
+        float green = (float) (textColor >> 8 & 255) / 255.0F;
+        float blue = (float) (textColor & 255) / 255.0F;
+        float alpha = Math.max(0.0F, Math.min(1.0F, lineWidth - 0.35F));
         for (float x = -size; x < size + scale; x += scale) {
             buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
-            buffer.pos(x, gridY, -size).color(r, g, b, a).endVertex();
-            buffer.pos(x, gridY, size).color(r, g, b, a).endVertex();
+            buffer.pos(x, gridY, -size).color(red, green, blue, alpha).endVertex();
+            buffer.pos(x, gridY, size).color(red, green, blue, alpha).endVertex();
             tessellator.draw();
         }
         for (float z = -size; z < size + scale; z += scale) {
             buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
-            buffer.pos(-size, gridY, z).color(r, g, b, a).endVertex();
-            buffer.pos(size, gridY, z).color(r, g, b, a).endVertex();
+            buffer.pos(-size, gridY, z).color(red, green, blue, alpha).endVertex();
+            buffer.pos(size, gridY, z).color(red, green, blue, alpha).endVertex();
             tessellator.draw();
         }
     }
@@ -299,59 +267,26 @@ public class ModelViewElement extends Element<QubbleGUI> {
         return true;
     }
 
-    public void updateModel() {
-        Project selectedProject = this.gui.getSelectedProject();
-        if (selectedProject != null && selectedProject.getModel() != null) {
-            QubbleModel newModel = selectedProject.getModel();
-            this.currentModel = new QubbleModelBase(newModel);
-        } else {
-            this.currentModel = null;
-        }
-    }
-
-    public void updatePart(QubbleCuboid cube) {
-        if (this.currentModel == null) {
-            this.updateModel();
-        } else {
-            QubbleModelRenderer box = this.currentModel.getCube(cube);
-            box.setRotationPoint(cube.getPositionX(), cube.getPositionY(), cube.getPositionZ());
-            box.setTextureOffset(cube.getTextureX(), cube.getTextureY());
-            box.cubeList.clear();
-            box.addBox(cube.getOffsetX(), cube.getOffsetY(), cube.getOffsetZ(), cube.getDimensionX(), cube.getDimensionY(), cube.getDimensionZ(), 0.0F);
-            box.rotateAngleX = (float) Math.toRadians(cube.getRotationX());
-            box.rotateAngleY = (float) Math.toRadians(cube.getRotationY());
-            box.rotateAngleZ = (float) Math.toRadians(cube.getRotationZ());
-            box.mirror = cube.isTextureMirrored();
-            box.scaleX = cube.getScaleX();
-            box.scaleY = cube.getScaleY();
-            box.scaleZ = cube.getScaleZ();
-            box.compileDisplayList(0.0625F);
-        }
-    }
-
     @Override
     public boolean mouseReleased(float mouseX, float mouseY, int button) {
         if (button == 0) {
-            if (!this.dragged && this.gui.getSelectedProject() != null && this.currentModel != null && this.isSelected(mouseX, mouseY)) {
+            Project selectedProject = this.gui.getSelectedProject();
+            if (!this.dragged && selectedProject != null && this.isSelected(mouseX, mouseY)) {
                 ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
                 this.renderModel(this.partialTicks, scaledResolution, true);
                 FloatBuffer buffer = BufferUtils.createFloatBuffer(3);
                 GL11.glReadPixels(Mouse.getX(), Mouse.getY(), 1, 1, GL11.GL_RGB, GL11.GL_FLOAT, buffer);
-                int r = (int) (buffer.get(0) * 255.0F);
-                int g = (int) (buffer.get(1) * 255.0F);
-                int b = (int) (buffer.get(2) * 255.0F);
-                int id = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF));
-                QubbleCuboid cube = this.gui.getSelectedProject().getSelectedCube();
+                int red = (int) (buffer.get(0) * 255.0F);
+                int green = (int) (buffer.get(1) * 255.0F);
+                int blue = (int) (buffer.get(2) * 255.0F);
+                int selectionID = (red & 0xFF) << 16 | (green & 0xFF) << 8 | blue & 0xFF;
+                CuboidWrapper cube = selectedProject.getSelectedCuboid();
                 if (cube != null) {
-                    this.gui.getSelectedProject().setSelectedCube(null);
+                    selectedProject.setSelectedCube(null);
                 }
-                QubbleCuboid newCube = this.currentModel.getCube(id);
-                this.gui.getSelectedProject().setSelectedCube(newCube);
-                if (newCube != null) {
-                    this.gui.getSelectedProject().setSelectedCube(newCube);
-                    return true;
-                }
-                return false;
+                CuboidWrapper cuboid = selectedProject.getModel().getSelected(selectionID);
+                selectedProject.setSelectedCube(cuboid);
+                return cuboid != null;
             }
         }
         this.dragged = false;

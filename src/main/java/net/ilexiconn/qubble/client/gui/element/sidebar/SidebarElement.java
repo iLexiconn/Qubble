@@ -5,16 +5,18 @@ import net.ilexiconn.llibrary.client.gui.element.Element;
 import net.ilexiconn.llibrary.client.gui.element.InputElement;
 import net.ilexiconn.llibrary.client.gui.element.InputElementBase;
 import net.ilexiconn.llibrary.client.gui.element.LabelElement;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
+import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class SidebarElement extends Element<QubbleGUI> {
     private InputElementBase<QubbleGUI> nameInput;
+    private SidebarHandler sidebarHandler;
 
     private boolean initialized;
 
@@ -24,10 +26,11 @@ public class SidebarElement extends Element<QubbleGUI> {
 
     @Override
     public void init() {
+        this.initialized = false;
         this.initFields();
         Project selectedProject = this.gui.getSelectedProject();
-        if (selectedProject != null && selectedProject.getSelectedCube() != null) {
-            this.enable(selectedProject.getModel(), selectedProject.getSelectedCube());
+        if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
+            this.enable(selectedProject.getModel(), selectedProject.getSelectedCuboid());
         } else {
             this.disable();
         }
@@ -36,7 +39,8 @@ public class SidebarElement extends Element<QubbleGUI> {
     @Override
     public void update() {
         if (this.initialized) {
-            this.gui.getEditMode().getSidebarHandler().update(this.gui, this.gui.getSelectedProject());
+            Project<?, ?> project = this.gui.getSelectedProject();
+            this.sidebarHandler.update(this.gui, project);
         }
     }
 
@@ -46,31 +50,17 @@ public class SidebarElement extends Element<QubbleGUI> {
         this.drawRectangle(this.getPosX(), this.getPosY(), 2, this.getHeight(), LLibrary.CONFIG.getAccentColor());
     }
 
-    public <T extends Element<QubbleGUI>> T getElement(Class<T> type, int index) {
-        int currentIndex = 0;
-        for (Element<QubbleGUI> element : this.getChildren()) {
-            if (type.isAssignableFrom(element.getClass())) {
-                if (currentIndex == index) {
-                    return (T) element;
-                } else {
-                    currentIndex++;
-                }
-            }
-        }
-        return null;
-    }
-
-    public void enable(QubbleModel model, QubbleCuboid cuboid) {
+    public void enable(ModelWrapper model, CuboidWrapper cuboid) {
         this.nameInput.clearText();
         this.nameInput.writeText(cuboid.getName());
         this.nameInput.setEditable(true);
-        this.gui.getEditMode().getSidebarHandler().enable(this.gui, model, cuboid);
+        this.sidebarHandler.enable(this.gui, model, cuboid);
     }
 
     public void disable() {
         this.nameInput.clearText();
         this.nameInput.setEditable(false);
-        this.gui.getEditMode().getSidebarHandler().disable();
+        this.sidebarHandler.disable();
     }
 
     public void initFields() {
@@ -78,14 +68,17 @@ public class SidebarElement extends Element<QubbleGUI> {
         new LabelElement<>(this.gui, "Selected cube", 4, 10).withParent(this);
         this.nameInput = (InputElementBase<QubbleGUI>) new InputElement<>(this.gui, 4, 19, 116, "", inputElement -> {
             Project selectedProject = this.gui.getSelectedProject();
-            if (selectedProject != null && selectedProject.getSelectedCube() != null) {
-                QubbleCuboid selectedCube = selectedProject.getSelectedCube();
-                selectedCube.setName(inputElement.getText());
-                this.gui.getModelView().updatePart(selectedCube);
+            if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
+                CuboidWrapper selectedCuboid = selectedProject.getSelectedCuboid();
+                selectedCuboid.setName(inputElement.getText());
+                selectedProject.getModel().rebuildModel();
                 selectedProject.setSaved(false);
             }
         }).withParent(this);
-        this.gui.getEditMode().getSidebarHandler().create(this.gui, this);
+        Project<?, ?> project = this.gui.getSelectedProject();
+        ModelType modelType = project != null ? project.getModelType() : ModelType.DEFAULT;
+        this.sidebarHandler = this.gui.getEditMode().createHandler(modelType);
+        this.sidebarHandler.create(this.gui, this);
         this.initialized = true;
     }
 }

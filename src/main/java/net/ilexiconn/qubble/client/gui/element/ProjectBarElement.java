@@ -2,11 +2,11 @@ package net.ilexiconn.qubble.client.gui.element;
 
 import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.gui.element.Element;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarElement;
+import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 import net.minecraft.client.gui.FontRenderer;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public class ProjectBarElement extends Element<QubbleGUI> {
         List<Project> openProjects = this.gui.getOpenProjects();
         for (int projectIndex = 0; projectIndex < openProjects.size(); projectIndex++) {
             Project project = openProjects.get(projectIndex);
-            QubbleModel model = project.getModel();
+            ModelWrapper model = project.getModel();
             String name = model.getName();
             if (!project.isSaved()) {
                 name = "* " + name;
@@ -77,7 +77,7 @@ public class ProjectBarElement extends Element<QubbleGUI> {
                 boolean selected = false;
                 for (int projectIndex = 0; projectIndex < openProjects.size(); projectIndex++) {
                     Project project = openProjects.get(projectIndex);
-                    QubbleModel model = project.getModel();
+                    ModelWrapper model = project.getModel();
                     String name = model.getName();
                     if (!project.isSaved()) {
                         name = "* " + name;

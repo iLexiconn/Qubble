@@ -2,25 +2,34 @@ package net.ilexiconn.qubble.client.gui.element.sidebar;
 
 import net.ilexiconn.llibrary.client.gui.element.LabelElement;
 import net.ilexiconn.llibrary.client.gui.element.SliderElement;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
-import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.property.DimensionProperty;
 import net.ilexiconn.qubble.client.gui.property.RotationProperty;
 import net.ilexiconn.qubble.client.gui.property.TransformProperty;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 
-public class ModelSidebarHandler extends SidebarHandler {
+public class DefaultModelSidebarHandler extends SidebarHandler<DefaultCuboidWrapper, DefaultModelWrapper> {
     private DimensionProperty propertyDimensionX, propertyDimensionY, propertyDimensionZ;
     private TransformProperty propertyPositionX, propertyPositionY, propertyPositionZ;
     private TransformProperty propertyOffsetX, propertyOffsetY, propertyOffsetZ;
     private TransformProperty propertyScaleX, propertyScaleY, propertyScaleZ;
     private RotationProperty propertyRotationX, propertyRotationY, propertyRotationZ;
 
-    public ModelSidebarHandler() {
-        this.propertyRotationX = new RotationProperty(this, value -> this.edit(cuboid -> cuboid.setRotation(value, cuboid.getRotationY(), cuboid.getRotationZ())));
-        this.propertyRotationY = new RotationProperty(this, value -> this.edit(cuboid -> cuboid.setRotation(cuboid.getRotationX(), value, cuboid.getRotationZ())));
-        this.propertyRotationZ = new RotationProperty(this, value -> this.edit(cuboid -> cuboid.setRotation(cuboid.getRotationX(), cuboid.getRotationY(), value)));
+    public DefaultModelSidebarHandler() {
+        this.propertyRotationX = new RotationProperty(this, value -> {
+            this.edit(cuboid -> cuboid.setRotation(value, cuboid.getRotationY(), cuboid.getRotationZ()));
+            return value;
+        });
+        this.propertyRotationY = new RotationProperty(this, value -> {
+            this.edit(cuboid -> cuboid.setRotation(cuboid.getRotationX(), value, cuboid.getRotationZ()));
+            return value;
+        });
+        this.propertyRotationZ = new RotationProperty(this, value -> {
+            this.edit(cuboid -> cuboid.setRotation(cuboid.getRotationX(), cuboid.getRotationY(), value));
+            return value;
+        });
         this.propertyScaleX = new TransformProperty(this, value -> this.edit(cuboid -> cuboid.setScale(value, cuboid.getScaleY(), cuboid.getScaleZ())));
         this.propertyScaleY = new TransformProperty(this, value -> this.edit(cuboid -> cuboid.setScale(cuboid.getScaleX(), value, cuboid.getScaleZ())));
         this.propertyScaleZ = new TransformProperty(this, value -> this.edit(cuboid -> cuboid.setScale(cuboid.getScaleX(), cuboid.getScaleY(), value)));
@@ -46,7 +55,7 @@ public class ModelSidebarHandler extends SidebarHandler {
     }
 
     @Override
-    protected void initProperties(QubbleModel model, QubbleCuboid cuboid) {
+    protected void initProperties(DefaultModelWrapper model, DefaultCuboidWrapper cuboid) {
         this.propertyRotationX.set(cuboid.getRotationX());
         this.propertyRotationY.set(cuboid.getRotationY());
         this.propertyRotationZ.set(cuboid.getRotationZ());
@@ -59,9 +68,9 @@ public class ModelSidebarHandler extends SidebarHandler {
         this.propertyOffsetX.set(cuboid.getOffsetX());
         this.propertyOffsetY.set(cuboid.getOffsetY());
         this.propertyOffsetZ.set(cuboid.getOffsetZ());
-        this.propertyDimensionX.set(cuboid.getDimensionX());
-        this.propertyDimensionY.set(cuboid.getDimensionY());
-        this.propertyDimensionZ.set(cuboid.getDimensionZ());
+        this.propertyDimensionX.set((int) cuboid.getDimensionX());
+        this.propertyDimensionY.set((int) cuboid.getDimensionY());
+        this.propertyDimensionZ.set((int) cuboid.getDimensionZ());
     }
 
     @Override
@@ -94,6 +103,6 @@ public class ModelSidebarHandler extends SidebarHandler {
     }
 
     @Override
-    protected void initElements(QubbleModel model, QubbleCuboid cuboid) {
+    protected void initElements(DefaultModelWrapper model, DefaultCuboidWrapper cuboid) {
     }
 }
