@@ -16,6 +16,7 @@ import net.ilexiconn.llibrary.client.gui.element.color.ColorMode;
 import net.ilexiconn.llibrary.server.config.ConfigHandler;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
+import net.ilexiconn.qubble.client.gui.GUIHelper;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
@@ -30,15 +31,12 @@ import net.ilexiconn.qubble.server.model.exporter.ModelExporters;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.ilexiconn.qubble.server.model.importer.ModelImporters;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Session;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +96,9 @@ public class ToolbarElement extends Element<QubbleGUI> {
         StateButtonElement<QubbleGUI> typeState = new StateButtonElement<>(this.gui, 2, 42, 96, 12, ModelType.NAMES, button -> true);
         newWindow.addElement(new LabelElement<>(this.gui, "Model Type", 3, 32));
         newWindow.addElement(typeState.withColorScheme(ColorSchemes.WINDOW));
-        InputElement<QubbleGUI> nameInput = new InputElement<>(this.gui, 2, 16, 96, "", e -> {});
+        InputElement<QubbleGUI> nameInput = new InputElement<>(this.gui, 2, 16, 96, "", e -> {
+        });
+        nameInput.select();
         newWindow.addElement(nameInput);
         newWindow.addElement(new ButtonElement<>(this.gui, "Done", 2, 56, 96, 12, (v) -> {
             String name = nameInput.getText();
@@ -124,7 +124,12 @@ public class ToolbarElement extends Element<QubbleGUI> {
     public void openModelWindow(IModelImporter modelImporter) {
         WindowElement<QubbleGUI> openWindow = new WindowElement<>(this.gui, (modelImporter == null ? "Open" : "Import " + modelImporter.getName()), 200, modelImporter == null ? 214 : 200);
         openWindow.addElement(new ListElement<>(this.gui, 2, 16, 196, 182, this.getModels(modelImporter), (list) -> {
-            this.gui.selectModel(list.getSelectedEntry(), modelImporter);
+            try {
+                this.gui.selectModel(list.getSelectedEntry(), modelImporter);
+            } catch (IOException e) {
+                GUIHelper.INSTANCE.error(this.gui, 200, "Failed to load model!", e);
+                e.printStackTrace();
+            }
             this.gui.removeElement(openWindow);
             return true;
         }));
@@ -170,11 +175,11 @@ public class ToolbarElement extends Element<QubbleGUI> {
         WindowElement<QubbleGUI> openWindow = new WindowElement<>(this.gui, "Import Game Model", 150, 200);
         openWindow.addElement(new ListElement<>(this.gui, 2, 16, 146, 182, ClientProxy.getGameModels(), (list) -> {
             ModelWrapper model = ClientProxy.GAME_MODELS.get(list.getSelectedEntry());
-            this.gui.selectModel(model.copy());
+            this.gui.selectModel(model.copyModel());
             ResourceLocation texture = ClientProxy.GAME_TEXTURES.get(list.getSelectedEntry());
             if (texture != null) {
                 Project<?, ?> selectedProject = this.gui.getSelectedProject();
-                selectedProject.setBaseTexture(new ModelTexture(texture));
+                selectedProject.getModel().setBaseTexture(new ModelTexture(texture));
                 selectedProject.setSaved(true);
             }
             this.gui.removeElement(openWindow);
@@ -188,9 +193,17 @@ public class ToolbarElement extends Element<QubbleGUI> {
         openWindow.addElement(new ListElement<>(this.gui, 2, 16, 146, 182, ClientProxy.getGameBlockModels(), (list) -> {
             String name = list.getSelectedEntry();
             ResourceLocation location = ClientProxy.GAME_JSON_MODEL_LOCATIONS.get(name);
-            ModelWrapper model = ClientProxy.loadBlockModel(name, location);
+            ModelWrapper model = null;
+            try {
+                model = ClientProxy.loadBlockModel(name, location);
+            } catch (Exception e) {
+                GUIHelper.INSTANCE.error(this.gui, 200, "Failed to import block model!", e);
+                e.printStackTrace();
+            }
             if (model != null) {
                 this.gui.selectModel(model);
+            } else {
+                GUIHelper.INSTANCE.info(this.gui, 200, "Failed to import block model", "Could not find model variant to load!");
             }
             this.gui.removeElement(openWindow);
             return true;
@@ -207,14 +220,14 @@ public class ToolbarElement extends Element<QubbleGUI> {
         String name = selectedModel.getFileName() == null ? selectedModel.getName() : selectedModel.getFileName();
         saveWindow.addElement(fileName = new InputElement<>(this.gui, 2, 30, 96, name, (i) -> {
         }));
+        fileName.select();
         saveWindow.addElement(new ButtonElement<>(this.gui, "Save", 2, 50, 47, 12, (v) -> {
             try {
-                NBTTagCompound compound = selectedModel.copy().serializeNBT();
-                compound.setByte("type", (byte) selectedModel.getType().ordinal());
-                CompressedStreamTools.writeCompressed(compound, new FileOutputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, fileName.getText() + ".qbl")));
+                ModelHandler.INSTANCE.saveModel(selectedModel, fileName.getText());
                 project.setSaved(true);
                 callback.accept(true);
             } catch (IOException e) {
+                GUIHelper.INSTANCE.error(this.gui, 200, "Failed to save model!", e);
                 e.printStackTrace();
             }
             this.gui.removeElement(saveWindow);
@@ -247,7 +260,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
     private void openModelExportWindow(IModelExporter modelExporter, String fileName) {
         Project project = this.gui.getSelectedProject();
-        ModelWrapper copy = project.getModel().copy();
+        ModelWrapper copy = project.getModel().copyModel();
         int argumentY = 18;
         String[] argumentNames = modelExporter.getArgumentNames();
         String[] defaultArguments = modelExporter.getDefaultArguments(copy);
@@ -258,6 +271,9 @@ public class ToolbarElement extends Element<QubbleGUI> {
             window.addElement(new LabelElement<>(this.gui, argumentNames[argumentIndex], 2, argumentY));
             InputElement<QubbleGUI> input = new InputElement<>(this.gui, 1, argumentY + 9, 97, defaultArguments[argumentIndex], (i) -> {
             });
+            if (argumentIndex == 0) {
+                input.select();
+            }
             window.addElement(input);
             argumentTextBoxes[argumentIndex] = input;
             argumentY += 28;
@@ -268,9 +284,10 @@ public class ToolbarElement extends Element<QubbleGUI> {
                 arguments[i] = argumentTextBoxes[i].getText();
             }
             try {
-                modelExporter.save(modelExporter.export(copy, arguments), new File(ClientProxy.QUBBLE_EXPORT_DIRECTORY, fileName + "." + modelExporter.getExtension()));
+                modelExporter.save(modelExporter.export(copy, arguments), new File(ClientProxy.QUBBLE_EXPORT_DIRECTORY, modelExporter.getFileName(arguments, fileName) + "." + modelExporter.getExtension()));
                 project.setSaved(true);
             } catch (IOException e) {
+                GUIHelper.INSTANCE.error(this.gui, 200, "Failed to export model!", e);
                 e.printStackTrace();
             }
             this.gui.removeElement(window);

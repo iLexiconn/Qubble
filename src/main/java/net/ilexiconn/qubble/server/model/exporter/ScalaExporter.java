@@ -125,4 +125,9 @@ public class ScalaExporter implements IModelExporter<List<String>, DefaultCuboid
     public String[] getDefaultArguments(DefaultModelWrapper currentModel) {
         return new String[]{"pkg", currentModel.getName()};
     }
+
+    @Override
+    public String getFileName(String[] arguments, String fileName) {
+        return arguments[1];
+    }
 }

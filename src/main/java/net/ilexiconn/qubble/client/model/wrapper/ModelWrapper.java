@@ -1,6 +1,7 @@
 package net.ilexiconn.qubble.client.model.wrapper;
 
 import net.ilexiconn.llibrary.client.model.VoxelModel;
+import net.ilexiconn.qubble.client.gui.ModelTexture;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.model.ModelType;
 import net.minecraft.client.Minecraft;
@@ -10,53 +11,62 @@ import javax.vecmath.Matrix4d;
 import javax.vecmath.Vector3d;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-public interface ModelWrapper<CBE extends CuboidWrapper<CBE>> {
-    Minecraft MC = Minecraft.getMinecraft();
-    VoxelModel ROTATION_POINT = new VoxelModel();
+public abstract class ModelWrapper<CBE extends CuboidWrapper<CBE>> {
+    public static final Minecraft MC = Minecraft.getMinecraft();
+    public static final VoxelModel ROTATION_POINT = new VoxelModel();
+    private Map<String, ModelTexture> textures = new LinkedHashMap<>();
 
-    boolean reparent(CBE cuboid, CBE parent, boolean inPlace);
+    public abstract boolean reparent(CBE cuboid, CBE parent, boolean inPlace);
 
-    boolean supportsParenting();
+    public abstract boolean supportsParenting();
 
-    void rebuildModel();
+    public abstract void rebuildModel();
 
-    void rebuildCuboid(CBE cuboid);
+    public abstract void rebuildCuboid(CBE cuboid);
 
-    void addCuboid(CBE cuboid);
+    public abstract void addCuboid(CBE cuboid);
 
-    void copyCuboid(CBE cuboid);
+    public abstract void deleteCuboid(CBE cuboid);
 
-    void deleteCuboid(CBE cuboid);
+    public abstract void render(boolean clicking);
 
-    void render(boolean clicking);
+    public abstract void renderSelection(CBE selectedCuboid, Project project);
 
-    void renderSelection(CBE selectedCuboid, Project project);
+    public abstract CBE getSelected(int selectionID);
 
-    CBE getSelected(int selectionID);
+    public abstract List<CBE> getCuboids();
 
-    List<CBE> getCuboids();
+    public abstract String getName();
 
-    String getName();
+    public abstract String getFileName();
 
-    String getFileName();
+    public abstract String getAuthor();
 
-    String getAuthor();
+    protected abstract ModelWrapper<CBE> copy();
 
-    ModelWrapper<CBE> copy();
+    public abstract NBTTagCompound serializeNBT();
 
-    NBTTagCompound serializeNBT();
+    public abstract CBE createCuboid(String name);
 
-    CBE createCuboid(String name);
+    public abstract ModelType getType();
 
-    ModelType getType();
+    public ModelWrapper<CBE> copyModel() {
+        ModelWrapper<CBE> modelWrapper = this.copy();
+        for (Map.Entry<String, ModelTexture> entry : this.textures.entrySet()) {
+            modelWrapper.setTexture(entry.getKey(), entry.getValue().copy());
+        }
+        return modelWrapper;
+    }
 
-    default void maintainParentTransformation(CBE parenting) {
+    public void maintainParentTransformation(CBE parenting) {
         this.applyTransformation(parenting, this.getParentTransformation(parenting, true, false));
     }
 
-    default void inheritParentTransformation(CBE parenting, CBE newParent) {
+    public void inheritParentTransformation(CBE parenting, CBE newParent) {
         Matrix4d matrix = this.getParentTransformationMatrix(newParent, true, false);
         matrix.invert();
         matrix.mul(this.getParentTransformationMatrix(parenting, false, false));
@@ -64,12 +74,12 @@ public interface ModelWrapper<CBE extends CuboidWrapper<CBE>> {
         this.applyTransformation(parenting, parentTransformation);
     }
 
-    default void applyTransformation(CBE parenting, float[][] parentTransformation) {
+    public void applyTransformation(CBE parenting, float[][] parentTransformation) {
         parenting.setPosition(parentTransformation[0][0], parentTransformation[0][1], parentTransformation[0][2]);
         parenting.setRotation(parentTransformation[1][0], parentTransformation[1][1], parentTransformation[1][2]);
     }
 
-    default CBE getParent(CBE cuboid) {
+    public CBE getParent(CBE cuboid) {
         for (CBE currentCube : this.getCuboids()) {
             CBE foundParent = this.getParent(currentCube, cuboid);
             if (foundParent != null) {
@@ -79,7 +89,7 @@ public interface ModelWrapper<CBE extends CuboidWrapper<CBE>> {
         return null;
     }
 
-    default CBE getParent(CBE parent, CBE cuboid) {
+    public CBE getParent(CBE parent, CBE cuboid) {
         if (parent.getChildren().contains(cuboid)) {
             return parent;
         }
@@ -92,7 +102,7 @@ public interface ModelWrapper<CBE extends CuboidWrapper<CBE>> {
         return null;
     }
 
-    default boolean hasChild(CBE parent, CBE child) {
+    public boolean hasChild(CBE parent, CBE child) {
         if (parent.getChildren().contains(child)) {
             return true;
         }
@@ -105,7 +115,7 @@ public interface ModelWrapper<CBE extends CuboidWrapper<CBE>> {
         return false;
     }
 
-    default List<CBE> getParents(CBE cube, boolean ignoreSelf) {
+    public List<CBE> getParents(CBE cube, boolean ignoreSelf) {
         CBE parent = cube;
         List<CBE> parents = new ArrayList<>();
         if (!ignoreSelf) {
@@ -118,11 +128,11 @@ public interface ModelWrapper<CBE extends CuboidWrapper<CBE>> {
         return parents;
     }
 
-    default float[][] getParentTransformation(CBE cube, boolean includeParents, boolean ignoreSelf) {
+    public float[][] getParentTransformation(CBE cube, boolean includeParents, boolean ignoreSelf) {
         return this.getParentTransformation(this.getParentTransformationMatrix(cube, includeParents, ignoreSelf));
     }
 
-    default Matrix4d getParentTransformationMatrix(CBE cube, boolean includeParents, boolean ignoreSelf) {
+    public Matrix4d getParentTransformationMatrix(CBE cube, boolean includeParents, boolean ignoreSelf) {
         List<CBE> parentCubes = new ArrayList<>();
         if (includeParents) {
             parentCubes = this.getParents(cube, ignoreSelf);
@@ -146,7 +156,7 @@ public interface ModelWrapper<CBE extends CuboidWrapper<CBE>> {
         return matrix;
     }
 
-    default float[][] getParentTransformation(Matrix4d matrix) {
+    public float[][] getParentTransformation(Matrix4d matrix) {
         double sinRotationAngleY, cosRotationAngleY, sinRotationAngleX, cosRotationAngleX, sinRotationAngleZ, cosRotationAngleZ;
         sinRotationAngleY = -matrix.m20;
         cosRotationAngleY = Math.sqrt(1 - sinRotationAngleY * sinRotationAngleY);
@@ -167,7 +177,42 @@ public interface ModelWrapper<CBE extends CuboidWrapper<CBE>> {
         return new float[][] { { this.epsilon((float) matrix.m03), this.epsilon((float) matrix.m13), this.epsilon((float) matrix.m23) }, { rotationAngleX, rotationAngleY, rotationAngleZ } };
     }
 
-    default float epsilon(float x) {
+    public float epsilon(float x) {
         return x < 0 ? x > -0.0001F ? 0 : x : x < 0.0001F ? 0 : x;
     }
+
+    public ModelTexture getTexture(String name) {
+        return this.textures.get(name);
+    }
+
+    public void setTexture(String name, ModelTexture texture) {
+        if (texture == null) {
+            this.textures.remove(name);
+        } else {
+            this.textures.put(name, texture);
+        }
+        this.rebuildModel();
+    }
+
+    public ModelTexture getBaseTexture() {
+        return this.getTexture(ModelTexture.BASE);
+    }
+
+    public ModelTexture getOverlayTexture() {
+        return this.getTexture(ModelTexture.OVERLAY);
+    }
+
+    public void setBaseTexture(ModelTexture texture) {
+        this.setTexture(ModelTexture.BASE, texture);
+    }
+
+    public void setOverlayTexture(ModelTexture texture) {
+        this.setTexture(ModelTexture.OVERLAY, texture);
+    }
+
+    public Map<String, ModelTexture> getTextures() {
+        return this.textures;
+    }
+
+    public abstract void importTextures(Map<String, ModelTexture> textures);
 }

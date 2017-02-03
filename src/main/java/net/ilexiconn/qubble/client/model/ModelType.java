@@ -22,7 +22,7 @@ public enum ModelType {
             return new DefaultModelWrapper(QubbleModel.create(name, author, 64, 32));
         }
     },
-    JSON_VANILLA("Vanilla JSON") {
+    BLOCK("Vanilla JSON") {
         @Override
         public ModelWrapper deserialize(NBTTagCompound compound) {
             return new BlockModelWrapper(QubbleVanillaModel.deserialize(compound));

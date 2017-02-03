@@ -4,30 +4,27 @@ import net.ilexiconn.llibrary.client.gui.ElementGUI;
 import net.ilexiconn.llibrary.client.gui.element.ButtonElement;
 import net.ilexiconn.llibrary.client.gui.element.LabelElement;
 import net.ilexiconn.llibrary.client.gui.element.WindowElement;
-import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.element.ModelTreeElement;
 import net.ilexiconn.qubble.client.gui.element.ModelViewElement;
 import net.ilexiconn.qubble.client.gui.element.ProjectBarElement;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
 import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarElement;
 import net.ilexiconn.qubble.client.gui.element.toolbar.ToolbarElement;
-import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
+import net.ilexiconn.qubble.server.model.ModelHandler;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 @SideOnly(Side.CLIENT)
@@ -49,6 +46,8 @@ public class QubbleGUI extends ElementGUI {
 
     private boolean initialized;
 
+    private CuboidWrapper<?> clipboard;
+
     public QubbleGUI(GuiScreen parent) {
         this.parent = parent;
     }
@@ -68,13 +67,9 @@ public class QubbleGUI extends ElementGUI {
         if (this.ticks % 40 == 0) {
             Project selectedProject = this.getSelectedProject();
             if (selectedProject != null) {
-                ModelTexture baseTexture = selectedProject.getBaseTexture();
-                if (baseTexture != null) {
-                    baseTexture.update();
-                }
-                ModelTexture overlay = selectedProject.getOverlayTexture();
-                if (overlay != null) {
-                    overlay.update();
+                Map<String, ModelTexture> textures = selectedProject.getModel().getTextures();
+                for (Map.Entry<String, ModelTexture> entry : textures.entrySet()) {
+                    entry.getValue().update();
                 }
             }
         }
@@ -98,24 +93,10 @@ public class QubbleGUI extends ElementGUI {
         return this.toolbar;
     }
 
-    public void selectModel(String name, IModelImporter importer) {
-        try {
-            ModelWrapper model;
-            if (importer == null) {
-                NBTTagCompound compound = CompressedStreamTools.readCompressed(new FileInputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, name + ".qbl")));
-                ModelType type;
-                try {
-                    type = ModelType.values()[compound.getByte("type")];
-                } catch (Exception e) {
-                    type = ModelType.DEFAULT;
-                }
-                model = type.deserialize(compound);
-            } else {
-                model = importer.getModel(name, importer.read(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, name + "." + importer.getExtension())));
-            }
+    public void selectModel(String name, IModelImporter importer) throws IOException {
+        ModelWrapper model = ModelHandler.INSTANCE.loadModel(name, importer);
+        if (model != null) {
             this.selectModel(model);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -252,6 +233,13 @@ public class QubbleGUI extends ElementGUI {
             });
             return;
         }
+        if (keyCode == Keyboard.KEY_F1) {
+            this.mc.gameSettings.hideGUI = !this.mc.gameSettings.hideGUI;
+            this.updateProjectElements(this.getSelectedProject());
+            if (this.mc.gameSettings.hideGUI) {
+                this.sendElementToFront(this.getModelView());
+            }
+        }
         super.keyTyped(typedChar, keyCode);
     }
 
@@ -280,6 +268,14 @@ public class QubbleGUI extends ElementGUI {
         } else {
             callback.accept(true);
         }
+    }
+
+    public void setClipboard(CuboidWrapper<?> clipboard) {
+        this.clipboard = clipboard;
+    }
+
+    public CuboidWrapper<?> getClipboard() {
+        return this.clipboard;
     }
 
     public static List<String> getFiles(File directory, String extension) {

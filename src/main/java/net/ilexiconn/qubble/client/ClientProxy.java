@@ -97,6 +97,7 @@ public class ClientProxy extends ServerProxy {
     @Override
     public void onPreInit() {
         super.onPreInit();
+
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.INSTANCE);
         if (!QUBBLE_MODEL_DIRECTORY.exists()) {
             QUBBLE_MODEL_DIRECTORY.mkdirs();
@@ -415,27 +416,23 @@ public class ClientProxy extends ServerProxy {
         return null;
     }
 
-    public static ModelWrapper loadBlockModel(String name, ResourceLocation location) {
-        try {
-            IResourceManager resourceManager = MINECRAFT.getResourceManager();
-            IModelImporter<BlockModelContainer, BlockCuboidWrapper, BlockModelWrapper> importer = (IModelImporter<BlockModelContainer, BlockCuboidWrapper, BlockModelWrapper>) ModelImporters.BLOCK_JSON.getModelImporter();
-            ModelBlockDefinition state = BlockStateLoader.load(new InputStreamReader(resourceManager.getResource(location).getInputStream()), blockGson);
-            for (VariantList variantList : state.getMultipartVariants()) {
-                for (Variant variant : variantList.getVariantList()) {
-                    ResourceLocation resource = variant.getModelLocation();
-                    ResourceLocation variantResource = new ResourceLocation(resource.getResourceDomain(), "models/" + resource.getResourcePath() + ".json");
-                    ModelWrapper model = ClientProxy.parseJsonModel(blockGson, resourceManager, importer, name, variantResource);
-                    if (model == null) {
-                        QubbleVanillaModel qubbleModel = QubbleVanillaModel.create(name, "Unknown");
-                        QubbleVanillaCuboid cuboid = QubbleVanillaCuboid.create("Cube", null, 0.0F, 0.0F, 0.0F, 16.0F, 16.0F, 16.0F);
-                        qubbleModel.addCuboid(cuboid);
-                        return new BlockModelWrapper(qubbleModel);
-                    }
-                    return model;
+    public static ModelWrapper loadBlockModel(String name, ResourceLocation location) throws Exception {
+        IResourceManager resourceManager = MINECRAFT.getResourceManager();
+        IModelImporter<BlockModelContainer, BlockCuboidWrapper, BlockModelWrapper> importer = (IModelImporter<BlockModelContainer, BlockCuboidWrapper, BlockModelWrapper>) ModelImporters.BLOCK_JSON.getModelImporter();
+        ModelBlockDefinition state = BlockStateLoader.load(new InputStreamReader(resourceManager.getResource(location).getInputStream()), blockGson);
+        for (VariantList variantList : state.getMultipartVariants()) {
+            for (Variant variant : variantList.getVariantList()) {
+                ResourceLocation resource = variant.getModelLocation();
+                ResourceLocation variantResource = new ResourceLocation(resource.getResourceDomain(), "models/" + resource.getResourcePath() + ".json");
+                ModelWrapper model = ClientProxy.parseJsonModel(blockGson, resourceManager, importer, name, variantResource);
+                if (model == null) {
+                    QubbleVanillaModel qubbleModel = QubbleVanillaModel.create(name, "Unknown");
+                    QubbleVanillaCuboid cuboid = QubbleVanillaCuboid.create("Cube", null, 0.0F, 0.0F, 0.0F, 16.0F, 16.0F, 16.0F);
+                    qubbleModel.addCuboid(cuboid);
+                    return new BlockModelWrapper(qubbleModel);
                 }
+                return model;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return null;
     }

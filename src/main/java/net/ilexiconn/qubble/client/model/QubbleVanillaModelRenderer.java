@@ -3,7 +3,10 @@ package net.ilexiconn.qubble.client.model;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaFace;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaRotation;
-import net.minecraft.client.renderer.GLAllocation;
+import net.ilexiconn.qubble.client.ClientProxy;
+import net.ilexiconn.qubble.client.gui.ModelTexture;
+import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
@@ -15,13 +18,13 @@ import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class QubbleVanillaModelRenderer {
-    private QubbleVanillaCuboid cuboid;
-    private int displayList;
-    private boolean compiled;
+    private BlockModelWrapper modelWrapper;
+    private BlockCuboidWrapper cuboidWrapper;
     private float selectionRed, selectionGreen, selectionBlue;
 
-    public QubbleVanillaModelRenderer(int id, QubbleVanillaCuboid cuboid) {
-        this.cuboid = cuboid;
+    public QubbleVanillaModelRenderer(int id, BlockModelWrapper modelWrapper, BlockCuboidWrapper cuboidWrapper) {
+        this.modelWrapper = modelWrapper;
+        this.cuboidWrapper = cuboidWrapper;
         this.selectionRed = (float) (id >> 16 & 0xFF) / 255.0F;
         this.selectionGreen = (float) (id >> 8 & 0xFF) / 255.0F;
         this.selectionBlue = (float) (id & 0xFF) / 255.0F;
@@ -29,7 +32,8 @@ public class QubbleVanillaModelRenderer {
 
     public void postRender(float scale) {
         this.translate(scale);
-        GlStateManager.translate(this.cuboid.getFromX() * scale, this.cuboid.getFromY() * scale, this.cuboid.getFromZ() * scale);
+        QubbleVanillaCuboid cuboid = this.cuboidWrapper.getCuboid();
+        GlStateManager.translate(cuboid.getFromX() * scale, cuboid.getFromY() * scale, cuboid.getFromZ() * scale);
     }
 
     public void render(float scale, boolean selection) {
@@ -39,13 +43,9 @@ public class QubbleVanillaModelRenderer {
             GlStateManager.color(this.selectionRed, this.selectionGreen, this.selectionBlue, 1.0F);
         }
 
-        if (!this.compiled) {
-            this.compile(scale);
-        }
-
         this.translate(scale);
 
-        GlStateManager.callList(this.displayList);
+        this.draw(scale, selection);
         GlStateManager.popMatrix();
     }
 
@@ -56,39 +56,46 @@ public class QubbleVanillaModelRenderer {
             GlStateManager.color(this.selectionRed, this.selectionGreen, this.selectionBlue, 1.0F);
         }
 
-        if (!this.compiled) {
-            this.compile(scale);
-        }
-
         this.translate(scale);
 
-        GlStateManager.callList(this.displayList);
+        this.draw(scale, selection);
+
         GlStateManager.popMatrix();
     }
 
-    public void compile(float scale) {
-        if (this.compiled) {
-            GLAllocation.deleteDisplayLists(this.displayList);
-            this.compiled = false;
+    public void draw(float scale, boolean selection) {
+        if (this.cuboidWrapper.hasShade() && !selection) {
+            GlStateManager.enableLighting();
+        } else {
+            GlStateManager.disableLighting();
         }
-        this.displayList = GLAllocation.generateDisplayLists(1);
-        GlStateManager.glNewList(this.displayList, GL11.GL_COMPILE);
+        QubbleVanillaCuboid cuboid = this.cuboidWrapper.getCuboid();
         Tessellator tessellator = Tessellator.getInstance();
         VertexBuffer buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
-        float fromX = this.cuboid.getFromX() * scale;
-        float fromY = this.cuboid.getFromY() * scale;
-        float fromZ = this.cuboid.getFromZ() * scale;
-        float toX = this.cuboid.getToX() * scale;
-        float toY = this.cuboid.getToY() * scale;
-        float toZ = this.cuboid.getToZ() * scale;
+        float fromX = cuboid.getFromX() * scale;
+        float fromY = cuboid.getFromY() * scale;
+        float fromZ = cuboid.getFromZ() * scale;
+        float toX = cuboid.getToX() * scale;
+        float toY = cuboid.getToY() * scale;
+        float toZ = cuboid.getToZ() * scale;
         for (EnumFacing facing : EnumFacing.VALUES) {
-            QubbleVanillaFace face = this.cuboid.getFace(facing);
-            if (face != null) {
-                float minU = face.getMinU();
-                float minV = face.getMinV();
-                float maxU = face.getMaxU();
-                float maxV = face.getMaxV();
+            QubbleVanillaFace face = cuboid.getFace(facing);
+            if (facing.getAxis() == EnumFacing.Axis.Z) {
+                facing = facing.getOpposite();
+            }
+            if (face != null && face.isEnabled()) {
+                float minU = face.getMinU() / 16.0F;
+                float minV = face.getMinV() / 16.0F;
+                float maxU = face.getMaxU() / 16.0F;
+                float maxV = face.getMaxV() / 16.0F;
+                ModelTexture texture = this.modelWrapper.getTexture(face.getTexture());
+                if (texture == null || selection) {
+                    GlStateManager.disableTexture2D();
+                } else {
+                    GlStateManager.enableTexture2D();
+                    ClientProxy.MINECRAFT.getTextureManager().bindTexture(texture.getLocation());
+                }
+                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
                 if (facing == EnumFacing.DOWN) {
                     buffer.pos(fromX, fromY, fromZ).tex(minU, minV).normal(0.0F, -1.0F, 0.0F).endVertex();
                     buffer.pos(toX, fromY, fromZ).tex(maxU, minV).normal(0.0F, -1.0F, 0.0F).endVertex();
@@ -120,22 +127,13 @@ public class QubbleVanillaModelRenderer {
                     buffer.pos(toX, fromY, toZ).tex(maxU, maxV).normal(1.0F, 0.0F, 0.0F).endVertex();
                     buffer.pos(toX, fromY, fromZ).tex(minU, maxV).normal(1.0F, 0.0F, 0.0F).endVertex();
                 }
+                tessellator.draw();
             }
-        }
-        tessellator.draw();
-        GlStateManager.glEndList();
-        this.compiled = true;
-    }
-
-    public void delete() {
-        if (this.compiled) {
-            GLAllocation.deleteDisplayLists(this.displayList);
-            this.compiled = false;
         }
     }
 
     private void translate(float scale) {
-        QubbleVanillaRotation rotation = this.cuboid.getRotation();
+        QubbleVanillaRotation rotation = this.cuboidWrapper.getCuboid().getRotation();
 
         if (rotation != null) {
             GlStateManager.translate(rotation.getOriginX() * scale, rotation.getOriginY() * scale, rotation.getOriginZ() * scale);
@@ -160,7 +158,7 @@ public class QubbleVanillaModelRenderer {
         }
     }
 
-    public QubbleVanillaCuboid getCuboid() {
-        return this.cuboid;
+    public BlockCuboidWrapper getCuboidWrapper() {
+        return this.cuboidWrapper;
     }
 }

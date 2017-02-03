@@ -76,7 +76,7 @@ public class JavaExporter implements IModelExporter<List<String>, DefaultCuboidW
             String field = this.getFieldName(cube);
             list.add("        this." + field + " = new ModelRenderer(this, " + cube.getTextureX() + ", " + cube.getTextureY() + ");");
             list.add("        this." + field + ".setRotationPoint(" + cube.getPositionX() + "F, " + cube.getPositionY() + "F, " + cube.getPositionZ() + "F);");
-            list.add("        this." + field + ".addBox(" + cube.getOffsetX() + "F, " + cube.getOffsetY() + "F, " + cube.getOffsetZ() + "F, " + cube.getDimensionX() + ", " + cube.getDimensionY() + ", " + cube.getDimensionZ() + ");");
+            list.add("        this." + field + ".addBox(" + cube.getOffsetX() + "F, " + cube.getOffsetY() + "F, " + cube.getOffsetZ() + "F, " + (int) cube.getDimensionX() + ", " + (int) cube.getDimensionY() + ", " + (int) cube.getDimensionZ() + ");");
             if (cube.isTextureMirrored()) {
                 list.add("        this." + field + ".mirror = true;");
             }
@@ -94,7 +94,6 @@ public class JavaExporter implements IModelExporter<List<String>, DefaultCuboidW
         for (DefaultCuboidWrapper cube : cubes) {
             String field = this.getFieldName(cube);
             boolean scale = cube.getRotationX() != 0.0F || cube.getRotationY() != 0.0F || cube.getRotationZ() != 0.0F;
-            boolean blend = cube.getOpacity() != 100.0F;
             if (scale) {
                 list.add("        GlStateManager.pushMatrix();");
                 list.add("        GlStateManager.translate(this." + field + ".offsetX, this." + field + ".offsetY, this." + field + ".offsetZ);");
@@ -103,15 +102,7 @@ public class JavaExporter implements IModelExporter<List<String>, DefaultCuboidW
                 list.add("        GlStateManager.translate(-this." + field + ".offsetX, -this." + field + ".offsetY, -this." + field + ".offsetZ);");
                 list.add("        GlStateManager.translate(-this." + field + ".rotationPointX * scale, -this." + field + ".rotationPointY * scale, -this." + field + ".rotationPointZ * scale);");
             }
-            if (blend) {
-                list.add("        GlStateManager.enableBlend();");
-                list.add("        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);");
-                list.add("        GlStateManager.color(1.0F, 1.0F, 1.0F, " + (cube.getOpacity() / 100.0F) + "F);");
-            }
             list.add("        this." + field + ".render(scale);");
-            if (blend) {
-                list.add("        GlStateManager.disableBlend();");
-            }
             if (scale) {
                 list.add("        GlStateManager.popMatrix();");
             }
@@ -119,7 +110,7 @@ public class JavaExporter implements IModelExporter<List<String>, DefaultCuboidW
     }
 
     public void addRotationAngles(List<String> list) {
-        list.add("    public void setRotationAngles(ModelRenderer modelRenderer, float x, float y, float z) {");
+        list.add("    private void setRotationAngles(ModelRenderer modelRenderer, float x, float y, float z) {");
         list.add("        modelRenderer.rotateAngleX = x;");
         list.add("        modelRenderer.rotateAngleY = y;");
         list.add("        modelRenderer.rotateAngleZ = z;");
@@ -138,5 +129,10 @@ public class JavaExporter implements IModelExporter<List<String>, DefaultCuboidW
     @Override
     public String[] getDefaultArguments(DefaultModelWrapper currentModel) {
         return new String[]{"pkg", currentModel.getName()};
+    }
+
+    @Override
+    public String getFileName(String[] arguments, String fileName) {
+        return arguments[1];
     }
 }

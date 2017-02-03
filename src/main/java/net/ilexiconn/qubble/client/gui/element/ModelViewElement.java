@@ -10,6 +10,7 @@ import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.toolbar.ToolbarElement;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -69,6 +70,9 @@ public class ModelViewElement extends Element<QubbleGUI> {
         GL11.glScissor(0, 0, gui.width * scaleFactor, (gui.height - gui.getToolbar().getHeight()) * scaleFactor);
         if (gui.getSelectedProject() != null) {
             this.renderModel(partialTicks, scaledResolution, false);
+            if (!ClientProxy.MINECRAFT.gameSettings.hideGUI) {
+                this.drawAxis(partialTicks, scaleFactor);
+            }
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
         GlStateManager.enableTexture2D();
@@ -80,6 +84,53 @@ public class ModelViewElement extends Element<QubbleGUI> {
         } else if (this.zoom > 10.0F) {
             this.zoom = 10.0F;
         }
+    }
+
+    private void drawAxis(float partialTicks, int scaleFactor) {
+        GlStateManager.disableTexture2D();
+        GlStateManager.pushMatrix();
+        Tessellator tessellator = Tessellator.getInstance();
+        VertexBuffer buffer = tessellator.getBuffer();
+        GlStateManager.translate(this.gui.getModelTree().getWidth(), this.gui.getToolbar().getHeight() + this.gui.getProjectBar().getHeight(), 0.0F);
+        GlStateManager.scale(scaleFactor, scaleFactor, scaleFactor);
+        GlStateManager.translate(7.5F, 7.5F, -100.0F);
+        float pitch = ClientUtils.interpolate(this.prevRotationPitch, this.rotationPitch, partialTicks);
+        float yaw = ClientUtils.interpolate(this.prevRotationYaw, this.rotationYaw, partialTicks);
+        GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
+
+        double axisLength = 5.0;
+        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+        buffer.pos(0.0, 0.0, 0.0).color(1.0F, 0.0F, 0.0F, 1.0F).endVertex();
+        buffer.pos(axisLength, 0.0, 0.0).color(1.0F, 0.0F, 0.0F, 1.0F).endVertex();
+        buffer.pos(0.0, 0.0, 0.0).color(0.0F, 1.0F, 0.0F, 1.0F).endVertex();
+        buffer.pos(0.0, axisLength, 0.0).color(0.0F, 1.0F, 0.0F, 1.0F).endVertex();
+        buffer.pos(0.0, 0.0, 0.0).color(0.0F, 0.0F, 1.0F, 1.0F).endVertex();
+        buffer.pos(0.0, 0.0, axisLength).color(0.0F, 0.0F, 1.0F, 1.0F).endVertex();
+        tessellator.draw();
+
+        GlStateManager.disableCull();
+        GlStateManager.enableTexture2D();
+
+        this.renderAxisName("x", axisLength + 1.0, 0.0, 0.0, yaw, pitch, 0xFF0000);
+        this.renderAxisName("y", 0.0, axisLength + 1.0, 0.0, yaw, pitch, 0x00FF00);
+        this.renderAxisName("z", 0.0, 0.0, axisLength + 1.0, yaw, pitch, 0x0000FF);
+
+        GlStateManager.popMatrix();
+    }
+
+    private void renderAxisName(String name, double x, double y, double z, float yaw, float pitch, int color) {
+        FontRenderer fontRenderer = this.gui.getFontRenderer();
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x, y, z);
+        GlStateManager.rotate(-yaw, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(-pitch, 1.0F, 0.0F, 0.0F);
+        GlStateManager.scale(0.2F, 0.2F, 0.2F);
+        float offsetX = -fontRenderer.getStringWidth(name) / 2.0F;
+        float offsetY = -fontRenderer.FONT_HEIGHT / 2.0F;
+        GlStateManager.translate(offsetX, offsetY, offsetX);
+        fontRenderer.drawString(name, 0, 0, color);
+        GlStateManager.popMatrix();
     }
 
     private void renderModel(float partialTicks, ScaledResolution scaledResolution, boolean clicking) {
@@ -122,22 +173,21 @@ public class ModelViewElement extends Element<QubbleGUI> {
                 if (hasSelection) {
                     GlStateManager.color(0.7F, 0.7F, 0.7F, 1.0F);
                 }
-                if (project.getBaseTexture() != null) {
+                if (wrapper.getBaseTexture() != null) {
                     GlStateManager.enableTexture2D();
-                    textureManager.bindTexture(project.getBaseTexture().getLocation());
-                }
-                if (LLibrary.CONFIG.getColorMode().equals("light")) {
+                    textureManager.bindTexture(wrapper.getBaseTexture().getLocation());
+                } else if (LLibrary.CONFIG.getColorMode().equals("light")) {
                     GlStateManager.color(0.6F, 0.6F, 0.6F, 1.0F);
                 }
             }
             wrapper.render(clicking);
             if (!clicking) {
-                if (project.getOverlayTexture() != null) {
+                if (wrapper.getOverlayTexture() != null) {
                     GlStateManager.enableTexture2D();
-                    textureManager.bindTexture(project.getOverlayTexture().getLocation());
+                    textureManager.bindTexture(wrapper.getOverlayTexture().getLocation());
                     wrapper.render(false);
                 }
-                if (Qubble.CONFIG.showGrid) {
+                if (Qubble.CONFIG.showGrid && !ClientProxy.MINECRAFT.gameSettings.hideGUI) {
                     GlStateManager.pushMatrix();
                     GlStateManager.disableTexture2D();
                     GlStateManager.disableLighting();
@@ -179,6 +229,7 @@ public class ModelViewElement extends Element<QubbleGUI> {
             GlStateManager.loadIdentity();
             GlStateManager.disableBlend();
         }
+        GlStateManager.glLineWidth(2.0F);
         GlStateManager.cullFace(GlStateManager.CullFace.BACK);
     }
 
@@ -296,10 +347,9 @@ public class ModelViewElement extends Element<QubbleGUI> {
 
     @Override
     protected boolean isSelected(float mouseX, float mouseY) {
-        ModelTreeElement modelTree = this.gui.getModelTree();
         ToolbarElement toolbar = this.gui.getToolbar();
         ProjectBarElement projectBar = this.gui.getProjectBar();
-        return this.gui.isElementOnTop(this) && mouseX > modelTree.getPosX() + modelTree.getWidth() && mouseY >= toolbar.getPosY() + toolbar.getHeight() + (projectBar.isVisible() ? projectBar.getHeight() : 0);
+        return this.gui.isElementOnTop(this) && mouseY >= toolbar.getPosY() + toolbar.getHeight() + (projectBar.isVisible() ? projectBar.getHeight() : 0);
     }
 
     private void updatePrevious() {

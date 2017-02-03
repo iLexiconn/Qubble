@@ -16,16 +16,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @SideOnly(Side.CLIENT)
 public class QubbleVanillaModelBase {
+    private BlockModelWrapper model;
     private List<QubbleVanillaModelRenderer> rootCubes = new ArrayList<>();
     private Map<Integer, BlockCuboidWrapper> selectionIDs = new HashMap<>();
     private Map<BlockCuboidWrapper, QubbleVanillaModelRenderer> cubes = new HashMap<>();
     private int selectionID;
 
     public QubbleVanillaModelBase(BlockModelWrapper wrapper) {
+        this.model = wrapper;
         for (BlockCuboidWrapper cuboidWrapper : wrapper.getCuboids()) {
             this.parseCube(cuboidWrapper);
         }
@@ -37,8 +38,7 @@ public class QubbleVanillaModelBase {
     }
 
     private QubbleVanillaModelRenderer createCube(BlockCuboidWrapper wrapper) {
-        QubbleVanillaCuboid cuboid = wrapper.getCuboid();
-        QubbleVanillaModelRenderer box = new QubbleVanillaModelRenderer(this.selectionID, cuboid);
+        QubbleVanillaModelRenderer box = new QubbleVanillaModelRenderer(this.selectionID, this.model, wrapper);
         this.cubes.put(wrapper, box);
         this.selectionIDs.put(this.selectionID, wrapper);
         this.selectionID++;
@@ -64,7 +64,8 @@ public class QubbleVanillaModelBase {
     }
 
     private void renderOutline(QubbleVanillaModelRenderer modelRenderer, float scale) {
-        QubbleVanillaCuboid cuboid = modelRenderer.getCuboid();
+        BlockCuboidWrapper wrapper = modelRenderer.getCuboidWrapper();
+        QubbleVanillaCuboid cuboid = wrapper.getCuboid();
         Tessellator tessellator = Tessellator.getInstance();
         GlStateManager.glLineWidth(16.0F);
         VertexBuffer buffer = tessellator.getBuffer();
@@ -89,10 +90,10 @@ public class QubbleVanillaModelBase {
         tessellator.draw();
         buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
         buffer.pos(0.0F, 0.0F, 0.0F).endVertex();
-        buffer.pos(0.0F, sizeY + 0.3, 0.0F).endVertex();
+        buffer.pos(0.0F, sizeY, 0.0F).endVertex();
         tessellator.draw();
         buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
-        buffer.pos(sizeX, 00.3F, 0.0F).endVertex();
+        buffer.pos(sizeX, 0.0F, 0.0F).endVertex();
         buffer.pos(sizeX, sizeY, 0.0F).endVertex();
         tessellator.draw();
         buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
@@ -111,15 +112,5 @@ public class QubbleVanillaModelBase {
 
     public QubbleVanillaModelRenderer getCuboid(BlockCuboidWrapper cube) {
         return this.cubes.get(cube);
-    }
-
-    public Set<Map.Entry<BlockCuboidWrapper, QubbleVanillaModelRenderer>> getCubes() {
-        return this.cubes.entrySet();
-    }
-
-    public void delete() {
-        for (QubbleVanillaModelRenderer renderer : this.rootCubes) {
-            renderer.delete();
-        }
     }
 }

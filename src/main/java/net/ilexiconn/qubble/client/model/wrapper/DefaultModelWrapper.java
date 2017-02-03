@@ -3,18 +3,19 @@ package net.ilexiconn.qubble.client.model.wrapper;
 import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
+import net.ilexiconn.qubble.client.gui.ModelTexture;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.QubbleModelBase;
 import net.ilexiconn.qubble.client.model.QubbleModelRenderer;
-import net.ilexiconn.qubble.server.model.ModelHandler;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class DefaultModelWrapper implements ModelWrapper<DefaultCuboidWrapper> {
+public class DefaultModelWrapper extends ModelWrapper<DefaultCuboidWrapper> {
     private QubbleModel model;
     private QubbleModelBase renderModel;
     private List<DefaultCuboidWrapper> cuboids = new ArrayList<>();
@@ -22,7 +23,7 @@ public class DefaultModelWrapper implements ModelWrapper<DefaultCuboidWrapper> {
     public DefaultModelWrapper(QubbleModel model) {
         this.model = model;
         for (QubbleCuboid cuboid : model.getCuboids()) {
-            this.cuboids.add(new DefaultCuboidWrapper(cuboid));
+            this.cuboids.add(new DefaultCuboidWrapper(this, cuboid));
         }
     }
 
@@ -98,11 +99,6 @@ public class DefaultModelWrapper implements ModelWrapper<DefaultCuboidWrapper> {
     }
 
     @Override
-    public void copyCuboid(DefaultCuboidWrapper cuboid) {
-        this.addCuboid(new DefaultCuboidWrapper(ModelHandler.INSTANCE.copy(this, cuboid)));
-    }
-
-    @Override
     public void deleteCuboid(DefaultCuboidWrapper cuboid) {
         this.cuboids.remove(cuboid);
         this.model.getCuboids().remove(cuboid.getCuboid());
@@ -130,14 +126,14 @@ public class DefaultModelWrapper implements ModelWrapper<DefaultCuboidWrapper> {
             if (renderCuboid.getParent() != null) {
                 renderCuboid.getParent().parentedPostRender(scale);
             }
-            if (project.getBaseTexture() != null) {
+            if (this.getBaseTexture() != null) {
                 GlStateManager.enableTexture2D();
-                MC.getTextureManager().bindTexture(project.getBaseTexture().getLocation());
+                MC.getTextureManager().bindTexture(this.getBaseTexture().getLocation());
             }
             renderCuboid.renderSingle(scale, false);
-            if (project.getOverlayTexture() != null) {
+            if (this.getOverlayTexture() != null) {
                 GlStateManager.enableTexture2D();
-                MC.getTextureManager().bindTexture(project.getOverlayTexture().getLocation());
+                MC.getTextureManager().bindTexture(this.getOverlayTexture().getLocation());
                 renderCuboid.renderSingle(scale, false);
             }
             GlStateManager.popMatrix();
@@ -205,7 +201,7 @@ public class DefaultModelWrapper implements ModelWrapper<DefaultCuboidWrapper> {
         QubbleCuboid cuboid = QubbleCuboid.create(name);
         cuboid.setDimensions(1, 1, 1);
         cuboid.setScale(1.0F, 1.0F, 1.0F);
-        DefaultCuboidWrapper wrapper = new DefaultCuboidWrapper(cuboid);
+        DefaultCuboidWrapper wrapper = new DefaultCuboidWrapper(this, cuboid);
         this.addCuboid(wrapper);
         return wrapper;
     }
@@ -213,6 +209,23 @@ public class DefaultModelWrapper implements ModelWrapper<DefaultCuboidWrapper> {
     @Override
     public ModelType getType() {
         return ModelType.DEFAULT;
+    }
+
+    @Override
+    public void importTextures(Map<String, ModelTexture> textures) {
+        for (Map.Entry<String, String> entry : this.model.getTextures().entrySet()) {
+            ModelTexture texture = textures.get(entry.getKey());
+            if (texture != null) {
+                texture.setName(entry.getValue());
+                super.setTexture(entry.getKey(), texture);
+            }
+        }
+    }
+
+    @Override
+    public void setTexture(String name, ModelTexture texture) {
+        super.setTexture(name, texture);
+        this.model.setTexture(name, texture.getName());
     }
 
     public int getTextureWidth() {

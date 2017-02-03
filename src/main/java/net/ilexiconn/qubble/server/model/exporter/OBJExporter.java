@@ -87,4 +87,9 @@ public class OBJExporter implements IModelExporter<OBJModel, DefaultCuboidWrappe
     public String[] getDefaultArguments(DefaultModelWrapper model) {
         return new String[]{};
     }
+
+    @Override
+    public String getFileName(String[] arguments, String fileName) {
+        return fileName;
+    }
 }

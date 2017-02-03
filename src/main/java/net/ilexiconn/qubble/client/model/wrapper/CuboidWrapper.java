@@ -1,5 +1,6 @@
 package net.ilexiconn.qubble.client.model.wrapper;
 
+import net.ilexiconn.qubble.client.model.ModelType;
 import net.minecraft.util.EnumFacing;
 
 import java.util.List;
@@ -10,6 +11,10 @@ public interface CuboidWrapper<CBE extends CuboidWrapper<CBE>> {
     String getName();
 
     List<CBE> getChildren();
+
+    CBE copy(ModelWrapper<CBE> model);
+
+    CBE copyRaw();
 
     float getPositionX();
 
@@ -78,4 +83,6 @@ public interface CuboidWrapper<CBE extends CuboidWrapper<CBE>> {
     void removeChild(CBE cuboid);
 
     boolean hasChild(CBE cuboid);
+
+    ModelType getModelType();
 }

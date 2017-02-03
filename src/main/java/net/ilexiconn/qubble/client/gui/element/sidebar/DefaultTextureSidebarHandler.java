@@ -39,12 +39,14 @@ public class DefaultTextureSidebarHandler extends SidebarHandler<DefaultCuboidWr
 
     @Override
     public void update(QubbleGUI gui, Project project) {
-        ModelTexture texture = project != null ? project.getBaseTexture() : null;
-        ModelTexture overlayTexture = project != null ? project.getOverlayTexture() : null;
+        ModelTexture texture = project != null ? project.getModel().getBaseTexture() : null;
+        ModelTexture overlayTexture = project != null ? project.getModel().getOverlayTexture() : null;
         this.texture.clearText();
         this.texture.writeText(texture != null ? texture.getName() : "");
+        this.texture.setCursorPositionZero();
         this.overlayTexture.clearText();
         this.overlayTexture.writeText(overlayTexture != null ? overlayTexture.getName() : "");
+        this.overlayTexture.setCursorPositionZero();
     }
 
     @Override
@@ -118,14 +120,16 @@ public class DefaultTextureSidebarHandler extends SidebarHandler<DefaultCuboidWr
             Project project = this.gui.getSelectedProject();
             if (project != null) {
                 ModelTexture texture = null;
-                if (!list.getSelectedEntry().equals("None")) {
+                if (list.getSelectedIndex() != 0) {
                     texture = new ModelTexture(new File(ClientProxy.QUBBLE_TEXTURE_DIRECTORY, list.getSelectedEntry() + ".png"), list.getSelectedEntry());
                 }
+                ModelWrapper model = project.getModel();
                 if (base) {
-                    project.setBaseTexture(texture);
+                    model.setBaseTexture(texture);
                 } else {
-                    project.setOverlayTexture(texture);
+                    model.setOverlayTexture(texture);
                 }
+                project.setSaved(false);
                 this.gui.removeElement(selectTextureWindow);
             }
             return true;

@@ -10,6 +10,7 @@ import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
+import net.ilexiconn.qubble.server.model.ModelHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -67,12 +68,17 @@ public class SidebarElement extends Element<QubbleGUI> {
         this.getChildren().clear();
         new LabelElement<>(this.gui, "Selected cube", 4, 10).withParent(this);
         this.nameInput = (InputElementBase<QubbleGUI>) new InputElement<>(this.gui, 4, 19, 116, "", inputElement -> {
-            Project selectedProject = this.gui.getSelectedProject();
+            Project<?, ?> selectedProject = this.gui.getSelectedProject();
             if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
                 CuboidWrapper selectedCuboid = selectedProject.getSelectedCuboid();
-                selectedCuboid.setName(inputElement.getText());
-                selectedProject.getModel().rebuildModel();
-                selectedProject.setSaved(false);
+                if (!ModelHandler.INSTANCE.hasDuplicateName(selectedProject.getModel(), inputElement.getText())) {
+                    selectedCuboid.setName(inputElement.getText());
+                    selectedProject.getModel().rebuildModel();
+                    selectedProject.setSaved(false);
+                } else {
+                    inputElement.clearText();
+                    inputElement.writeText(selectedCuboid.getName());
+                }
             }
         }).withParent(this);
         Project<?, ?> project = this.gui.getSelectedProject();

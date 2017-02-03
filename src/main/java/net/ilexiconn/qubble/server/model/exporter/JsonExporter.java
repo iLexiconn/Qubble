@@ -95,6 +95,11 @@ public class JsonExporter implements IModelExporter<BlockModelContainer, Default
         return new String[] {};
     }
 
+    @Override
+    public String getFileName(String[] arguments, String fileName) {
+        return fileName;
+    }
+
     private float clampPosition(float position) {
         return Math.max(-16.0F, Math.min(32.0F, position));
     }

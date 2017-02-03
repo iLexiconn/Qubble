@@ -4,13 +4,15 @@ import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class Project<CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> {
     private QubbleGUI gui;
     private ModelType modelType;
     private MDL model;
     private CBE selectedCube;
-    private ModelTexture baseTexture;
-    private ModelTexture overlayTexture;
+    private Map<String, ModelTexture> textures = new LinkedHashMap<>();
     private boolean saved;
 
     public Project(QubbleGUI gui, MDL model) {
@@ -26,24 +28,6 @@ public class Project<CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CB
 
     public MDL getModel() {
         return this.model;
-    }
-
-    public ModelTexture getBaseTexture() {
-        return this.baseTexture;
-    }
-
-    public void setBaseTexture(ModelTexture texture) {
-        this.baseTexture = texture;
-        this.setSaved(false);
-    }
-
-    public ModelTexture getOverlayTexture() {
-        return this.overlayTexture;
-    }
-
-    public void setOverlayTexture(ModelTexture texture) {
-        this.overlayTexture = texture;
-        this.setSaved(false);
     }
 
     public CBE getSelectedCuboid() {
@@ -65,10 +49,5 @@ public class Project<CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CB
 
     public boolean isSaved() {
         return this.saved;
-    }
-
-    public void duplicateCube() {
-        this.model.copyCuboid(this.selectedCube);
-        this.setSaved(false);
     }
 }

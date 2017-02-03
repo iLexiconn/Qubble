@@ -26,7 +26,7 @@ public class DefaultTextureMapElement extends Element<QubbleGUI> {
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
         Project<DefaultCuboidWrapper, DefaultModelWrapper> selectedProject = (Project<DefaultCuboidWrapper, DefaultModelWrapper>) this.gui.getSelectedProject();
         if (selectedProject != null) {
-            ModelTexture texture = selectedProject.getBaseTexture();
+            ModelTexture texture = selectedProject.getModel().getBaseTexture();
             GlStateManager.translate(this.getPosX(), this.getPosY(), 0.0F);
             DefaultModelWrapper model = selectedProject.getModel();
             String dimensions = model.getTextureWidth() + "x" + model.getTextureHeight();
@@ -114,6 +114,7 @@ public class DefaultTextureMapElement extends Element<QubbleGUI> {
                         selectedCube.setTexture(Math.max(0, Math.min(textureX, model.getTextureWidth() - (selectedCube.getDimensionX() * 2 + selectedCube.getDimensionZ() * 2))), Math.max(0, Math.min(textureY, model.getTextureHeight() - (selectedCube.getDimensionY() + selectedCube.getDimensionZ()))));
                         model.rebuildCuboid(selectedCube);
                         this.gui.getSidebar().enable(model, selectedCube);
+                        selectedProject.setSaved(false);
                     }
                     return true;
                 }

@@ -1,19 +1,23 @@
 package net.ilexiconn.qubble.client.model.wrapper;
 
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
+import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.server.model.ModelHandler;
 import net.minecraft.util.EnumFacing;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultCuboidWrapper implements CuboidWrapper<DefaultCuboidWrapper> {
+    private DefaultModelWrapper modelWrapper;
     private QubbleCuboid cuboid;
     private List<DefaultCuboidWrapper> children = new ArrayList<>();
 
-    public DefaultCuboidWrapper(QubbleCuboid cuboid) {
+    public DefaultCuboidWrapper(DefaultModelWrapper model, QubbleCuboid cuboid) {
+        this.modelWrapper = model;
         this.cuboid = cuboid;
         for (QubbleCuboid child : cuboid.getChildren()) {
-            this.children.add(new DefaultCuboidWrapper(child));
+            this.children.add(new DefaultCuboidWrapper(model, child));
         }
     }
 
@@ -200,8 +204,24 @@ public class DefaultCuboidWrapper implements CuboidWrapper<DefaultCuboidWrapper>
     }
 
     @Override
+    public DefaultCuboidWrapper copy(ModelWrapper<DefaultCuboidWrapper> model) {
+        DefaultModelWrapper defaultModel = (DefaultModelWrapper) model;
+        return new DefaultCuboidWrapper(defaultModel, ModelHandler.INSTANCE.copy(defaultModel, this));
+    }
+
+    @Override
+    public DefaultCuboidWrapper copyRaw() {
+        return new DefaultCuboidWrapper(this.modelWrapper, this.cuboid.copy());
+    }
+
+    @Override
     public boolean hasChild(DefaultCuboidWrapper cuboid) {
         return this.children.contains(cuboid);
+    }
+
+    @Override
+    public ModelType getModelType() {
+        return ModelType.DEFAULT;
     }
 
     public void setTextureMirrored(boolean textureMirrored) {

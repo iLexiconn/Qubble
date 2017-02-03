@@ -1,11 +1,19 @@
 package net.ilexiconn.qubble.client.gui;
 
-import net.ilexiconn.llibrary.client.gui.element.*;
-import net.ilexiconn.qubble.client.gui.element.*;
-import net.ilexiconn.qubble.client.gui.element.sidebar.*;
-import net.ilexiconn.qubble.client.model.*;
+import net.ilexiconn.llibrary.client.gui.element.Element;
+import net.ilexiconn.llibrary.client.gui.element.WindowElement;
+import net.ilexiconn.qubble.client.gui.element.BlockTextureListElement;
+import net.ilexiconn.qubble.client.gui.element.DefaultTextureMapElement;
+import net.ilexiconn.qubble.client.gui.element.sidebar.BlockModelSidebarHandler;
+import net.ilexiconn.qubble.client.gui.element.sidebar.BlockTextureSidebarHandler;
+import net.ilexiconn.qubble.client.gui.element.sidebar.DefaultModelSidebarHandler;
+import net.ilexiconn.qubble.client.gui.element.sidebar.DefaultTextureSidebarHandler;
+import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarHandler;
+import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
 
-import java.util.function.*;
+import java.util.function.Function;
 
 public enum EditMode {
     MODEL("Model", 40, type -> {
@@ -23,10 +31,17 @@ public enum EditMode {
         }
     }, gui -> {
         Project<?, ?> selectedProject = gui.getSelectedProject();
-        if (selectedProject == null || selectedProject.getModelType() == ModelType.DEFAULT) {
-            WindowElement<QubbleGUI> textureWindow = new WindowElement<>(gui, "Texture Map", 200, 214, false);
-            new DefaultTextureMapElement(gui, 0.0F, 14.0F, 200, 200).withParent(textureWindow);
-            return new Element[] { textureWindow };
+        if (selectedProject != null) {
+            ModelType modelType = selectedProject.getModelType();
+            if (modelType == ModelType.DEFAULT) {
+                WindowElement<QubbleGUI> textureWindow = new WindowElement<>(gui, "Texture Map", 200, 214, false);
+                new DefaultTextureMapElement(gui, 0.0F, 14.0F, 200, 200).withParent(textureWindow);
+                return new Element[] { textureWindow };
+            } else if (modelType == ModelType.BLOCK) {
+                WindowElement<QubbleGUI> textureWindow = new WindowElement<>(gui, "Textures", 200, 214, false);
+                new BlockTextureListElement(gui, 0.0F, 14.0F, 200, 200, (Project<BlockCuboidWrapper, BlockModelWrapper>) selectedProject).withParent(textureWindow);
+                return new Element[] { textureWindow };
+            }
         }
         return null;
     });

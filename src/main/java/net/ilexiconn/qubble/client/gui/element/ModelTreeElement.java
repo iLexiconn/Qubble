@@ -43,6 +43,7 @@ public class ModelTreeElement<CBE extends CuboidWrapper<CBE>, MDL extends ModelW
             WindowElement<QubbleGUI> createCubeWindow = new WindowElement<>(this.gui, "Create Cube", 100, 42);
             InputElement<QubbleGUI> nameElement = new InputElement<>(this.gui, 2, 16, 96, "Cube Name", (i) -> {
             });
+            nameElement.select();
             createCubeWindow.addElement(nameElement);
             createCubeWindow.addElement(new ButtonElement<>(this.gui, "Create", 2, 30, 96, 10, (element) -> this.createCube(createCubeWindow, nameElement)).withColorScheme(ColorSchemes.WINDOW));
             this.gui.addElement(createCubeWindow);
@@ -69,6 +70,7 @@ public class ModelTreeElement<CBE extends CuboidWrapper<CBE>, MDL extends ModelW
                 WindowElement<QubbleGUI> renameWindow = new WindowElement<>(this.gui, "Duplicate Name!", 100, 42);
                 InputElement<QubbleGUI> nameElement = new InputElement<>(this.gui, 2, 16, 96, "Cube Name", (i) -> {
                 });
+                nameElement.select();
                 renameWindow.addElement(nameElement);
                 renameWindow.addElement(new ButtonElement<>(this.gui, "Create", 2, 30, 96, 10, (element) -> this.createCube(renameWindow, nameElement)).withColorScheme(ColorSchemes.WINDOW));
                 this.gui.addElement(renameWindow);
@@ -168,6 +170,7 @@ public class ModelTreeElement<CBE extends CuboidWrapper<CBE>, MDL extends ModelW
                 if (model.supportsParenting()) {
                     if (model.reparent(this.parenting, this.getSelectedCube(mouseX, mouseY), GuiScreen.isShiftKeyDown())) {
                         this.project.setSaved(false);
+                        model.rebuildModel();
                     }
                 }
             }
@@ -260,12 +263,28 @@ public class ModelTreeElement<CBE extends CuboidWrapper<CBE>, MDL extends ModelW
 
     @Override
     public boolean keyPressed(char character, int key) {
-        if (this.project != null && this.project.getSelectedCuboid() != null) {
-            if (key == Keyboard.KEY_DELETE || key == Keyboard.KEY_BACK) {
-                this.removeSelectedCube();
-                return true;
-            } else if (GuiScreen.isKeyComboCtrlC(key)) {
-                this.project.duplicateCube();
+        if (this.project != null) {
+            MDL model = this.project.getModel();
+            CBE selectedCuboid = this.project.getSelectedCuboid();
+            if (selectedCuboid != null) {
+                if (key == Keyboard.KEY_DELETE || key == Keyboard.KEY_BACK) {
+                    this.removeSelectedCube();
+                    return true;
+                } else if (GuiScreen.isKeyComboCtrlC(key)) {
+                    CBE clipboard = selectedCuboid.copyRaw();
+                    if (model.supportsParenting()) {
+                        float[][] transformation = model.getParentTransformation(selectedCuboid, true, false);
+                        model.applyTransformation(clipboard, transformation);
+                    }
+                    this.gui.setClipboard(clipboard);
+                    return true;
+                }
+            }
+            if (GuiScreen.isKeyComboCtrlV(key)) {
+                CuboidWrapper<?> clipboard = this.gui.getClipboard();
+                if (clipboard != null && clipboard.getModelType() == this.project.getModelType()) {
+                    model.addCuboid(((CBE) clipboard).copy(model));
+                }
                 return true;
             }
         }

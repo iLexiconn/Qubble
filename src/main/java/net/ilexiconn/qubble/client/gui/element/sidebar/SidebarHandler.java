@@ -81,7 +81,7 @@ public abstract class SidebarHandler<CBE extends CuboidWrapper<CBE>, MDL extends
         }
     }
 
-    public abstract void update(QubbleGUI gui, Project project);
+    public abstract void update(QubbleGUI gui, Project<CBE, MDL> project);
 
     protected abstract void initProperties(MDL model, CBE cuboid);
 

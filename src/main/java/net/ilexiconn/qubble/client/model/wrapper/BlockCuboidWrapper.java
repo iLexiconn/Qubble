@@ -2,15 +2,19 @@ package net.ilexiconn.qubble.client.model.wrapper;
 
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaRotation;
+import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.server.model.ModelHandler;
 import net.minecraft.util.EnumFacing;
 
 import java.util.Collections;
 import java.util.List;
 
 public class BlockCuboidWrapper implements CuboidWrapper<BlockCuboidWrapper> {
+    private BlockModelWrapper modelWrapper;
     private QubbleVanillaCuboid cuboid;
 
-    public BlockCuboidWrapper(QubbleVanillaCuboid cuboid) {
+    public BlockCuboidWrapper(BlockModelWrapper modelWrapper, QubbleVanillaCuboid cuboid) {
+        this.modelWrapper = modelWrapper;
         this.cuboid = cuboid;
     }
 
@@ -27,6 +31,17 @@ public class BlockCuboidWrapper implements CuboidWrapper<BlockCuboidWrapper> {
     @Override
     public List<BlockCuboidWrapper> getChildren() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public BlockCuboidWrapper copy(ModelWrapper<BlockCuboidWrapper> model) {
+        BlockModelWrapper defaultModel = (BlockModelWrapper) model;
+        return new BlockCuboidWrapper(defaultModel, ModelHandler.INSTANCE.copy(defaultModel, this));
+    }
+
+    @Override
+    public BlockCuboidWrapper copyRaw() {
+        return new BlockCuboidWrapper(this.modelWrapper, this.cuboid.copy());
     }
 
     @Override
@@ -250,7 +265,20 @@ public class BlockCuboidWrapper implements CuboidWrapper<BlockCuboidWrapper> {
         return false;
     }
 
+    @Override
+    public ModelType getModelType() {
+        return ModelType.BLOCK;
+    }
+
     public QubbleVanillaCuboid getCuboid() {
         return this.cuboid;
+    }
+
+    public void setShade(boolean shade) {
+        this.cuboid.setShade(shade);
+    }
+
+    public boolean hasShade() {
+        return this.cuboid.hasShade();
     }
 }

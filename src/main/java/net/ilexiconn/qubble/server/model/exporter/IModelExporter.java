@@ -18,4 +18,6 @@ public interface IModelExporter<T, CBE extends CuboidWrapper<CBE>, MDL extends M
     String[] getArgumentNames();
 
     String[] getDefaultArguments(MDL currentModel);
+
+    String getFileName(String[] arguments, String fileName);
 }

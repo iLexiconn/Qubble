@@ -51,7 +51,7 @@ public class DimensionProperty implements IFloatRangeProperty, IStringProperty {
 
     @Override
     public void setString(String text) {
-        this.value = Integer.parseInt(text);
+        this.setFloat(Integer.parseInt(text));
     }
 
     @Override

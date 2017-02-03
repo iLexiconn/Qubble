@@ -36,8 +36,12 @@ public class TabulaExporter implements IModelExporter<TabulaModelContainer, Defa
             double[] offset = { cube.getOffsetX(), cube.getOffsetY(), cube.getOffsetZ() };
             double[] rotation = { cube.getRotationX(), cube.getRotationY(), cube.getRotationZ() };
             double[] scale = { cube.getScaleX(), cube.getScaleY(), cube.getScaleZ() };
-            int[] textureOffset = { (int) cube.getTextureX(), (int) cube.getTextureY() };
-            TabulaCubeContainer tabulaCube = new TabulaCubeContainer(cube.getName(), this.generateIdentifier(cube.getName(), null), null, dimensions, position, offset, rotation, scale, textureOffset, cube.isTextureMirrored(), cube.getOpacity(), 0.0, false);
+            int[] textureOffset = { cube.getTextureX(), cube.getTextureY() };
+            String identifier = cube.getCuboid().getIdentifier();
+            if (identifier == null) {
+                identifier = this.generateIdentifier(cube.getName(), null);
+            }
+            TabulaCubeContainer tabulaCube = new TabulaCubeContainer(cube.getName(), identifier, null, dimensions, position, offset, rotation, scale, textureOffset, cube.isTextureMirrored(), cube.getOpacity(), 0.0, false);
             tabulaCube.getChildren().addAll(this.convertChildren(cube, tabulaCube));
             tabulaCubes.add(tabulaCube);
         }
@@ -52,8 +56,12 @@ public class TabulaExporter implements IModelExporter<TabulaModelContainer, Defa
             double[] offset = { child.getOffsetX(), child.getOffsetY(), child.getOffsetZ() };
             double[] rotation = { child.getRotationX(), child.getRotationY(), child.getRotationZ() };
             double[] scale = { child.getScaleX(), child.getScaleY(), child.getScaleZ() };
-            int[] textureOffset = { (int) child.getTextureX(), (int) child.getTextureY() };
-            TabulaCubeContainer tabulaChild = new TabulaCubeContainer(child.getName(), this.generateIdentifier(child.getName(), parent.getName()), tabulaParent.getIdentifier(), dimensions, position, offset, rotation, scale, textureOffset, child.isTextureMirrored(), child.getOpacity(), 0.0, false);
+            int[] textureOffset = { child.getTextureX(), child.getTextureY() };
+            String identifier = child.getCuboid().getIdentifier();
+            if (identifier == null) {
+                identifier = this.generateIdentifier(child.getName(), parent.getName());
+            }
+            TabulaCubeContainer tabulaChild = new TabulaCubeContainer(child.getName(), identifier, tabulaParent.getIdentifier(), dimensions, position, offset, rotation, scale, textureOffset, child.isTextureMirrored(), child.getOpacity(), 0.0, false);
             tabulaChild.getChildren().addAll(this.convertChildren(child, tabulaChild));
             children.add(tabulaChild);
         }
@@ -78,6 +86,11 @@ public class TabulaExporter implements IModelExporter<TabulaModelContainer, Defa
     @Override
     public String[] getDefaultArguments(DefaultModelWrapper currentModel) {
         return new String[] {};
+    }
+
+    @Override
+    public String getFileName(String[] arguments, String fileName) {
+        return fileName;
     }
 
     protected String generateIdentifier(String name, String parentName) {

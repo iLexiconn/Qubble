@@ -54,6 +54,11 @@ public class TextureMapExporter implements IModelExporter<BufferedImage, Default
         return new String[]{};
     }
 
+    @Override
+    public String getFileName(String[] arguments, String fileName) {
+        return fileName;
+    }
+
     private void fill(BufferedImage image, int x, int y, int width, int height, int color) {
         for (int textureX = x; textureX < x + width; textureX++) {
             for (int textureY = y; textureY < y + height; textureY++) {

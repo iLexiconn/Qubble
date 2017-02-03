@@ -3,18 +3,19 @@ package net.ilexiconn.qubble.client.model.wrapper;
 import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaModel;
+import net.ilexiconn.qubble.client.gui.ModelTexture;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.QubbleVanillaModelBase;
 import net.ilexiconn.qubble.client.model.QubbleVanillaModelRenderer;
-import net.ilexiconn.qubble.server.model.ModelHandler;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class BlockModelWrapper implements ModelWrapper<BlockCuboidWrapper> {
+public class BlockModelWrapper extends ModelWrapper<BlockCuboidWrapper> {
     private QubbleVanillaModel model;
     private QubbleVanillaModelBase renderModel;
     private List<BlockCuboidWrapper> cuboids = new ArrayList<>();
@@ -22,7 +23,7 @@ public class BlockModelWrapper implements ModelWrapper<BlockCuboidWrapper> {
     public BlockModelWrapper(QubbleVanillaModel model) {
         this.model = model;
         for (QubbleVanillaCuboid cuboid : model.getCuboids()) {
-            this.cuboids.add(new BlockCuboidWrapper(cuboid));
+            this.cuboids.add(new BlockCuboidWrapper(this, cuboid));
         }
     }
 
@@ -38,20 +39,11 @@ public class BlockModelWrapper implements ModelWrapper<BlockCuboidWrapper> {
 
     @Override
     public void rebuildModel() {
-        if (this.renderModel != null) {
-            this.renderModel.delete();
-        }
         this.renderModel = new QubbleVanillaModelBase(this);
     }
 
     @Override
     public void rebuildCuboid(BlockCuboidWrapper wrapper) {
-        if (this.renderModel == null) {
-            this.rebuildModel();
-        } else {
-            QubbleVanillaModelRenderer box = this.renderModel.getCuboid(wrapper);
-            box.delete();
-        }
     }
 
     @Override
@@ -59,11 +51,6 @@ public class BlockModelWrapper implements ModelWrapper<BlockCuboidWrapper> {
         this.cuboids.add(cuboid);
         this.model.addCuboid(cuboid.getCuboid());
         this.rebuildModel();
-    }
-
-    @Override
-    public void copyCuboid(BlockCuboidWrapper cuboid) {
-        this.addCuboid(new BlockCuboidWrapper(ModelHandler.INSTANCE.copy(this, cuboid)));
     }
 
     @Override
@@ -102,16 +89,7 @@ public class BlockModelWrapper implements ModelWrapper<BlockCuboidWrapper> {
             GlStateManager.depthMask(true);
             GlStateManager.enableLighting();
             GlStateManager.pushMatrix();
-            if (project.getBaseTexture() != null) {
-                GlStateManager.enableTexture2D();
-                MC.getTextureManager().bindTexture(project.getBaseTexture().getLocation());
-            }
             renderCuboid.renderSingle(scale, false);
-            if (project.getOverlayTexture() != null) {
-                GlStateManager.enableTexture2D();
-                MC.getTextureManager().bindTexture(project.getOverlayTexture().getLocation());
-                renderCuboid.renderSingle(scale, false);
-            }
             GlStateManager.popMatrix();
             GlStateManager.pushMatrix();
             GlStateManager.disableTexture2D();
@@ -177,13 +155,42 @@ public class BlockModelWrapper implements ModelWrapper<BlockCuboidWrapper> {
 
     @Override
     public BlockCuboidWrapper createCuboid(String name) {
-        BlockCuboidWrapper cuboid = new BlockCuboidWrapper(QubbleVanillaCuboid.create(name, null, 0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F));
+        BlockCuboidWrapper cuboid = new BlockCuboidWrapper(this, QubbleVanillaCuboid.create(name, null, 0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F));
         this.addCuboid(cuboid);
         return cuboid;
     }
 
     @Override
     public ModelType getType() {
-        return ModelType.JSON_VANILLA;
+        return ModelType.BLOCK;
+    }
+
+    @Override
+    public void importTextures(Map<String, ModelTexture> textures) {
+        for (String texture : this.model.getTextures()) {
+            ModelTexture modelTexture = textures.get(texture);
+            if (modelTexture != null) {
+                modelTexture.setName(texture);
+                super.setTexture(modelTexture.getName(), modelTexture);
+            }
+        }
+    }
+
+    @Override
+    public void setTexture(String name, ModelTexture texture) {
+        super.setTexture(name, texture);
+        this.model.addTexture(texture.getName());
+    }
+
+    public QubbleVanillaModel getModel() {
+        return this.model;
+    }
+
+    public void setAmbientOcclusion(boolean ambientOcclusion) {
+        this.model.setAmbientOcclusion(ambientOcclusion);
+    }
+
+    public boolean hasAmbientOcclusion() {
+        return this.model.hasAmbientOcclusion();
     }
 }

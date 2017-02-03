@@ -33,8 +33,9 @@ public class AxisProperty implements IStringSelectionProperty {
 
     @Override
     public void setString(String value) {
+        String last = this.value;
         this.value = value;
-        if (this.value != null && !this.value.equals(value) && this.value.length() != 0) {
+        if (last != null && !last.equals(value) && last.length() != 0) {
             this.onSubmit.accept(this.get());
         }
     }

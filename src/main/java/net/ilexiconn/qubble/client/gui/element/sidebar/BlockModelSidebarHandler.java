@@ -1,5 +1,6 @@
 package net.ilexiconn.qubble.client.gui.element.sidebar;
 
+import net.ilexiconn.llibrary.client.gui.element.CheckboxElement;
 import net.ilexiconn.llibrary.client.gui.element.DropdownButtonElement;
 import net.ilexiconn.llibrary.client.gui.element.LabelElement;
 import net.ilexiconn.llibrary.client.gui.element.SliderElement;
@@ -8,6 +9,7 @@ import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
 import net.ilexiconn.qubble.client.gui.property.AxisProperty;
+import net.ilexiconn.qubble.client.gui.property.CheckboxProperty;
 import net.ilexiconn.qubble.client.gui.property.RotationProperty;
 import net.ilexiconn.qubble.client.gui.property.TransformProperty;
 import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
@@ -19,7 +21,8 @@ public class BlockModelSidebarHandler extends SidebarHandler<BlockCuboidWrapper,
     private RotationProperty propertyRotation;
     private TransformProperty propertyDimensionX, propertyDimensionY, propertyDimensionZ;
     private TransformProperty propertyPositionX, propertyPositionY, propertyPositionZ;
-    private TransformProperty propertyOriginX, propertyOriginY, propertyOrigintZ;
+    private TransformProperty propertyOriginX, propertyOriginY, propertyOriginZ;
+    private CheckboxProperty propertyShade;
 
     public BlockModelSidebarHandler() {
         this.propertyPositionX = new TransformProperty(this, value -> this.edit(cuboid -> cuboid.setPosition(value, cuboid.getPositionY(), cuboid.getPositionZ())));
@@ -30,14 +33,14 @@ public class BlockModelSidebarHandler extends SidebarHandler<BlockCuboidWrapper,
         this.propertyDimensionZ = new TransformProperty(this, value -> this.edit(cuboid -> cuboid.setDimensions(cuboid.getDimensionX(), cuboid.getDimensionY(), value)));
         this.propertyOriginX = new TransformProperty(this, value -> this.edit(cuboid -> cuboid.setOffset(value, cuboid.getOffsetY(), cuboid.getOffsetZ())));
         this.propertyOriginY = new TransformProperty(this, value -> this.edit(cuboid -> cuboid.setOffset(cuboid.getOffsetX(), value, cuboid.getOffsetZ())));
-        this.propertyOrigintZ = new TransformProperty(this, value -> this.edit(cuboid -> cuboid.setOffset(cuboid.getOffsetX(), cuboid.getOffsetY(), value)));
+        this.propertyOriginZ = new TransformProperty(this, value -> this.edit(cuboid -> cuboid.setOffset(cuboid.getOffsetX(), cuboid.getOffsetY(), value)));
         this.propertyRotation = new RotationProperty(this, value -> {
             float angle = (int) (value / 22.5) * 22.5F;
             this.edit(cuboid -> {
                 QubbleVanillaRotation rotation = cuboid.getCuboid().getRotation();
                 if (rotation == null) {
                     EnumFacing.Axis axis = this.propertyRotationAxis.get();
-                    rotation = QubbleVanillaRotation.create(axis, cuboid.getPositionX(), cuboid.getPositionY(), cuboid.getPositionZ(), angle);
+                    rotation = QubbleVanillaRotation.create(axis, 0.0F, 0.0F, 0.0F, angle);
                     cuboid.getCuboid().setRotation(rotation);
                 } else {
                     rotation.setAngle(angle);
@@ -48,18 +51,21 @@ public class BlockModelSidebarHandler extends SidebarHandler<BlockCuboidWrapper,
         this.propertyRotationAxis = new AxisProperty(value -> this.edit(cuboid -> {
             QubbleVanillaRotation rotation = cuboid.getCuboid().getRotation();
             if (rotation == null) {
-                rotation = QubbleVanillaRotation.create(value, cuboid.getPositionX(), cuboid.getPositionY(), cuboid.getPositionZ(), 0.0F);
+                rotation = QubbleVanillaRotation.create(value, 0.0F, 0.0F, 0.0F, 0.0F);
                 cuboid.getCuboid().setRotation(rotation);
             } else {
                 rotation.setAxis(value);
             }
         }));
 
+        this.propertyShade = new CheckboxProperty(value -> this.edit(cuboid -> cuboid.setShade(value)));
+
         this.addString(this.propertyRotationAxis);
         this.addFloat(this.propertyDimensionX, this.propertyDimensionY, this.propertyDimensionZ);
         this.addFloat(this.propertyPositionX, this.propertyPositionY, this.propertyPositionZ);
-        this.addFloat(this.propertyOriginX, this.propertyOriginY, this.propertyOrigintZ);
+        this.addFloat(this.propertyOriginX, this.propertyOriginY, this.propertyOriginZ);
         this.addFloat(this.propertyRotation);
+        this.addBoolean(this.propertyShade);
     }
 
     @Override
@@ -76,7 +82,8 @@ public class BlockModelSidebarHandler extends SidebarHandler<BlockCuboidWrapper,
         this.propertyDimensionZ.set(cuboid.getDimensionZ());
         this.propertyOriginX.set(cuboid.getOffsetX());
         this.propertyOriginY.set(cuboid.getOffsetY());
-        this.propertyOrigintZ.set(cuboid.getOffsetZ());
+        this.propertyOriginZ.set(cuboid.getOffsetZ());
+        this.propertyShade.setBoolean(cuboid.hasShade());
         QubbleVanillaRotation rotation = cuboid.getCuboid().getRotation();
         if (rotation == null) {
             this.propertyRotationAxis.set(EnumFacing.Axis.X);
@@ -100,16 +107,19 @@ public class BlockModelSidebarHandler extends SidebarHandler<BlockCuboidWrapper,
         new LabelElement<>(this.gui, "Origin", 4, 94).withParent(sidebar);
         SliderElement<QubbleGUI, TransformProperty> originX = new SliderElement<>(this.gui, 4, 103, this.propertyOriginX, 0.1F);
         SliderElement<QubbleGUI, TransformProperty> originY = new SliderElement<>(this.gui, 43, 103, this.propertyOriginY, 0.1F);
-        SliderElement<QubbleGUI, TransformProperty> originZ = new SliderElement<>(this.gui, 82, 103, this.propertyOrigintZ, 0.1F);
+        SliderElement<QubbleGUI, TransformProperty> originZ = new SliderElement<>(this.gui, 82, 103, this.propertyOriginZ, 0.1F);
         new LabelElement<>(this.gui, "Rotation", 4, 119).withParent(sidebar);
         SliderElement<QubbleGUI, RotationProperty> rotation = new SliderElement<>(this.gui, 4, 130, 78, this.propertyRotation, 22.5F);
         new LabelElement<>(this.gui, "Axis", 4, 149).withParent(sidebar);
         DropdownButtonElement<QubbleGUI> rotationAxis = (DropdownButtonElement<QubbleGUI>) new DropdownButtonElement<>(this.gui, 28, 148, 50, 10, this.propertyRotationAxis).withColorScheme(ColorSchemes.WINDOW);
+        new LabelElement<>(this.gui, "Shade", 4, 169).withParent(sidebar);
+        CheckboxElement<QubbleGUI> shade = new CheckboxElement<>(this.gui, 4, 179, this.propertyShade);
         this.add(dimensionX, dimensionY, dimensionZ);
         this.add(positionX, positionY, positionZ);
         this.add(originX, originY, originZ);
         this.add(rotation);
         this.add(rotationAxis);
+        this.add(shade);
     }
 
     @Override

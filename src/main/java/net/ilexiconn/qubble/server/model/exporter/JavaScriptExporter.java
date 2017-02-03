@@ -98,4 +98,9 @@ public class JavaScriptExporter implements IModelExporter<List<String>, DefaultC
     public String[] getDefaultArguments(DefaultModelWrapper currentModel) {
         return new String[]{};
     }
+
+    @Override
+    public String getFileName(String[] arguments, String fileName) {
+        return fileName;
+    }
 }

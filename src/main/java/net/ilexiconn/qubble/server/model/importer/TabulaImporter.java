@@ -66,6 +66,7 @@ public class TabulaImporter implements IModelImporter<TabulaModelContainer, Defa
             qubble.setTexture(cube.getTextureOffset()[0], cube.getTextureOffset()[1]);
             qubble.setTextureMirrored(cube.isTextureMirrorEnabled());
             qubble.setOpacity((float) cube.getOpacity());
+            qubble.setIdentifier(cube.getIdentifier());
             if (parent == null) {
                 list.add(qubble);
             } else {
