@@ -1,5 +1,6 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
+import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 
@@ -20,4 +21,6 @@ public interface IModelExporter<T, CBE extends CuboidWrapper<CBE>, MDL extends M
     String[] getDefaultArguments(MDL currentModel);
 
     String getFileName(String[] arguments, String fileName);
+
+    boolean supports(ModelType modelType);
 }

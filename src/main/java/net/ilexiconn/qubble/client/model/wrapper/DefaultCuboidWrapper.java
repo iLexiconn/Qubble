@@ -235,4 +235,15 @@ public class DefaultCuboidWrapper implements CuboidWrapper<DefaultCuboidWrapper>
     public float getOpacity() {
         return this.cuboid.getOpacity();
     }
+
+    public void translateOffset(float offsetX, float offsetY, float offsetZ) {
+        float deltaX = this.getOffsetX() - offsetX;
+        float deltaY = this.getOffsetY() - offsetY;
+        float deltaZ = this.getOffsetZ() - offsetZ;
+        this.cuboid.setPosition(this.getPositionX() + deltaX, this.getPositionY() + deltaY,  this.getPositionZ() + deltaZ);
+    }
+
+    public boolean hasParent() {
+        return this.modelWrapper.getParent(this) != null;
+    }
 }

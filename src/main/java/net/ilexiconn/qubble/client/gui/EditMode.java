@@ -2,10 +2,10 @@ package net.ilexiconn.qubble.client.gui;
 
 import net.ilexiconn.llibrary.client.gui.element.Element;
 import net.ilexiconn.llibrary.client.gui.element.WindowElement;
-import net.ilexiconn.qubble.client.gui.element.BlockTextureListElement;
+import net.ilexiconn.qubble.client.gui.element.BlockTextureBarElement;
 import net.ilexiconn.qubble.client.gui.element.DefaultTextureMapElement;
-import net.ilexiconn.qubble.client.gui.element.sidebar.BlockModelSidebarHandler;
-import net.ilexiconn.qubble.client.gui.element.sidebar.BlockTextureSidebarHandler;
+import net.ilexiconn.qubble.client.gui.element.sidebar.block.BlockModelSidebarHandler;
+import net.ilexiconn.qubble.client.gui.element.sidebar.block.BlockTextureSidebarHandler;
 import net.ilexiconn.qubble.client.gui.element.sidebar.DefaultModelSidebarHandler;
 import net.ilexiconn.qubble.client.gui.element.sidebar.DefaultTextureSidebarHandler;
 import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarHandler;
@@ -38,9 +38,8 @@ public enum EditMode {
                 new DefaultTextureMapElement(gui, 0.0F, 14.0F, 200, 200).withParent(textureWindow);
                 return new Element[] { textureWindow };
             } else if (modelType == ModelType.BLOCK) {
-                WindowElement<QubbleGUI> textureWindow = new WindowElement<>(gui, "Textures", 200, 214, false);
-                new BlockTextureListElement(gui, 0.0F, 14.0F, 200, 200, (Project<BlockCuboidWrapper, BlockModelWrapper>) selectedProject).withParent(textureWindow);
-                return new Element[] { textureWindow };
+                BlockTextureBarElement textureBar = new BlockTextureBarElement(gui, (Project<BlockCuboidWrapper, BlockModelWrapper>) selectedProject);
+                return new Element[] { textureBar };
             }
         }
         return null;

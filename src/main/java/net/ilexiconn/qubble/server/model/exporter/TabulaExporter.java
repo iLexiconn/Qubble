@@ -3,6 +3,7 @@ package net.ilexiconn.qubble.server.model.exporter;
 import com.google.gson.Gson;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaCubeContainer;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaModelContainer;
+import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -95,5 +96,10 @@ public class TabulaExporter implements IModelExporter<TabulaModelContainer, Defa
 
     protected String generateIdentifier(String name, String parentName) {
         return RandomStringUtils.random(20, 32, 127, false, false, null, new Random(parentName == null ? name.hashCode() : name.hashCode() | parentName.hashCode() << 8));
+    }
+
+    @Override
+    public boolean supports(ModelType modelType) {
+        return modelType == ModelType.DEFAULT;
     }
 }

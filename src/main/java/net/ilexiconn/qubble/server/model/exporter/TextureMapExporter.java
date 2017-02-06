@@ -1,5 +1,6 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
+import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 
@@ -57,6 +58,11 @@ public class TextureMapExporter implements IModelExporter<BufferedImage, Default
     @Override
     public String getFileName(String[] arguments, String fileName) {
         return fileName;
+    }
+
+    @Override
+    public boolean supports(ModelType modelType) {
+        return modelType == ModelType.DEFAULT;
     }
 
     private void fill(BufferedImage image, int x, int y, int width, int height, int color) {

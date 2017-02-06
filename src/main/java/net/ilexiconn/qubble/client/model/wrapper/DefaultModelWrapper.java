@@ -114,7 +114,7 @@ public class DefaultModelWrapper extends ModelWrapper<DefaultCuboidWrapper> {
     }
 
     @Override
-    public void renderSelection(DefaultCuboidWrapper selectedCuboid, Project project) {
+    public void renderSelection(DefaultCuboidWrapper selectedCuboid, Project project, boolean hovering) {
         QubbleModelRenderer renderCuboid = this.renderModel.getCuboid(selectedCuboid);
         if (renderCuboid != null) {
             float scale = 0.0625F;
@@ -137,25 +137,38 @@ public class DefaultModelWrapper extends ModelWrapper<DefaultCuboidWrapper> {
                 renderCuboid.renderSingle(scale, false);
             }
             GlStateManager.popMatrix();
-            GlStateManager.pushMatrix();
-            GlStateManager.disableTexture2D();
-            int accent = LLibrary.CONFIG.getAccentColor();
-            GlStateManager.disableDepth();
-            GlStateManager.disableLighting();
-            float r = (float) (accent >> 16 & 0xFF) / 255.0F;
-            float g = (float) (accent >> 8 & 0xFF) / 255.0F;
-            float b = (float) (accent & 0xFF) / 255.0F;
-            GlStateManager.color(r, g, b, 1.0F);
-            renderCuboid.parentedPostRender(scale);
-            GlStateManager.translate(-0.5F * scale, -0.5F * scale, 0.5F * scale);
-            GlStateManager.scale(0.15F, 0.15F, 0.15F);
-            GlStateManager.translate(3.0F * scale, -18.0F * scale, 3.0F * scale);
-            ROTATION_POINT.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, scale);
-            GlStateManager.scale(0.8F, 0.8F, 0.8F);
-            GlStateManager.translate(0.0F, 0.33F, 0.0F);
-            GlStateManager.color(r * 0.6F, g * 0.6F, b * 0.6F, 1.0F);
-            ROTATION_POINT.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, scale);
-            GlStateManager.popMatrix();
+
+            if (!hovering) {
+                GlStateManager.pushMatrix();
+                GlStateManager.disableTexture2D();
+                int accent = LLibrary.CONFIG.getAccentColor();
+                GlStateManager.disableDepth();
+                GlStateManager.disableLighting();
+                float r = (float) (accent >> 16 & 0xFF) / 255.0F;
+                float g = (float) (accent >> 8 & 0xFF) / 255.0F;
+                float b = (float) (accent & 0xFF) / 255.0F;
+                GlStateManager.color(r, g, b, hovering ? 0.5F : 1.0F);
+                renderCuboid.parentedPostRender(scale);
+                float scaleX = renderCuboid.getParentedScaleX();
+                float scaleY = renderCuboid.getParentedScaleY();
+                float scaleZ = renderCuboid.getParentedScaleZ();
+                GlStateManager.translate((-0.5F * scale) / scaleX, (-0.5F * scale) / scaleY, (0.5F * scale) / scaleZ);
+                GlStateManager.scale(0.15F, 0.15F, 0.15F);
+                GlStateManager.translate((3.0F * scale) / scaleX, (-18.0F * scale) / scaleY, (3.0F * scale) / scaleZ);
+                GlStateManager.pushMatrix();
+                GlStateManager.scale(1.0F / scaleX, 1.0F / scaleY, 1.0F / scaleZ);
+                ROTATION_POINT.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, scale);
+                GlStateManager.popMatrix();
+                GlStateManager.scale(0.8F, 0.8F, 0.8F);
+                GlStateManager.translate(0.0F, 0.33F / scaleY, 0.0F);
+                GlStateManager.color(r * 0.6F, g * 0.6F, b * 0.6F, 1.0F);
+                GlStateManager.pushMatrix();
+                GlStateManager.scale(1.0F / scaleX, 1.0F / scaleY, 1.0F / scaleZ);
+                ROTATION_POINT.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, scale);
+                GlStateManager.popMatrix();
+                GlStateManager.popMatrix();
+            }
+
             GlStateManager.enableLighting();
             GlStateManager.enableDepth();
         }
@@ -225,7 +238,7 @@ public class DefaultModelWrapper extends ModelWrapper<DefaultCuboidWrapper> {
     @Override
     public void setTexture(String name, ModelTexture texture) {
         super.setTexture(name, texture);
-        this.model.setTexture(name, texture.getName());
+        this.model.setTexture(name, texture != null ? texture.getName() : null);
     }
 
     public int getTextureWidth() {

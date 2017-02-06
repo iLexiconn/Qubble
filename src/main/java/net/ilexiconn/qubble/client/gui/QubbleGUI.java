@@ -120,26 +120,28 @@ public class QubbleGUI extends ElementGUI {
     }
 
     public void closeModel(int index) {
-        Project project = this.openProjects.get(index);
-        if (project != null && !project.isSaved()) {
-            WindowElement<QubbleGUI> window = new WindowElement<>(this, "Project not saved!", 200, 54);
-            new LabelElement<>(this, "You have unsaved changes to this", 3.0F, 16.0F).withParent(window);
-            new LabelElement<>(this, "project. Would you like to save now?", 3.0F, 26.0F).withParent(window);
-            new ButtonElement<>(this, "Save", 2.0F, 37.0F, 97, 15, (button) -> {
-                this.removeElement(window);
-                this.toolbar.openSaveWindow((saved) -> this.closeModel(index), false);
-                return true;
-            }).withParent(window).withColorScheme(ColorSchemes.WINDOW);
-            new ButtonElement<>(this, "Discard", 101.0F, 37.0F, 97, 15, (button) -> {
-                this.removeElement(window);
-                project.setSaved(true);
-                this.closeModel(index);
-                return true;
-            }).withParent(window).withColorScheme(ColorSchemes.WINDOW);
-            this.addElement(window);
-        } else {
-            this.openProjects.remove(index);
-            this.selectModel(this.selectedProject);
+        if (!this.openProjects.isEmpty()) {
+            Project project = this.openProjects.get(index);
+            if (project != null && !project.isSaved()) {
+                WindowElement<QubbleGUI> window = new WindowElement<>(this, "Project not saved!", 200, 54);
+                new LabelElement<>(this, "You have unsaved changes to this", 3.0F, 16.0F).withParent(window);
+                new LabelElement<>(this, "project. Would you like to save now?", 3.0F, 26.0F).withParent(window);
+                new ButtonElement<>(this, "Save", 2.0F, 37.0F, 97, 15, (button) -> {
+                    this.removeElement(window);
+                    this.toolbar.openSaveWindow((saved) -> this.closeModel(index), false);
+                    return true;
+                }).withParent(window).withColorScheme(ColorSchemes.WINDOW);
+                new ButtonElement<>(this, "Discard", 101.0F, 37.0F, 97, 15, (button) -> {
+                    this.removeElement(window);
+                    project.setSaved(true);
+                    this.closeModel(index);
+                    return true;
+                }).withParent(window).withColorScheme(ColorSchemes.WINDOW);
+                this.addElement(window);
+            } else {
+                this.openProjects.remove(index);
+                this.selectModel(this.selectedProject);
+            }
         }
     }
 
@@ -222,25 +224,39 @@ public class QubbleGUI extends ElementGUI {
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        if (keyCode == Keyboard.KEY_ESCAPE) {
-            this.close((close) -> {
-                if (close) {
-                    this.mc.displayGuiScreen(null);
-                    if (this.mc.currentScreen == null) {
-                        this.mc.setIngameFocus();
+        try {
+            if (keyCode == Keyboard.KEY_ESCAPE) {
+                this.close((close) -> {
+                    if (close) {
+                        this.mc.displayGuiScreen(null);
+                        if (this.mc.currentScreen == null) {
+                            this.mc.setIngameFocus();
+                        }
                     }
-                }
-            });
-            return;
-        }
-        if (keyCode == Keyboard.KEY_F1) {
-            this.mc.gameSettings.hideGUI = !this.mc.gameSettings.hideGUI;
-            this.updateProjectElements(this.getSelectedProject());
-            if (this.mc.gameSettings.hideGUI) {
-                this.sendElementToFront(this.getModelView());
+                });
+                return;
             }
+            if (keyCode == Keyboard.KEY_F1) {
+                this.mc.gameSettings.hideGUI = !this.mc.gameSettings.hideGUI;
+                this.updateProjectElements(this.getSelectedProject());
+                if (this.mc.gameSettings.hideGUI) {
+                    this.sendElementToFront(this.getModelView());
+                }
+            }
+            super.keyTyped(typedChar, keyCode);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        super.keyTyped(typedChar, keyCode);
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+        try {
+            super.mouseClicked(mouseX, mouseY, mouseButton);
+        } catch (Exception e) {
+            GUIHelper.INSTANCE.error(this, 200, "Click threw an exception!", e);
+            e.printStackTrace();
+        }
     }
 
     public void close(Consumer<Boolean> callback) {

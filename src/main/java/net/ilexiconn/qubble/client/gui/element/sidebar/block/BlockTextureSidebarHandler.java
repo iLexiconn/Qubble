@@ -1,33 +1,24 @@
-package net.ilexiconn.qubble.client.gui.element.sidebar;
+package net.ilexiconn.qubble.client.gui.element.sidebar.block;
 
-import net.ilexiconn.llibrary.client.gui.element.ButtonElement;
 import net.ilexiconn.llibrary.client.gui.element.DropdownButtonElement;
-import net.ilexiconn.llibrary.client.gui.element.InputElement;
 import net.ilexiconn.llibrary.client.gui.element.InputElementBase;
-import net.ilexiconn.llibrary.client.gui.element.LabelElement;
-import net.ilexiconn.llibrary.client.gui.element.ListElement;
 import net.ilexiconn.llibrary.client.gui.element.SliderElement;
-import net.ilexiconn.llibrary.client.gui.element.WindowElement;
-import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaCuboid;
-import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaFace;
-import net.ilexiconn.qubble.client.gui.ModelTexture;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
-import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
+import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarElement;
+import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarHandler;
 import net.ilexiconn.qubble.client.gui.property.FacingProperty;
 import net.ilexiconn.qubble.client.gui.property.TransformProperty;
 import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import net.minecraft.util.EnumFacing;
 
 public class BlockTextureSidebarHandler extends SidebarHandler<BlockCuboidWrapper, BlockModelWrapper> {
     private DropdownButtonElement<QubbleGUI> facing;
     private SliderElement<QubbleGUI, TransformProperty> minU, minV;
     private SliderElement<QubbleGUI, TransformProperty> maxU, maxV;
     private InputElementBase<QubbleGUI> texture;
+    private InputElementBase<QubbleGUI> particleTexture;
 
     private FacingProperty propertyFacing;
     private TransformProperty propertyMinU, propertyMinV;
@@ -57,12 +48,19 @@ public class BlockTextureSidebarHandler extends SidebarHandler<BlockCuboidWrappe
 
     @Override
     public void update(QubbleGUI gui, Project<BlockCuboidWrapper, BlockModelWrapper> project) {
-        this.texture.clearText();
-        if (project != null && project.getSelectedCuboid() != null) {
+        /*this.texture.clearText();
+        this.particleTexture.clearText();
+        if (project != null) {
             BlockCuboidWrapper selectedCuboid = project.getSelectedCuboid();
-            String texture = selectedCuboid.getCuboid().getFace(this.propertyFacing.get()).getTexture();
-            this.texture.writeText(texture != null ? texture : "");
+            if (selectedCuboid != null) {
+                String texture = selectedCuboid.getCuboid().getFace(this.propertyFacing.get()).getTexture();
+                this.texture.writeText(texture != null ? texture : "");
+            }
+            ModelTexture particle = project.getModel().getTexture("particle");
+            this.particleTexture.writeText(particle != null ? particle.getName() : "");
         }
+        this.texture.setCursorPositionEnd();
+        this.particleTexture.setCursorPositionEnd();*/
     }
 
     @Override
@@ -75,7 +73,7 @@ public class BlockTextureSidebarHandler extends SidebarHandler<BlockCuboidWrappe
 
     @Override
     protected void createElements(QubbleGUI gui, SidebarElement sidebar) {
-        new LabelElement<>(this.gui, "Facing", 4, 38).withParent(sidebar);
+        /*new LabelElement<>(this.gui, "Facing", 4, 38).withParent(sidebar);
         this.facing = (DropdownButtonElement<QubbleGUI>) new DropdownButtonElement<>(this.gui, 4, 48, 116, 14, this.propertyFacing).withColorScheme(ColorSchemes.WINDOW);
 
         new LabelElement<>(this.gui, "Texture", 4, 66).withParent(sidebar);
@@ -89,51 +87,78 @@ public class BlockTextureSidebarHandler extends SidebarHandler<BlockCuboidWrappe
         this.texture = (InputElementBase<QubbleGUI>) new InputElement<>(this.gui, 4, 76, 104, "", (i) -> {
         }).withParent(sidebar);
         new ButtonElement<>(this.gui, "...", 108, 76, 12, 12, (button) -> {
-            Project<?, ?> selectedProject = this.gui.getSelectedProject();
+            Project<BlockCuboidWrapper, BlockModelWrapper> selectedProject = (Project<BlockCuboidWrapper, BlockModelWrapper>) this.gui.getSelectedProject();
             if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
-                this.openSelectTextureWindow("Select Texture", (BlockModelWrapper) selectedProject.getModel());
+                BlockModelWrapper model = selectedProject.getModel();
+                List<String> textures = new ArrayList<>();
+                for (Map.Entry<String, ModelTexture> entry : model.getTextures().entrySet()) {
+                    textures.add(entry.getKey());
+                }
+                this.openSelectTextureWindow("Select Texture", textures, list -> {
+                    BlockCuboidWrapper cuboidWrapper = selectedProject.getSelectedCuboid();
+                    if (cuboidWrapper != null) {
+                        QubbleVanillaCuboid cuboid = cuboidWrapper.getCuboid();
+                        QubbleVanillaFace face = cuboid.getFace(this.propertyFacing.get());
+                        if (list.getSelectedIndex() != 0) {
+                            face.setTexture(list.getSelectedEntry());
+                        } else {
+                            face.setTexture(null);
+                        }
+                        selectedProject.setSaved(false);
+                        model.rebuildModel();
+                    }
+                });
                 return true;
             }
             return false;
         }).withColorScheme(ColorSchemes.DEFAULT).withParent(sidebar);
 
-        this.add(this.texture);
+        new LabelElement<>(this.gui, "Particle Texture", 4, 144).withParent(sidebar);
+        this.particleTexture = (InputElementBase<QubbleGUI>) new InputElement<>(this.gui, 4, 154, 104, "", (i) -> {
+        }).withParent(sidebar);
+        new ButtonElement<>(this.gui, "...", 108, 154, 12, 12, (button) -> {
+            Project<BlockCuboidWrapper, BlockModelWrapper> selectedProject = (Project<BlockCuboidWrapper, BlockModelWrapper>) this.gui.getSelectedProject();
+            if (selectedProject != null) {
+                BlockModelWrapper model = selectedProject.getModel();
+                this.openSelectTextureWindow("Select Particle", QubbleGUI.getFiles(ClientProxy.QUBBLE_TEXTURE_DIRECTORY, ".png"), list -> {
+                    if (list.getSelectedIndex() > 0) {
+                        String entry = list.getSelectedEntry();
+                        ModelTexture texture = new ModelTexture(new File(ClientProxy.QUBBLE_TEXTURE_DIRECTORY, entry + ".png"), entry);
+                        model.setTexture("particle", texture);
+                    } else {
+                        model.setTexture("particle", null);
+                    }
+                    selectedProject.setSaved(false);
+                    model.rebuildModel();
+                });
+                return true;
+            }
+            return false;
+        }).withColorScheme(ColorSchemes.DEFAULT).withParent(sidebar);
+
+        this.add(this.texture, this.particleTexture);
 
         this.add(this.facing);
         this.add(this.minU, this.minV);
-        this.add(this.maxU, this.maxV);
+        this.add(this.maxU, this.maxV);*/
+
+        int x = 0;
+        int y = 0;
+
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            float renderX = x * (BlockFaceElement.SIZE + 14) + 12;
+            float renderY = y * (BlockFaceElement.SIZE + 16) + 48;
+
+            new BlockFaceElement(this.gui, facing, renderX, renderY).withParent(sidebar);
+
+            if (++x >= 2) {
+                x = 0;
+                y++;
+            }
+        }
     }
 
     @Override
     protected void initElements(BlockModelWrapper model, BlockCuboidWrapper cuboid) {
-    }
-
-    private void openSelectTextureWindow(String name, BlockModelWrapper wrapper) {
-        WindowElement<QubbleGUI> selectTextureWindow = new WindowElement<>(this.gui, name, 100, 100);
-        List<String> textures = new ArrayList<>();
-        textures.add("none");
-        Project<BlockCuboidWrapper, BlockModelWrapper> project = (Project<BlockCuboidWrapper, BlockModelWrapper>) this.gui.getSelectedProject();
-        for (Map.Entry<String, ModelTexture> entry : wrapper.getTextures().entrySet()) {
-            textures.add(entry.getKey());
-        }
-        if (project != null) {
-            selectTextureWindow.addElement(new ListElement<>(this.gui, 2, 16, 96, 82, textures, (list) -> {
-                BlockCuboidWrapper cuboidWrapper = project.getSelectedCuboid();
-                if (cuboidWrapper != null) {
-                    QubbleVanillaCuboid cuboid = cuboidWrapper.getCuboid();
-                    QubbleVanillaFace face = cuboid.getFace(this.propertyFacing.get());
-                    if (list.getSelectedIndex() != 0) {
-                        face.setTexture(list.getSelectedEntry());
-                    } else {
-                        face.setTexture(null);
-                    }
-                    project.setSaved(false);
-                    wrapper.rebuildModel();
-                }
-                this.gui.removeElement(selectTextureWindow);
-                return true;
-            }));
-            this.gui.addElement(selectTextureWindow);
-        }
     }
 }

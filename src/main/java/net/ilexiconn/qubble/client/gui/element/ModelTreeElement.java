@@ -3,9 +3,7 @@ package net.ilexiconn.qubble.client.gui.element;
 import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.gui.element.ButtonElement;
 import net.ilexiconn.llibrary.client.gui.element.Element;
-import net.ilexiconn.llibrary.client.gui.element.InputElement;
 import net.ilexiconn.llibrary.client.gui.element.ScrollbarElement;
-import net.ilexiconn.llibrary.client.gui.element.WindowElement;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
@@ -20,7 +18,7 @@ import org.lwjgl.input.Keyboard;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ModelTreeElement<CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> extends Element<QubbleGUI> {
+public class ModelTreeElement<CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> extends Element<QubbleGUI> implements ModelViewAdapter {
     private Project<CBE, MDL> project;
     private boolean resizing;
     private int cubeY;
@@ -40,13 +38,7 @@ public class ModelTreeElement<CBE extends CuboidWrapper<CBE>, MDL extends ModelW
     public void init() {
         this.gui.addElement(this.scroller = new ScrollbarElement<>(this, () -> this.getWidth() - 8.0F, () -> 2.0F, () -> (float) this.getHeight(), 12, () -> this.entryCount));
         this.gui.addElement(new ButtonElement<>(this.gui, "+", this.getPosX(), this.getPosY() + this.getHeight(), 16, 16, (button) -> {
-            WindowElement<QubbleGUI> createCubeWindow = new WindowElement<>(this.gui, "Create Cube", 100, 42);
-            InputElement<QubbleGUI> nameElement = new InputElement<>(this.gui, 2, 16, 96, "Cube Name", (i) -> {
-            });
-            nameElement.select();
-            createCubeWindow.addElement(nameElement);
-            createCubeWindow.addElement(new ButtonElement<>(this.gui, "Create", 2, 30, 96, 10, (element) -> this.createCube(createCubeWindow, nameElement)).withColorScheme(ColorSchemes.WINDOW));
-            this.gui.addElement(createCubeWindow);
+            this.createCube();
             return true;
         }).withColorScheme(ColorSchemes.DEFAULT));
         this.gui.addElement(new ButtonElement<>(this.gui, "-", this.getPosX() + 16, this.getPosY() + this.getHeight(), 16, 16, (button) -> {
@@ -57,24 +49,14 @@ public class ModelTreeElement<CBE extends CuboidWrapper<CBE>, MDL extends ModelW
         }).withColorScheme(ColorSchemes.DEFAULT));
     }
 
-    private boolean createCube(WindowElement<QubbleGUI> window, InputElement<QubbleGUI> input) {
-        String name = input.getText().trim();
-        if (this.project != null && this.project.getModel() != null && name.length() > 0) {
+    private boolean createCube() {
+        if (this.project != null && this.project.getModel() != null) {
             MDL model = this.project.getModel();
-            this.gui.removeElement(window);
-            if (!ModelHandler.INSTANCE.hasDuplicateName(model, name)) {
-                CBE cuboid = model.createCuboid(name);
-                this.project.setSaved(false);
-                this.project.setSelectedCube(cuboid);
-            } else {
-                WindowElement<QubbleGUI> renameWindow = new WindowElement<>(this.gui, "Duplicate Name!", 100, 42);
-                InputElement<QubbleGUI> nameElement = new InputElement<>(this.gui, 2, 16, 96, "Cube Name", (i) -> {
-                });
-                nameElement.select();
-                renameWindow.addElement(nameElement);
-                renameWindow.addElement(new ButtonElement<>(this.gui, "Create", 2, 30, 96, 10, (element) -> this.createCube(renameWindow, nameElement)).withColorScheme(ColorSchemes.WINDOW));
-                this.gui.addElement(renameWindow);
-            }
+            String name = ModelHandler.INSTANCE.getCopyName(model, "Cuboid");
+            CBE cuboid = model.createCuboid(name);
+            this.project.setSaved(false);
+            this.project.setSelectedCube(cuboid);
+            this.gui.getSidebar().selectName();
             return true;
         }
         return false;
@@ -283,7 +265,9 @@ public class ModelTreeElement<CBE extends CuboidWrapper<CBE>, MDL extends ModelW
             if (GuiScreen.isKeyComboCtrlV(key)) {
                 CuboidWrapper<?> clipboard = this.gui.getClipboard();
                 if (clipboard != null && clipboard.getModelType() == this.project.getModelType()) {
-                    model.addCuboid(((CBE) clipboard).copy(model));
+                    CBE copy = ((CBE) clipboard).copy(model);
+                    model.addCuboid(copy);
+                    this.project.setSelectedCube(copy);
                 }
                 return true;
             }
@@ -325,5 +309,25 @@ public class ModelTreeElement<CBE extends CuboidWrapper<CBE>, MDL extends ModelW
 
     public boolean isParenting() {
         return this.parenting != null;
+    }
+
+    @Override
+    public float getOffsetX() {
+        return this.gui.getModelTree().getWidth() - 100;
+    }
+
+    @Override
+    public float getOffsetY() {
+        return 0;
+    }
+
+    @Override
+    public float getOffsetZ() {
+        return 0;
+    }
+
+    @Override
+    public boolean shouldHighlightHovered() {
+        return false;
     }
 }

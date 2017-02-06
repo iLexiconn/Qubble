@@ -5,6 +5,7 @@ import net.ilexiconn.llibrary.client.model.obj.OBJModel;
 import net.ilexiconn.llibrary.client.model.obj.Shape;
 import net.ilexiconn.llibrary.client.model.obj.TextureCoords;
 import net.ilexiconn.llibrary.client.model.obj.Vertex;
+import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 import org.lwjgl.util.vector.Vector3f;
@@ -91,5 +92,10 @@ public class OBJExporter implements IModelExporter<OBJModel, DefaultCuboidWrappe
     @Override
     public String getFileName(String[] arguments, String fileName) {
         return fileName;
+    }
+
+    @Override
+    public boolean supports(ModelType modelType) {
+        return modelType == ModelType.DEFAULT;
     }
 }

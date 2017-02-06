@@ -33,6 +33,10 @@ public class CheckboxProperty implements IBooleanProperty {
         }
     }
 
+    public void set(boolean state) {
+        this.state = state;
+    }
+
     @Override
     public boolean isValidBoolean(boolean state) {
         return true;

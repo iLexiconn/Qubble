@@ -34,7 +34,7 @@ public class JsonImporter implements IModelImporter<BlockModelContainer, BlockCu
         int partIndex = 0;
         QubbleVanillaModel qubbleModel = QubbleVanillaModel.create(fileName, "Unknown");
         for (BlockModelContainer.Element element : model.elements) {
-            String name = element.name == null ? "Part " + partIndex++ : element.name;
+            String name = element.name == null ? "Part " + ++partIndex : element.name;
             QubbleVanillaCuboid cuboid = QubbleVanillaCuboid.create(name, null, element.from[0], element.from[1], element.from[2], element.to[0], element.to[1], element.to[2]);
             if (element.rotation != null) {
                 BlockModelContainer.ElementRotation elementRotation = element.rotation;
@@ -44,7 +44,7 @@ public class JsonImporter implements IModelImporter<BlockModelContainer, BlockCu
                     origin = new float[] { 8, 8, 8 };
                 }
                 cuboid.setRotation(QubbleVanillaRotation.create(axis, origin[0], origin[1], origin[2], elementRotation.angle));
-                cuboid.setShade(element.shade);
+                cuboid.setShade(element.getShade());
             }
             for (EnumFacing facing : EnumFacing.VALUES) {
                 QubbleVanillaFace face = cuboid.getFace(facing);
@@ -79,10 +79,15 @@ public class JsonImporter implements IModelImporter<BlockModelContainer, BlockCu
         }
         Map<String, ModelTexture> textures = new HashMap<>();
         for (Map.Entry<String, String> textureEntry : model.textures.entrySet()) {
+            String identifier = textureEntry.getKey();
+            String[] path = textureEntry.getValue().split("/");
+            ResourceLocation location = new ResourceLocation(path[path.length - 1]);
             ResourceLocation value = new ResourceLocation(textureEntry.getValue());
-            ResourceLocation resource = new ResourceLocation(value.getResourceDomain(), "textures/" + value.getResourcePath() + ".png");
-            textures.put(textureEntry.getKey(), new ModelTexture(resource));
-            qubbleModel.addTexture(textureEntry.getKey());
+            ResourceLocation resource = new ResourceLocation(location.getResourceDomain(), "textures/" + value.getResourcePath() + ".png");
+            ModelTexture modelTexture = new ModelTexture(resource);
+            modelTexture.setName(location.toString());
+            textures.put(identifier, modelTexture);
+            qubbleModel.addTexture(identifier, location.toString());
         }
         BlockModelWrapper wrapper = new BlockModelWrapper(qubbleModel);
         wrapper.importTextures(textures);

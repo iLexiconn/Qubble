@@ -1,5 +1,6 @@
 package net.ilexiconn.qubble.server.model.exporter;
 
+import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 
@@ -143,5 +144,10 @@ public class KotlinExporter implements IModelExporter<List<String>, DefaultCuboi
     @Override
     public String getFileName(String[] arguments, String fileName) {
         return arguments[1];
+    }
+
+    @Override
+    public boolean supports(ModelType modelType) {
+        return modelType == ModelType.DEFAULT;
     }
 }

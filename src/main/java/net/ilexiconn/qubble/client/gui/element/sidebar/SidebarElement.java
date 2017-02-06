@@ -87,4 +87,10 @@ public class SidebarElement extends Element<QubbleGUI> {
         this.sidebarHandler.create(this.gui, this);
         this.initialized = true;
     }
+
+    public void selectName() {
+        if (this.nameInput != null && this.nameInput.isEnabled()) {
+            this.nameInput.select();
+        }
+    }
 }

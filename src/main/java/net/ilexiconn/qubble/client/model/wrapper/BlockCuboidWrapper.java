@@ -1,10 +1,12 @@
 package net.ilexiconn.qubble.client.model.wrapper;
 
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaCuboid;
+import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaFace;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaRotation;
 import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.server.model.ModelHandler;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.MathHelper;
 
 import java.util.Collections;
 import java.util.List;
@@ -225,6 +227,22 @@ public class BlockCuboidWrapper implements CuboidWrapper<BlockCuboidWrapper> {
 
     @Override
     public void setDimensions(float x, float y, float z) {
+        float deltaX = x - this.getDimensionX();
+        float deltaY = y - this.getDimensionY();
+        float deltaZ = z - this.getDimensionZ();
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            QubbleVanillaFace face = this.cuboid.getFace(facing);
+            EnumFacing.Axis axis = facing.getAxis();
+            float deltaU = deltaX;
+            float deltaV = deltaY;
+            if (axis == EnumFacing.Axis.Y) {
+                deltaV = deltaZ;
+            } else if (axis == EnumFacing.Axis.X) {
+                deltaU = deltaZ;
+            }
+            this.setMaxU(facing, face.getMaxU() + deltaU);
+            this.setMaxV(facing, face.getMaxV() + deltaV);
+        }
         this.cuboid.setTo(this.cuboid.getFromX() + x, this.cuboid.getFromY() + y, this.cuboid.getFromZ() + z);
     }
 
@@ -234,22 +252,22 @@ public class BlockCuboidWrapper implements CuboidWrapper<BlockCuboidWrapper> {
 
     @Override
     public void setMinU(EnumFacing facing, float minU) {
-        this.cuboid.getFace(facing).setMinU(minU);
+        this.cuboid.getFace(facing).setMinU(MathHelper.clamp(minU, 0.0F, 16.0F));
     }
 
     @Override
     public void setMinV(EnumFacing facing, float minV) {
-        this.cuboid.getFace(facing).setMinV(minV);
+        this.cuboid.getFace(facing).setMinV(MathHelper.clamp(minV, 0.0F, 16.0F));
     }
 
     @Override
     public void setMaxU(EnumFacing facing, float maxU) {
-        this.cuboid.getFace(facing).setMaxU(maxU);
+        this.cuboid.getFace(facing).setMaxU(MathHelper.clamp(maxU, 0.0F, 16.0F));
     }
 
     @Override
     public void setMaxV(EnumFacing facing, float maxV) {
-        this.cuboid.getFace(facing).setMaxV(maxV);
+        this.cuboid.getFace(facing).setMaxV(MathHelper.clamp(maxV, 0.0F, 16.0F));
     }
 
     @Override

@@ -172,4 +172,25 @@ public class QubbleModelRenderer extends AdvancedModelRenderer {
             }
         }
     }
+
+    public float getParentedScaleX() {
+        if (this.getParent() instanceof QubbleModelRenderer) {
+            return ((QubbleModelRenderer) this.getParent()).getParentedScaleX() * this.scaleX;
+        }
+        return this.scaleX;
+    }
+
+    public float getParentedScaleY() {
+        if (this.getParent() instanceof QubbleModelRenderer) {
+            return ((QubbleModelRenderer) this.getParent()).getParentedScaleY() * this.scaleY;
+        }
+        return this.scaleY;
+    }
+
+    public float getParentedScaleZ() {
+        if (this.getParent() instanceof QubbleModelRenderer) {
+            return ((QubbleModelRenderer) this.getParent()).getParentedScaleZ() * this.scaleZ;
+        }
+        return this.scaleZ;
+    }
 }

@@ -80,9 +80,6 @@ public class QubbleVanillaModelRenderer {
         float toZ = cuboid.getToZ() * scale;
         for (EnumFacing facing : EnumFacing.VALUES) {
             QubbleVanillaFace face = cuboid.getFace(facing);
-            if (facing.getAxis() == EnumFacing.Axis.Z) {
-                facing = facing.getOpposite();
-            }
             if (face != null && face.isEnabled()) {
                 float minU = face.getMinU() / 16.0F;
                 float minV = face.getMinV() / 16.0F;
@@ -106,12 +103,12 @@ public class QubbleVanillaModelRenderer {
                     buffer.pos(toX, toY, toZ).tex(maxU, maxV).normal(0.0F, 1.0F, 0.0F).endVertex();
                     buffer.pos(toX, toY, fromZ).tex(maxU, minV).normal(0.0F, 1.0F, 0.0F).endVertex();
                     buffer.pos(fromX, toY, fromZ).tex(minU, minV).normal(0.0F, 1.0F, 0.0F).endVertex();
-                } else if (facing == EnumFacing.NORTH) {
+                } else if (facing == EnumFacing.SOUTH) {
                     buffer.pos(fromX, fromY, toZ).tex(minU, maxV).normal(0.0F, 0.0F, 1.0F).endVertex();
                     buffer.pos(toX, fromY, toZ).tex(maxU, maxV).normal(0.0F, 0.0F, 1.0F).endVertex();
                     buffer.pos(toX, toY, toZ).tex(maxU, minV).normal(0.0F, 0.0F, 1.0F).endVertex();
                     buffer.pos(fromX, toY, toZ).tex(minU, minV).normal(0.0F, 0.0F, 1.0F).endVertex();
-                } else if (facing == EnumFacing.SOUTH) {
+                } else if (facing == EnumFacing.NORTH) {
                     buffer.pos(fromX, toY, fromZ).tex(minU, minV).normal(0.0F, 0.0F, -1.0F).endVertex();
                     buffer.pos(toX, toY, fromZ).tex(maxU, minV).normal(0.0F, 0.0F, -1.0F).endVertex();
                     buffer.pos(toX, fromY, fromZ).tex(maxU, maxV).normal(0.0F, 0.0F, -1.0F).endVertex();

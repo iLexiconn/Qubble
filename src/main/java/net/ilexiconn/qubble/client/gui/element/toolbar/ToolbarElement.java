@@ -243,7 +243,8 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
     public void openExportWindow(String fileName, Consumer<Boolean> callback) {
         WindowElement<QubbleGUI> exportWindow = new WindowElement<>(this.gui, "Export", 100, 100);
-        exportWindow.addElement(new ListElement<>(this.gui, 2, 16, 96, 82, Lists.newArrayList(ModelExporters.EXPORTERS).stream().map(IModelExporter::getName).collect(Collectors.toList()), (list) -> {
+        ModelType modelType = this.gui.getSelectedProject().getModelType();
+        exportWindow.addElement(new ListElement<>(this.gui, 2, 16, 96, 82, Lists.newArrayList(ModelExporters.EXPORTERS).stream().filter(exporter -> exporter.supports(modelType)).map(IModelExporter::getName).collect(Collectors.toList()), (list) -> {
             IModelExporter exporter = ModelHandler.INSTANCE.getExporter(list.getSelectedEntry());
             if (exporter != null) {
                 this.openModelExportWindow(exporter, fileName);

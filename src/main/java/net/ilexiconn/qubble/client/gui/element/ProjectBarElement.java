@@ -106,9 +106,4 @@ public class ProjectBarElement extends Element<QubbleGUI> {
         }
         return false;
     }
-
-    @Override
-    public boolean isVisible() {
-        return this.gui.getOpenProjects().size() > 0;
-    }
 }

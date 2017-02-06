@@ -43,10 +43,10 @@ public class DefaultTextureSidebarHandler extends SidebarHandler<DefaultCuboidWr
         ModelTexture overlayTexture = project != null ? project.getModel().getOverlayTexture() : null;
         this.texture.clearText();
         this.texture.writeText(texture != null ? texture.getName() : "");
-        this.texture.setCursorPositionZero();
+        this.texture.setCursorPositionEnd();
         this.overlayTexture.clearText();
         this.overlayTexture.writeText(overlayTexture != null ? overlayTexture.getName() : "");
-        this.overlayTexture.setCursorPositionZero();
+        this.overlayTexture.setCursorPositionEnd();
     }
 
     @Override

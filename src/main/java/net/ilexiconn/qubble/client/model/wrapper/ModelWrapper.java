@@ -34,7 +34,7 @@ public abstract class ModelWrapper<CBE extends CuboidWrapper<CBE>> {
 
     public abstract void render(boolean clicking);
 
-    public abstract void renderSelection(CBE selectedCuboid, Project project);
+    public abstract void renderSelection(CBE selectedCuboid, Project project, boolean hovering);
 
     public abstract CBE getSelected(int selectionID);
 

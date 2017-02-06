@@ -1,4 +1,4 @@
-package net.ilexiconn.qubble.client.gui.element.sidebar;
+package net.ilexiconn.qubble.client.gui.element.sidebar.block;
 
 import net.ilexiconn.llibrary.client.gui.element.CheckboxElement;
 import net.ilexiconn.llibrary.client.gui.element.DropdownButtonElement;
@@ -8,6 +8,8 @@ import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaRotation;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
+import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarElement;
+import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarHandler;
 import net.ilexiconn.qubble.client.gui.property.AxisProperty;
 import net.ilexiconn.qubble.client.gui.property.CheckboxProperty;
 import net.ilexiconn.qubble.client.gui.property.RotationProperty;
@@ -83,7 +85,7 @@ public class BlockModelSidebarHandler extends SidebarHandler<BlockCuboidWrapper,
         this.propertyOriginX.set(cuboid.getOffsetX());
         this.propertyOriginY.set(cuboid.getOffsetY());
         this.propertyOriginZ.set(cuboid.getOffsetZ());
-        this.propertyShade.setBoolean(cuboid.hasShade());
+        this.propertyShade.set(cuboid.hasShade());
         QubbleVanillaRotation rotation = cuboid.getCuboid().getRotation();
         if (rotation == null) {
             this.propertyRotationAxis.set(EnumFacing.Axis.X);

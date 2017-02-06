@@ -2,18 +2,23 @@ package net.ilexiconn.qubble.server.model.exporter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaCuboid;
+import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaFace;
+import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaRotation;
 import net.ilexiconn.qubble.client.model.BlockModelContainer;
-import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
-import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
-import org.lwjgl.util.vector.Vector3f;
+import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Map;
 
-//TODO Export from Vanilla models
-public class JsonExporter implements IModelExporter<BlockModelContainer, DefaultCuboidWrapper, DefaultModelWrapper> {
+public class JsonExporter implements IModelExporter<BlockModelContainer, BlockCuboidWrapper, BlockModelWrapper> {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     @Override
@@ -27,55 +32,52 @@ public class JsonExporter implements IModelExporter<BlockModelContainer, Default
     }
 
     @Override
-    public BlockModelContainer export(DefaultModelWrapper model, String... arguments) {
-        model.unparent();
+    public BlockModelContainer export(BlockModelWrapper model, String... arguments) {
         BlockModelContainer blockModel = new BlockModelContainer();
-        for (DefaultCuboidWrapper cube : model.getCuboids()) {
-            BlockModelContainer.Element element = new BlockModelContainer.Element();
-            int dimensionX = (int) cube.getDimensionX();
-            int dimensionY = (int) cube.getDimensionY();
-            int dimensionZ = (int) cube.getDimensionZ();
-            element.name = cube.getName();
-            float positionX = cube.getPositionX() + cube.getOffsetX() + 8;
-            float positionY = 24 - (cube.getPositionY() + cube.getOffsetY() + cube.getDimensionY());
-            float positionZ = cube.getPositionZ() + cube.getOffsetZ() + 8;
-            Vector3f from = new Vector3f(positionX, positionY, positionZ);
-            Vector3f to = new Vector3f(positionX + dimensionX, positionY + dimensionY, positionZ + dimensionZ);
-            element.from = new float[] { this.clampPosition(from.getX()), this.clampPosition(from.getY()), this.clampPosition(from.getZ()) };
-            element.to = new float[] { this.clampPosition(to.getX()), this.clampPosition(to.getY()), this.clampPosition(to.getZ()) };
-            BlockModelContainer.ElementRotation rotation = new BlockModelContainer.ElementRotation();
-            rotation.origin = new float[] { this.clampPosition(positionX - cube.getOffsetX()), this.clampPosition(positionY - cube.getOffsetY()), this.clampPosition(positionZ - cube.getOffsetZ()) };
-            if (cube.getRotationZ() != 0.0F) {
-                rotation.axis = "z";
-                rotation.angle = -(Math.round(cube.getRotationZ() / 22.5)) * 22.5F;
-            } else if (cube.getRotationY() != 0.0F) {
-                rotation.axis = "y";
-                rotation.angle = -(Math.round(cube.getRotationY() / 22.5)) * 22.5F;
-            } else if (cube.getRotationX() != 0.0F) {
-                rotation.axis = "x";
-                rotation.angle = -(Math.round(cube.getRotationX() / 22.5)) * 22.5F;
-            } else {
-                rotation = null;
-            }
-            element.rotation = rotation;
 
-            element.faces.put("down", this.createFace());
-            element.faces.put("up", this.createFace());
-            element.faces.put("north", this.createFace());
-            element.faces.put("south", this.createFace());
-            element.faces.put("west", this.createFace());
-            element.faces.put("east", this.createFace());
+        for (BlockCuboidWrapper wrapper : model.getCuboids()) {
+            QubbleVanillaCuboid cuboid = wrapper.getCuboid();
+            BlockModelContainer.Element element = new BlockModelContainer.Element();
+            element.name = wrapper.getName();
+            element.from = new float[] { cuboid.getFromX(), cuboid.getFromY(), cuboid.getFromZ() };
+            element.to = new float[] { cuboid.getToX(), cuboid.getToY(), cuboid.getToZ() };
+
+            QubbleVanillaRotation cuboidRotation = cuboid.getRotation();
+            if (cuboidRotation != null) {
+                BlockModelContainer.ElementRotation rotation = new BlockModelContainer.ElementRotation();
+                rotation.origin = new float[] { cuboidRotation.getOriginX(), cuboidRotation.getOriginY(), cuboidRotation.getOriginZ() };
+                rotation.axis = cuboidRotation.getAxis().getName();
+                rotation.angle = cuboidRotation.getAngle();
+                element.rotation = rotation;
+            }
+
+            for (EnumFacing facing : EnumFacing.VALUES) {
+                QubbleVanillaFace face = cuboid.getFace(facing);
+                if (face != null) {
+                    element.faces.put(facing.getName(), this.createFace(face));
+                }
+            }
+
+            element.setShade(cuboid.hasShade());
 
             blockModel.elements.add(element);
         }
+
+        for (Map.Entry<String, String> texture : model.getModel().getTextures().entrySet()) {
+            ResourceLocation resource = new ResourceLocation(texture.getValue());
+            blockModel.textures.put(texture.getKey(), new ResourceLocation(arguments[0], "blocks/" + resource.getResourcePath()).toString());
+        }
+
+        blockModel.ambientocclusion = model.hasAmbientOcclusion();
+
         return blockModel;
     }
 
-    private BlockModelContainer.ElementFace createFace() {
-        BlockModelContainer.ElementFace face = new BlockModelContainer.ElementFace();
-        face.texture = "#all";
-        face.uv = new float[] {0, 0, 1, 1};
-        return face;
+    private BlockModelContainer.ElementFace createFace(QubbleVanillaFace face) {
+        BlockModelContainer.ElementFace elementFace = new BlockModelContainer.ElementFace();
+        elementFace.texture = "#" + face.getTexture();
+        elementFace.uv = new float[] { face.getMinU(), face.getMinV(), face.getMaxU(), face.getMaxV() };
+        return elementFace;
     }
 
     @Override
@@ -87,12 +89,12 @@ public class JsonExporter implements IModelExporter<BlockModelContainer, Default
 
     @Override
     public String[] getArgumentNames() {
-        return new String[] {};
+        return new String[] { "Resource Domain" };
     }
 
     @Override
-    public String[] getDefaultArguments(DefaultModelWrapper currentModel) {
-        return new String[] {};
+    public String[] getDefaultArguments(BlockModelWrapper currentModel) {
+        return new String[] { "minecraft" };
     }
 
     @Override
@@ -100,7 +102,8 @@ public class JsonExporter implements IModelExporter<BlockModelContainer, Default
         return fileName;
     }
 
-    private float clampPosition(float position) {
-        return Math.max(-16.0F, Math.min(32.0F, position));
+    @Override
+    public boolean supports(ModelType modelType) {
+        return modelType == ModelType.BLOCK;
     }
 }

@@ -2,6 +2,7 @@ package net.ilexiconn.qubble.client.model.wrapper;
 
 import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaCuboid;
+import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaFace;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaModel;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
 import net.ilexiconn.qubble.client.gui.Project;
@@ -10,6 +11,7 @@ import net.ilexiconn.qubble.client.model.QubbleVanillaModelBase;
 import net.ilexiconn.qubble.client.model.QubbleVanillaModelRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +79,7 @@ public class BlockModelWrapper extends ModelWrapper<BlockCuboidWrapper> {
     }
 
     @Override
-    public void renderSelection(BlockCuboidWrapper selectedCuboid, Project project) {
+    public void renderSelection(BlockCuboidWrapper selectedCuboid, Project project, boolean hovering) {
         QubbleVanillaModelRenderer renderCuboid = this.renderModel.getCuboid(selectedCuboid);
         if (renderCuboid != null) {
             float scale = 0.0625F;
@@ -91,27 +93,29 @@ public class BlockModelWrapper extends ModelWrapper<BlockCuboidWrapper> {
             GlStateManager.pushMatrix();
             renderCuboid.renderSingle(scale, false);
             GlStateManager.popMatrix();
-            GlStateManager.pushMatrix();
-            GlStateManager.disableTexture2D();
-            int accent = LLibrary.CONFIG.getAccentColor();
-            GlStateManager.disableDepth();
-            GlStateManager.disableLighting();
-            float r = (float) (accent >> 16 & 0xFF) / 255.0F;
-            float g = (float) (accent >> 8 & 0xFF) / 255.0F;
-            float b = (float) (accent & 0xFF) / 255.0F;
-            GlStateManager.color(r, g, b, 1.0F);
-            float originX = (selectedCuboid.getOffsetX() - 0.5F) * scale;
-            float originY = (selectedCuboid.getOffsetY() - 0.5F) * scale;
-            float originZ = (selectedCuboid.getOffsetZ() - 0.5F) * scale;
-            GlStateManager.translate(originX, originY, originZ);
-            GlStateManager.scale(0.15F, 0.15F, 0.15F);
-            GlStateManager.translate(3.0F * scale, -18.0F * scale, 3.0F * scale);
-            ROTATION_POINT.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, scale);
-            GlStateManager.scale(0.8F, 0.8F, 0.8F);
-            GlStateManager.translate(0.0F, 0.33F, 0.0F);
-            GlStateManager.color(r * 0.6F, g * 0.6F, b * 0.6F, 1.0F);
-            ROTATION_POINT.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, scale);
-            GlStateManager.popMatrix();
+            if (!hovering) {
+                GlStateManager.pushMatrix();
+                GlStateManager.disableTexture2D();
+                int accent = LLibrary.CONFIG.getAccentColor();
+                GlStateManager.disableDepth();
+                GlStateManager.disableLighting();
+                float r = (float) (accent >> 16 & 0xFF) / 255.0F;
+                float g = (float) (accent >> 8 & 0xFF) / 255.0F;
+                float b = (float) (accent & 0xFF) / 255.0F;
+                GlStateManager.color(r, g, b, 1.0F);
+                float originX = (selectedCuboid.getOffsetX() - 0.5F) * scale;
+                float originY = (selectedCuboid.getOffsetY() - 0.5F) * scale;
+                float originZ = (selectedCuboid.getOffsetZ() - 0.5F) * scale;
+                GlStateManager.translate(originX, originY, originZ);
+                GlStateManager.scale(0.15F, 0.15F, 0.15F);
+                GlStateManager.translate(3.0F * scale, -18.0F * scale, 3.0F * scale);
+                ROTATION_POINT.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, scale);
+                GlStateManager.scale(0.8F, 0.8F, 0.8F);
+                GlStateManager.translate(0.0F, 0.33F, 0.0F);
+                GlStateManager.color(r * 0.6F, g * 0.6F, b * 0.6F, 1.0F);
+                ROTATION_POINT.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, scale);
+                GlStateManager.popMatrix();
+            }
             GlStateManager.enableLighting();
             GlStateManager.enableDepth();
             GlStateManager.cullFace(GlStateManager.CullFace.FRONT);
@@ -167,11 +171,12 @@ public class BlockModelWrapper extends ModelWrapper<BlockCuboidWrapper> {
 
     @Override
     public void importTextures(Map<String, ModelTexture> textures) {
-        for (String texture : this.model.getTextures()) {
-            ModelTexture modelTexture = textures.get(texture);
+        for (Map.Entry<String, String> entry : this.model.getTextures().entrySet()) {
+            String identifier = entry.getKey();
+            ModelTexture modelTexture = textures.get(identifier);
             if (modelTexture != null) {
-                modelTexture.setName(texture);
-                super.setTexture(modelTexture.getName(), modelTexture);
+                modelTexture.setName(entry.getValue());
+                super.setTexture(identifier, modelTexture);
             }
         }
     }
@@ -179,7 +184,38 @@ public class BlockModelWrapper extends ModelWrapper<BlockCuboidWrapper> {
     @Override
     public void setTexture(String name, ModelTexture texture) {
         super.setTexture(name, texture);
-        this.model.addTexture(texture.getName());
+        if (texture != null) {
+            this.model.addTexture(name, texture.getName());
+        } else {
+            this.model.removeTexture(name);
+            for (QubbleVanillaCuboid cuboid : this.model.getCuboids()) {
+                for (EnumFacing facing : EnumFacing.VALUES) {
+                    QubbleVanillaFace face = cuboid.getFace(facing);
+                    String faceTexture = face.getTexture();
+                    if (faceTexture != null && faceTexture.equals(name)) {
+                        face.setTexture(null);
+                    }
+                }
+            }
+        }
+    }
+
+    public void renameTexture(String name, String newName) {
+        String value = this.model.getTextures().remove(name);
+        if (value != null) {
+            this.model.addTexture(newName, value);
+            super.setTexture(newName, this.getTexture(name));
+            super.setTexture(name, null);
+            for (QubbleVanillaCuboid cuboid : this.model.getCuboids()) {
+                for (EnumFacing facing : EnumFacing.VALUES) {
+                    QubbleVanillaFace face = cuboid.getFace(facing);
+                    String faceTexture = face.getTexture();
+                    if (faceTexture != null && faceTexture.equals(name)) {
+                        face.setTexture(newName);
+                    }
+                }
+            }
+        }
     }
 
     public QubbleVanillaModel getModel() {

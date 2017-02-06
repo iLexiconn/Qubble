@@ -28,8 +28,8 @@ minecraft {
 repositories {
 	mavenCentral()
 	maven {
-		name = "ilexiconn"
-		url = "http://maven.mcmoddev.net"
+		name = "mcmoddev"
+		url = "http://maven.mcmoddev.com"
 	}
 }
 

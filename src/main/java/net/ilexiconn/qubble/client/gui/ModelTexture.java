@@ -101,7 +101,9 @@ public class ModelTexture {
         } else if (this.image != null) {
             return new ModelTexture(this.image, this.name);
         } else {
-            return new ModelTexture(this.location);
+            ModelTexture modelTexture = new ModelTexture(this.location);
+            modelTexture.setName(this.name);
+            return modelTexture;
         }
     }
 }
