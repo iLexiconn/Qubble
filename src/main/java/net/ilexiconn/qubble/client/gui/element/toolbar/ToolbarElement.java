@@ -24,6 +24,7 @@ import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
 import net.ilexiconn.qubble.client.gui.property.CheckboxProperty;
 import net.ilexiconn.qubble.client.gui.property.ColorProperty;
 import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 import net.ilexiconn.qubble.server.model.ModelHandler;
 import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
@@ -70,7 +71,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
         }).withColorScheme(ColorSchemes.DEFAULT));
         this.gui.addElement(new ButtonElement<>(this.gui, "Save", 60, 0, 30, 20, (v) -> {
             if (this.gui.getSelectedProject() != null) {
-                this.openSaveWindow((saved) -> {
+                this.openSaveWindow(saved -> {
                 }, true);
                 return true;
             }
@@ -103,7 +104,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
         newWindow.addElement(new ButtonElement<>(this.gui, "Done", 2, 56, 96, 12, (v) -> {
             String name = nameInput.getText();
             if (!name.isEmpty()) {
-                ModelType type = ModelType.values()[typeState.getState()];
+                ModelType<?, ?> type = ModelType.TYPES.get(typeState.getState());
                 String author = "Unknown";
                 Session session = Minecraft.getMinecraft().getSession();
                 if (session != null) {
@@ -178,8 +179,8 @@ public class ToolbarElement extends Element<QubbleGUI> {
             this.gui.selectModel(model.copyModel());
             ResourceLocation texture = ClientProxy.GAME_TEXTURES.get(list.getSelectedEntry());
             if (texture != null) {
-                Project<?, ?> selectedProject = this.gui.getSelectedProject();
-                selectedProject.getModel().setBaseTexture(new ModelTexture(texture));
+                Project selectedProject = this.gui.getSelectedProject();
+                selectedProject.getModel(model.getType()).setBaseTexture(new ModelTexture(texture));
                 selectedProject.setSaved(true);
             }
             this.gui.removeElement(openWindow);
@@ -216,7 +217,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
         saveWindow.addElement(new LabelElement<>(this.gui, "File name", 4, 19));
         InputElement<QubbleGUI> fileName;
         Project project = this.gui.getSelectedProject();
-        ModelWrapper selectedModel = project.getModel();
+        ModelWrapper<?> selectedModel = project.getModel();
         String name = selectedModel.getFileName() == null ? selectedModel.getName() : selectedModel.getFileName();
         saveWindow.addElement(fileName = new InputElement<>(this.gui, 2, 30, 96, name, (i) -> {
         }));
@@ -243,11 +244,11 @@ public class ToolbarElement extends Element<QubbleGUI> {
 
     public void openExportWindow(String fileName, Consumer<Boolean> callback) {
         WindowElement<QubbleGUI> exportWindow = new WindowElement<>(this.gui, "Export", 100, 100);
-        ModelType modelType = this.gui.getSelectedProject().getModelType();
+        ModelType<?, ?> modelType = this.gui.getSelectedProject().getModelType();
         exportWindow.addElement(new ListElement<>(this.gui, 2, 16, 96, 82, Lists.newArrayList(ModelExporters.EXPORTERS).stream().filter(exporter -> exporter.supports(modelType)).map(IModelExporter::getName).collect(Collectors.toList()), (list) -> {
             IModelExporter exporter = ModelHandler.INSTANCE.getExporter(list.getSelectedEntry());
             if (exporter != null) {
-                this.openModelExportWindow(exporter, fileName);
+                this.openModelExportWindow(exporter, modelType, fileName);
                 this.gui.removeElement(exportWindow);
                 callback.accept(true);
                 return true;
@@ -259,9 +260,9 @@ public class ToolbarElement extends Element<QubbleGUI> {
         this.gui.addElement(exportWindow);
     }
 
-    private void openModelExportWindow(IModelExporter modelExporter, String fileName) {
+    private <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>, EXP> void openModelExportWindow(IModelExporter<EXP, CBE, MDL> modelExporter, ModelType<CBE, MDL> type, String fileName) {
         Project project = this.gui.getSelectedProject();
-        ModelWrapper copy = project.getModel().copyModel();
+        MDL copy = (MDL) project.getModel(type).copyModel();
         int argumentY = 18;
         String[] argumentNames = modelExporter.getArgumentNames();
         String[] defaultArguments = modelExporter.getDefaultArguments(copy);

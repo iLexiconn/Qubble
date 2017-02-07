@@ -224,6 +224,10 @@ public class DefaultCuboidWrapper implements CuboidWrapper<DefaultCuboidWrapper>
         return ModelType.DEFAULT;
     }
 
+    @Override
+    public void setAutoUV() {
+    }
+
     public void setTextureMirrored(boolean textureMirrored) {
         this.cuboid.setTextureMirrored(textureMirrored);
     }

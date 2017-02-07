@@ -32,7 +32,7 @@ public class QubbleGUI extends ElementGUI {
     private GuiScreen parent;
     private ScaledResolution resolution;
     private ToolbarElement toolbar;
-    private ModelTreeElement<?, ?> modelTree;
+    private ModelTreeElement modelTree;
     private ModelViewElement modelView;
     private SidebarElement sidebar;
     private ProjectBarElement projectBar;
@@ -57,7 +57,12 @@ public class QubbleGUI extends ElementGUI {
         this.initialized = false;
         this.clearElements();
         this.setEditMode(EditMode.MODEL);
-        this.updateProjectElements(this.getSelectedProject());
+
+        this.addElement(this.modelView = new ModelViewElement(this));
+        this.addElement(this.modelTree = new ModelTreeElement(this));
+        this.addElement(this.sidebar = new SidebarElement(this));
+        this.addElement(this.toolbar = new ToolbarElement(this));
+        this.addElement(this.projectBar = new ProjectBarElement(this));
         this.initialized = true;
     }
 
@@ -101,14 +106,16 @@ public class QubbleGUI extends ElementGUI {
     }
 
     public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> void selectModel(MDL model) {
-        this.openProjects.add(new Project<>(this, model));
+        this.openProjects.add(new Project(this, model));
         this.selectModel(this.openProjects.size() - 1);
     }
 
     public void selectModel(int index) {
         this.selectedProject = Math.max(0, Math.min(this.openProjects.size() - 1, index));
-        Project<?, ?> selectedProject = this.getSelectedProject();
-        this.updateProjectElements(selectedProject);
+        Project selectedProject = this.getSelectedProject();
+        if (this.sidebar != null) {
+            this.sidebar.initFields();
+        }
         if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
             ModelWrapper model = selectedProject.getModel();
             model.rebuildModel();
@@ -145,35 +152,11 @@ public class QubbleGUI extends ElementGUI {
         }
     }
 
-    public Project<?, ?> getSelectedProject() {
-        return this.openProjects.size() > this.selectedProject ? this.openProjects.get(this.selectedProject) : null;
-    }
-
-    private void updateProjectElements(Project<?, ?> selectedProject) {
-        this.removeElement(this.modelView);
-        this.removeElement(this.modelTree);
-        this.removeElement(this.sidebar);
-        this.removeElement(this.toolbar);
-        this.removeElement(this.projectBar);
-
-        if (!this.initialized) {
-            this.modelView = new ModelViewElement(this);
-            this.sidebar = new SidebarElement(this);
-            this.toolbar = new ToolbarElement(this);
-            this.projectBar = new ProjectBarElement(this);
+    public Project getSelectedProject() {
+        if (this.openProjects.size() > this.selectedProject) {
+            return this.openProjects.get(this.selectedProject);
         }
-
-        this.addElement(this.modelView);
-        this.addElement(this.modelTree = new ModelTreeElement<>(this, selectedProject));
-        this.addElement(this.sidebar);
-        this.addElement(this.toolbar);
-        this.addElement(this.projectBar);
-
-        this.sendElementToBack(this.projectBar);
-        this.sendElementToBack(this.toolbar);
-        this.sendElementToBack(this.sidebar);
-        this.sendElementToBack(this.modelTree);
-        this.sendElementToBack(this.modelView);
+        return null;
     }
 
     public int getSelectedProjectIndex() {
@@ -208,7 +191,7 @@ public class QubbleGUI extends ElementGUI {
         this.editMode = editMode;
         if (this.sidebar != null) {
             this.sidebar.initFields();
-            Project<?, ?> selectedProject = this.getSelectedProject();
+            Project selectedProject = this.getSelectedProject();
             if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
                 this.sidebar.enable(selectedProject.getModel(), selectedProject.getSelectedCuboid());
             } else {
@@ -235,13 +218,6 @@ public class QubbleGUI extends ElementGUI {
                     }
                 });
                 return;
-            }
-            if (keyCode == Keyboard.KEY_F1) {
-                this.mc.gameSettings.hideGUI = !this.mc.gameSettings.hideGUI;
-                this.updateProjectElements(this.getSelectedProject());
-                if (this.mc.gameSettings.hideGUI) {
-                    this.sendElementToFront(this.getModelView());
-                }
             }
             super.keyTyped(typedChar, keyCode);
         } catch (Exception e) {

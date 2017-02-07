@@ -4,14 +4,12 @@ import net.ilexiconn.llibrary.client.gui.element.Element;
 import net.ilexiconn.llibrary.client.gui.element.WindowElement;
 import net.ilexiconn.qubble.client.gui.element.BlockTextureBarElement;
 import net.ilexiconn.qubble.client.gui.element.DefaultTextureMapElement;
-import net.ilexiconn.qubble.client.gui.element.sidebar.block.BlockModelSidebarHandler;
-import net.ilexiconn.qubble.client.gui.element.sidebar.block.BlockTextureSidebarHandler;
 import net.ilexiconn.qubble.client.gui.element.sidebar.DefaultModelSidebarHandler;
 import net.ilexiconn.qubble.client.gui.element.sidebar.DefaultTextureSidebarHandler;
 import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarHandler;
+import net.ilexiconn.qubble.client.gui.element.sidebar.block.BlockModelSidebarHandler;
+import net.ilexiconn.qubble.client.gui.element.sidebar.block.BlockTextureSidebarHandler;
 import net.ilexiconn.qubble.client.model.ModelType;
-import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
-import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
 
 import java.util.function.Function;
 
@@ -30,7 +28,7 @@ public enum EditMode {
             return new BlockTextureSidebarHandler();
         }
     }, gui -> {
-        Project<?, ?> selectedProject = gui.getSelectedProject();
+        Project selectedProject = gui.getSelectedProject();
         if (selectedProject != null) {
             ModelType modelType = selectedProject.getModelType();
             if (modelType == ModelType.DEFAULT) {
@@ -38,7 +36,7 @@ public enum EditMode {
                 new DefaultTextureMapElement(gui, 0.0F, 14.0F, 200, 200).withParent(textureWindow);
                 return new Element[] { textureWindow };
             } else if (modelType == ModelType.BLOCK) {
-                BlockTextureBarElement textureBar = new BlockTextureBarElement(gui, (Project<BlockCuboidWrapper, BlockModelWrapper>) selectedProject);
+                BlockTextureBarElement textureBar = new BlockTextureBarElement(gui);
                 return new Element[] { textureBar };
             }
         }

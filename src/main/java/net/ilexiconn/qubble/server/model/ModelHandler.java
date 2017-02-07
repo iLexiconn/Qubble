@@ -65,9 +65,10 @@ public enum ModelHandler {
                     if (entryName.equals("model.nbt")) {
                         NBTTagCompound compound = CompressedStreamTools.read(new DataInputStream(zipFile.getInputStream(entry)));
                         ModelType type;
-                        try {
-                            type = ModelType.values()[compound.getByte("type")];
-                        } catch (Exception e) {
+                        int typeValue = compound.getByte("type");
+                        if (ModelType.TYPES.containsKey(typeValue)) {
+                            type = ModelType.TYPES.get(typeValue);
+                        } else {
                             type = ModelType.DEFAULT;
                         }
                         model = type.deserialize(compound);
@@ -114,9 +115,10 @@ public enum ModelHandler {
         try (FileInputStream in = new FileInputStream(file)) {
             NBTTagCompound compound = CompressedStreamTools.readCompressed(in);
             ModelType type;
-            try {
-                type = ModelType.values()[compound.getByte("type")];
-            } catch (Exception e) {
+            int typeValue = compound.getByte("type");
+            if (ModelType.TYPES.containsKey(typeValue)) {
+                type = ModelType.TYPES.get(typeValue);
+            } else {
                 type = ModelType.DEFAULT;
             }
             return type.deserialize(compound);
@@ -127,7 +129,7 @@ public enum ModelHandler {
 
     public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> void saveModel(MDL model, String fileName) throws IOException {
         NBTTagCompound compound = model.copyModel().serializeNBT();
-        compound.setByte("type", (byte) model.getType().ordinal());
+        compound.setByte("type", (byte) model.getType().id());
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(new File(ClientProxy.QUBBLE_MODEL_DIRECTORY, fileName + ".qbl")));
         ZipEntry modelEntry = new ZipEntry("model.nbt");
         out.putNextEntry(modelEntry);
@@ -198,15 +200,16 @@ public enum ModelHandler {
     }
 
     public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> String getCopyName(MDL model, String name) {
+        while (name.matches("^.+?\\d$")) {
+            name = name.substring(0, name.length() - 1).trim();
+        }
         int index = 2;
-        while (this.hasDuplicateName(model, name)) {
-            String newName = name + " " + index;
-            if (!this.hasDuplicateName(model, newName)) {
-                return newName;
-            }
+        String newName = name;
+        while (this.hasDuplicateName(model, newName)) {
+            newName = name + " " + index;
             index++;
         }
-        return name;
+        return newName;
     }
 
     public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> boolean hasDuplicateName(MDL model, String name) {
@@ -219,7 +222,7 @@ public enum ModelHandler {
     }
 
     protected <CBE extends CuboidWrapper<CBE>> boolean hasDuplicateName(CBE cuboid, String name) {
-        if (cuboid.getName().trim().equals(name)) {
+        if (cuboid.getName().trim().equals(name.trim())) {
             return true;
         }
         for (CBE child : cuboid.getChildren()) {
@@ -228,6 +231,33 @@ public enum ModelHandler {
             }
         }
         return false;
+    }
+
+    public <CBE extends CuboidWrapper<CBE>> boolean removeChildCuboid(CBE parent, CBE cuboid) {
+        boolean isChild = false;
+        for (CBE currentCuboid : parent.getChildren()) {
+            if (currentCuboid.equals(cuboid)) {
+                isChild = true;
+                break;
+            }
+            if (this.removeChildCuboid(currentCuboid, cuboid)) {
+                return true;
+            }
+        }
+        if (isChild) {
+            parent.removeChild(cuboid);
+            return true;
+        }
+        return false;
+    }
+
+    public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> boolean removeCuboid(MDL model, CBE cuboid) {
+        for (CBE currentCuboid : model.getCuboids()) {
+            if (ModelHandler.INSTANCE.removeChildCuboid(currentCuboid, cuboid)) {
+                return true;
+            }
+        }
+        return model.deleteCuboid(cuboid);
     }
 
     public QubbleCuboid copy(DefaultModelWrapper model, DefaultCuboidWrapper cuboid) {

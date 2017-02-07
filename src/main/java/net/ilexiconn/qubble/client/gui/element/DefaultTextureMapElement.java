@@ -6,6 +6,7 @@ import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
+import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 import net.minecraft.client.gui.FontRenderer;
@@ -24,11 +25,11 @@ public class DefaultTextureMapElement extends Element<QubbleGUI> {
     public void render(float mouseX, float mouseY, float partialTicks) {
         GlStateManager.pushMatrix();
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
-        Project<DefaultCuboidWrapper, DefaultModelWrapper> selectedProject = (Project<DefaultCuboidWrapper, DefaultModelWrapper>) this.gui.getSelectedProject();
+        Project selectedProject = this.gui.getSelectedProject();
         if (selectedProject != null) {
-            ModelTexture texture = selectedProject.getModel().getBaseTexture();
+            DefaultModelWrapper model = selectedProject.getModel(ModelType.DEFAULT);
+            ModelTexture texture = model.getBaseTexture();
             GlStateManager.translate(this.getPosX(), this.getPosY(), 0.0F);
-            DefaultModelWrapper model = selectedProject.getModel();
             String dimensions = model.getTextureWidth() + "x" + model.getTextureHeight();
             fontRenderer.drawString(dimensions, this.getWidth() - fontRenderer.getStringWidth(dimensions) - 1, this.getHeight() - fontRenderer.FONT_HEIGHT, LLibrary.CONFIG.getTextColor());
             float scale = this.getScale(model);
@@ -43,13 +44,13 @@ public class DefaultTextureMapElement extends Element<QubbleGUI> {
             for (DefaultCuboidWrapper cube : model.getCuboids()) {
                 this.drawCube(cube, alpha);
             }
-            DefaultCuboidWrapper selectedCube = selectedProject.getSelectedCuboid();
-            if (selectedCube != null) {
-                int textureX = selectedCube.getTextureX();
-                int textureY = selectedCube.getTextureY();
-                int dimensionX = (int) selectedCube.getDimensionX();
-                int dimensionY = (int) selectedCube.getDimensionY();
-                int dimensionZ = (int) selectedCube.getDimensionZ();
+            DefaultCuboidWrapper selectedCuboid = selectedProject.getSelectedCuboid(ModelType.DEFAULT);
+            if (selectedCuboid != null) {
+                int textureX = selectedCuboid.getTextureX();
+                int textureY = selectedCuboid.getTextureY();
+                int dimensionX = (int) selectedCuboid.getDimensionX();
+                int dimensionY = (int) selectedCuboid.getDimensionY();
+                int dimensionZ = (int) selectedCuboid.getDimensionZ();
                 int outlineColor = LLibrary.CONFIG.getAccentColor();
                 this.fillRect(textureX, textureY + dimensionZ, dimensionZ, 0.5F, outlineColor);
                 this.fillRect(textureX + dimensionX + dimensionZ + dimensionX, textureY + dimensionZ, dimensionZ, 0.5F, outlineColor);
@@ -79,21 +80,19 @@ public class DefaultTextureMapElement extends Element<QubbleGUI> {
 
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
-        Project<DefaultCuboidWrapper, DefaultModelWrapper> selectedProject = (Project<DefaultCuboidWrapper, DefaultModelWrapper>) this.gui.getSelectedProject();
+        Project selectedProject = this.gui.getSelectedProject();
         if (selectedProject != null) {
             if (this.isSelected(mouseX, mouseY)) {
-                if (selectedProject != null) {
-                    DefaultCuboidWrapper selectedCube = this.getSelectedCube(mouseX, mouseY, selectedProject);
-                    DefaultModelWrapper model = selectedProject.getModel();
+                DefaultCuboidWrapper selectedCube = this.getSelectedCube(mouseX, mouseY, selectedProject);
+                DefaultModelWrapper model = selectedProject.getModel(ModelType.DEFAULT);
 
-                    selectedProject.setSelectedCube(selectedCube);
-                    if (selectedCube != null) {
-                        float scale = this.getScale(model);
-                        this.dragOffsetX = (int) (selectedCube.getTextureX() - ((mouseX - this.getPosX()) / scale));
-                        this.dragOffsetY = (int) (selectedCube.getTextureY() - ((mouseY - this.getPosY()) / scale));
-                    }
-                    return true;
+                selectedProject.setSelectedCuboid(selectedCube);
+                if (selectedCube != null) {
+                    float scale = this.getScale(model);
+                    this.dragOffsetX = (int) (selectedCube.getTextureX() - ((mouseX - this.getPosX()) / scale));
+                    this.dragOffsetY = (int) (selectedCube.getTextureY() - ((mouseY - this.getPosY()) / scale));
                 }
+                return true;
             }
         }
         return false;
@@ -101,30 +100,28 @@ public class DefaultTextureMapElement extends Element<QubbleGUI> {
 
     @Override
     public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
-        Project<DefaultCuboidWrapper, DefaultModelWrapper> selectedProject = (Project<DefaultCuboidWrapper, DefaultModelWrapper>) this.gui.getSelectedProject();
+        Project selectedProject = this.gui.getSelectedProject();
         if (selectedProject != null) {
             if (this.isSelected(mouseX, mouseY)) {
-                if (selectedProject != null) {
-                    DefaultCuboidWrapper selectedCube = selectedProject.getSelectedCuboid();
-                    if (selectedCube != null) {
-                        DefaultModelWrapper model = selectedProject.getModel();
-                        float scale = this.getScale(model);
-                        int textureX = (int) ((mouseX - this.getPosX()) / scale) + this.dragOffsetX;
-                        int textureY = (int) ((mouseY - this.getPosY()) / scale) + this.dragOffsetY;
-                        selectedCube.setTexture(Math.max(0, Math.min(textureX, model.getTextureWidth() - (selectedCube.getDimensionX() * 2 + selectedCube.getDimensionZ() * 2))), Math.max(0, Math.min(textureY, model.getTextureHeight() - (selectedCube.getDimensionY() + selectedCube.getDimensionZ()))));
-                        model.rebuildCuboid(selectedCube);
-                        this.gui.getSidebar().enable(model, selectedCube);
-                        selectedProject.setSaved(false);
-                    }
-                    return true;
+                DefaultCuboidWrapper selectedCube = selectedProject.getSelectedCuboid(ModelType.DEFAULT);
+                if (selectedCube != null) {
+                    DefaultModelWrapper model = selectedProject.getModel(ModelType.DEFAULT);
+                    float scale = this.getScale(model);
+                    int textureX = (int) ((mouseX - this.getPosX()) / scale) + this.dragOffsetX;
+                    int textureY = (int) ((mouseY - this.getPosY()) / scale) + this.dragOffsetY;
+                    selectedCube.setTexture(Math.max(0, Math.min(textureX, model.getTextureWidth() - (selectedCube.getDimensionX() * 2 + selectedCube.getDimensionZ() * 2))), Math.max(0, Math.min(textureY, model.getTextureHeight() - (selectedCube.getDimensionY() + selectedCube.getDimensionZ()))));
+                    model.rebuildCuboid(selectedCube);
+                    this.gui.getSidebar().enable(model, selectedCube);
+                    selectedProject.setSaved(false);
                 }
+                return true;
             }
         }
         return false;
     }
 
-    private DefaultCuboidWrapper getSelectedCube(float mouseX, float mouseY, Project<DefaultCuboidWrapper, DefaultModelWrapper> selectedProject) {
-        DefaultModelWrapper model = selectedProject.getModel();
+    private DefaultCuboidWrapper getSelectedCube(float mouseX, float mouseY, Project selectedProject) {
+        DefaultModelWrapper model = selectedProject.getModel(ModelType.DEFAULT);
         float scale = this.getScale(model);
         DefaultCuboidWrapper selected = null;
         for (DefaultCuboidWrapper cube : model.getCuboids()) {

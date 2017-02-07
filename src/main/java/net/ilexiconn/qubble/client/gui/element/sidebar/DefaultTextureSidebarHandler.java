@@ -4,21 +4,20 @@ import net.ilexiconn.llibrary.client.gui.element.ButtonElement;
 import net.ilexiconn.llibrary.client.gui.element.InputElement;
 import net.ilexiconn.llibrary.client.gui.element.InputElementBase;
 import net.ilexiconn.llibrary.client.gui.element.LabelElement;
-import net.ilexiconn.llibrary.client.gui.element.ListElement;
 import net.ilexiconn.llibrary.client.gui.element.SliderElement;
-import net.ilexiconn.llibrary.client.gui.element.WindowElement;
 import net.ilexiconn.qubble.client.ClientProxy;
+import net.ilexiconn.qubble.client.gui.GUIHelper;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
 import net.ilexiconn.qubble.client.gui.property.DimensionProperty;
+import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 
 import java.io.File;
-import java.util.List;
 
 public class DefaultTextureSidebarHandler extends SidebarHandler<DefaultCuboidWrapper, DefaultModelWrapper> {
     private SliderElement<QubbleGUI, DimensionProperty> textureX, textureY;
@@ -70,10 +69,10 @@ public class DefaultTextureSidebarHandler extends SidebarHandler<DefaultCuboidWr
             }
             Project selectedProject = this.gui.getSelectedProject();
             if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
-                ModelWrapper model = selectedProject.getModel();
-                DefaultCuboidWrapper selectedCube = (DefaultCuboidWrapper) selectedProject.getSelectedCuboid();
-                selectedCube.setTextureMirrored(button.getColorScheme() != ColorSchemes.TOGGLE_OFF);
-                model.rebuildCuboid(selectedCube);
+                DefaultModelWrapper model = selectedProject.getModel(this.getModelType());
+                DefaultCuboidWrapper selectedCuboid = selectedProject.getSelectedCuboid(this.getModelType());
+                selectedCuboid.setTextureMirrored(button.getColorScheme() != ColorSchemes.TOGGLE_OFF);
+                model.rebuildCuboid(selectedCuboid);
                 selectedProject.setSaved(false);
             }
             return true;
@@ -83,7 +82,7 @@ public class DefaultTextureSidebarHandler extends SidebarHandler<DefaultCuboidWr
         }).withParent(sidebar);
         new ButtonElement<>(this.gui, "...", 108, 78, 12, 12, (button) -> {
             if (this.gui.getSelectedProject() != null) {
-                this.openSelectTextureWindow("Select Texture", true);
+                this.openTextureSelection("Select Texture", ModelTexture.BASE);
                 return true;
             }
             return false;
@@ -93,7 +92,7 @@ public class DefaultTextureSidebarHandler extends SidebarHandler<DefaultCuboidWr
         }).withParent(sidebar);
         new ButtonElement<>(this.gui, "...", 108, 103, 12, 12, (button) -> {
             if (this.gui.getSelectedProject() != null) {
-                this.openSelectTextureWindow("Select Overlay Texture", false);
+                this.openTextureSelection("Select Overlay Texture", ModelTexture.OVERLAY);
                 return true;
             }
             return false;
@@ -112,28 +111,23 @@ public class DefaultTextureSidebarHandler extends SidebarHandler<DefaultCuboidWr
         this.mirror.withColorScheme(cuboid.isTextureMirrored() ? ColorSchemes.TOGGLE_ON : ColorSchemes.TOGGLE_OFF);
     }
 
-    private void openSelectTextureWindow(String name, boolean base) {
-        WindowElement<QubbleGUI> selectTextureWindow = new WindowElement<>(this.gui, name, 100, 100);
-        List<String> files = QubbleGUI.getFiles(ClientProxy.QUBBLE_TEXTURE_DIRECTORY, ".png");
-        files.add(0, "None");
-        selectTextureWindow.addElement(new ListElement<>(this.gui, 2, 16, 96, 82, files, (list) -> {
+    @Override
+    public ModelType<DefaultCuboidWrapper, DefaultModelWrapper> getModelType() {
+        return ModelType.DEFAULT;
+    }
+
+    private void openTextureSelection(String title, String textureName) {
+        GUIHelper.INSTANCE.selection(this.gui, title, QubbleGUI.getFiles(ClientProxy.QUBBLE_TEXTURE_DIRECTORY, ".png"), selection -> {
             Project project = this.gui.getSelectedProject();
             if (project != null) {
                 ModelTexture texture = null;
-                if (list.getSelectedIndex() != 0) {
-                    texture = new ModelTexture(new File(ClientProxy.QUBBLE_TEXTURE_DIRECTORY, list.getSelectedEntry() + ".png"), list.getSelectedEntry());
+                if (selection != null) {
+                    texture = new ModelTexture(new File(ClientProxy.QUBBLE_TEXTURE_DIRECTORY, selection + ".png"), selection);
                 }
                 ModelWrapper model = project.getModel();
-                if (base) {
-                    model.setBaseTexture(texture);
-                } else {
-                    model.setOverlayTexture(texture);
-                }
+                model.setTexture(textureName, texture);
                 project.setSaved(false);
-                this.gui.removeElement(selectTextureWindow);
             }
-            return true;
-        }));
-        this.gui.addElement(selectTextureWindow);
+        });
     }
 }

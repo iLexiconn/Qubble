@@ -40,7 +40,7 @@ public class SidebarElement extends Element<QubbleGUI> {
     @Override
     public void update() {
         if (this.initialized) {
-            Project<?, ?> project = this.gui.getSelectedProject();
+            Project project = this.gui.getSelectedProject();
             this.sidebarHandler.update(this.gui, project);
         }
     }
@@ -51,7 +51,7 @@ public class SidebarElement extends Element<QubbleGUI> {
         this.drawRectangle(this.getPosX(), this.getPosY(), 2, this.getHeight(), LLibrary.CONFIG.getAccentColor());
     }
 
-    public void enable(ModelWrapper model, CuboidWrapper cuboid) {
+    public void enable(ModelWrapper<?> model, CuboidWrapper<?> cuboid) {
         this.nameInput.clearText();
         this.nameInput.writeText(cuboid.getName());
         this.nameInput.setEditable(true);
@@ -66,22 +66,25 @@ public class SidebarElement extends Element<QubbleGUI> {
 
     public void initFields() {
         this.getChildren().clear();
-        new LabelElement<>(this.gui, "Selected cube", 4, 10).withParent(this);
+        new LabelElement<>(this.gui, "Selected cuboid", 4, 10).withParent(this);
         this.nameInput = (InputElementBase<QubbleGUI>) new InputElement<>(this.gui, 4, 19, 116, "", inputElement -> {
-            Project<?, ?> selectedProject = this.gui.getSelectedProject();
-            if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
-                CuboidWrapper selectedCuboid = selectedProject.getSelectedCuboid();
-                if (!ModelHandler.INSTANCE.hasDuplicateName(selectedProject.getModel(), inputElement.getText())) {
-                    selectedCuboid.setName(inputElement.getText());
-                    selectedProject.getModel().rebuildModel();
-                    selectedProject.setSaved(false);
-                } else {
-                    inputElement.clearText();
-                    inputElement.writeText(selectedCuboid.getName());
+            Project selectedProject = this.gui.getSelectedProject();
+            if (selectedProject != null) {
+                CuboidWrapper<?> selectedCuboid = selectedProject.getSelectedCuboid();
+                if (selectedCuboid != null) {
+                    ModelWrapper<?> model = selectedProject.getModel();
+                    if (!ModelHandler.INSTANCE.hasDuplicateName(model, inputElement.getText())) {
+                        selectedCuboid.setName(inputElement.getText());
+                        model.rebuildModel();
+                        selectedProject.setSaved(false);
+                    } else {
+                        inputElement.clearText();
+                        inputElement.writeText(selectedCuboid.getName());
+                    }
                 }
             }
         }).withParent(this);
-        Project<?, ?> project = this.gui.getSelectedProject();
+        Project project = this.gui.getSelectedProject();
         ModelType modelType = project != null ? project.getModelType() : ModelType.DEFAULT;
         this.sidebarHandler = this.gui.getEditMode().createHandler(modelType);
         this.sidebarHandler.create(this.gui, this);

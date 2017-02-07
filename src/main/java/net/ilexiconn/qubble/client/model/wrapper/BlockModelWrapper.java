@@ -56,11 +56,12 @@ public class BlockModelWrapper extends ModelWrapper<BlockCuboidWrapper> {
     }
 
     @Override
-    public void deleteCuboid(BlockCuboidWrapper cuboid) {
+    public boolean deleteCuboid(BlockCuboidWrapper cuboid) {
         String name = cuboid.getName();
-        this.cuboids.remove(cuboid);
+        boolean removed = this.cuboids.remove(cuboid);
         this.model.removeCuboid(name);
         this.rebuildModel();
+        return removed;
     }
 
     @Override
@@ -201,17 +202,19 @@ public class BlockModelWrapper extends ModelWrapper<BlockCuboidWrapper> {
     }
 
     public void renameTexture(String name, String newName) {
-        String value = this.model.getTextures().remove(name);
-        if (value != null) {
-            this.model.addTexture(newName, value);
-            super.setTexture(newName, this.getTexture(name));
-            super.setTexture(name, null);
-            for (QubbleVanillaCuboid cuboid : this.model.getCuboids()) {
-                for (EnumFacing facing : EnumFacing.VALUES) {
-                    QubbleVanillaFace face = cuboid.getFace(facing);
-                    String faceTexture = face.getTexture();
-                    if (faceTexture != null && faceTexture.equals(name)) {
-                        face.setTexture(newName);
+        if (!name.equals(newName)) {
+            String value = this.model.getTextures().remove(name);
+            if (value != null) {
+                this.model.addTexture(newName, value);
+                super.setTexture(newName, this.getTexture(name));
+                super.setTexture(name, null);
+                for (QubbleVanillaCuboid cuboid : this.model.getCuboids()) {
+                    for (EnumFacing facing : EnumFacing.VALUES) {
+                        QubbleVanillaFace face = cuboid.getFace(facing);
+                        String faceTexture = face.getTexture();
+                        if (faceTexture != null && faceTexture.equals(name)) {
+                            face.setTexture(newName);
+                        }
                     }
                 }
             }

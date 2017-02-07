@@ -80,7 +80,7 @@ public class QubbleVanillaModelRenderer {
         float toZ = cuboid.getToZ() * scale;
         for (EnumFacing facing : EnumFacing.VALUES) {
             QubbleVanillaFace face = cuboid.getFace(facing);
-            if (face != null && face.isEnabled()) {
+            if (face.isEnabled() || selection) {
                 float minU = face.getMinU() / 16.0F;
                 float minV = face.getMinV() / 16.0F;
                 float maxU = face.getMaxU() / 16.0F;

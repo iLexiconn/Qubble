@@ -30,7 +30,7 @@ public abstract class ModelWrapper<CBE extends CuboidWrapper<CBE>> {
 
     public abstract void addCuboid(CBE cuboid);
 
-    public abstract void deleteCuboid(CBE cuboid);
+    public abstract boolean deleteCuboid(CBE cuboid);
 
     public abstract void render(boolean clicking);
 

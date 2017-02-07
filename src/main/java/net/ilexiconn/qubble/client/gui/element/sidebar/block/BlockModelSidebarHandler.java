@@ -14,6 +14,7 @@ import net.ilexiconn.qubble.client.gui.property.AxisProperty;
 import net.ilexiconn.qubble.client.gui.property.CheckboxProperty;
 import net.ilexiconn.qubble.client.gui.property.RotationProperty;
 import net.ilexiconn.qubble.client.gui.property.TransformProperty;
+import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
 import net.minecraft.util.EnumFacing;
@@ -60,7 +61,7 @@ public class BlockModelSidebarHandler extends SidebarHandler<BlockCuboidWrapper,
             }
         }));
 
-        this.propertyShade = new CheckboxProperty(value -> this.edit(cuboid -> cuboid.setShade(value)));
+        this.propertyShade = new CheckboxProperty(this, value -> this.edit(cuboid -> cuboid.setShade(value)));
 
         this.addString(this.propertyRotationAxis);
         this.addFloat(this.propertyDimensionX, this.propertyDimensionY, this.propertyDimensionZ);
@@ -126,5 +127,10 @@ public class BlockModelSidebarHandler extends SidebarHandler<BlockCuboidWrapper,
 
     @Override
     protected void initElements(BlockModelWrapper model, BlockCuboidWrapper cuboid) {
+    }
+
+    @Override
+    public ModelType<BlockCuboidWrapper, BlockModelWrapper> getModelType() {
+        return ModelType.BLOCK;
     }
 }

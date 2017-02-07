@@ -184,7 +184,7 @@ public class BlockCuboidWrapper implements CuboidWrapper<BlockCuboidWrapper> {
         float offsetY = this.getOffsetY();
         float offsetZ = this.getOffsetZ();
         this.cuboid.setFrom(x, y, z);
-        this.setDimensions(dimensionX, dimensionY, dimensionZ);
+        this.cuboid.setTo(x + dimensionX, y + dimensionY, z + dimensionZ);
         this.setOffset(offsetX, offsetY, offsetZ);
     }
 
@@ -286,6 +286,24 @@ public class BlockCuboidWrapper implements CuboidWrapper<BlockCuboidWrapper> {
     @Override
     public ModelType getModelType() {
         return ModelType.BLOCK;
+    }
+
+    @Override
+    public void setAutoUV() {
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            EnumFacing.Axis axis = facing.getAxis();
+            float maxU = this.getDimensionX();
+            float maxV = this.getDimensionY();
+            if (axis == EnumFacing.Axis.Y) {
+                maxV = this.getDimensionZ();
+            } else if (axis == EnumFacing.Axis.X) {
+                maxU = this.getDimensionZ();
+            }
+            this.setMinU(facing, 0.0F);
+            this.setMinV(facing, 0.0F);
+            this.setMaxU(facing, maxU);
+            this.setMaxV(facing, maxV);
+        }
     }
 
     public QubbleVanillaCuboid getCuboid() {

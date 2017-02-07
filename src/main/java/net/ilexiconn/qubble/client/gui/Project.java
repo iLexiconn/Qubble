@@ -4,40 +4,44 @@ import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-public class Project<CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> {
+public class Project {
     private QubbleGUI gui;
-    private ModelType modelType;
-    private MDL model;
-    private CBE selectedCube;
-    private Map<String, ModelTexture> textures = new LinkedHashMap<>();
+    private ModelWrapper model;
+    private CuboidWrapper selectedCuboid;
     private boolean saved;
 
-    public Project(QubbleGUI gui, MDL model) {
+    public Project(QubbleGUI gui, ModelWrapper model) {
         this.gui = gui;
-        this.modelType = model.getType();
         this.model = model;
         this.saved = true;
     }
 
-    public ModelType getModelType() {
-        return this.modelType;
-    }
-
-    public MDL getModel() {
+    public ModelWrapper<?> getModel() {
         return this.model;
     }
 
-    public CBE getSelectedCuboid() {
-        return this.selectedCube;
+    public CuboidWrapper<?> getSelectedCuboid() {
+        return this.selectedCuboid;
     }
 
-    public void setSelectedCube(CBE cube) {
-        this.selectedCube = cube;
-        if (this.selectedCube != null) {
-            this.gui.getSidebar().enable(this.getModel(), this.selectedCube);
+    public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> MDL getModel(ModelType<CBE, MDL> modelType) {
+        if (modelType == this.model.getType()) {
+            return (MDL) this.model;
+        }
+        return null;
+    }
+
+    public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> CBE getSelectedCuboid(ModelType<CBE, MDL> modelType) {
+        if (modelType == this.model.getType()) {
+            return (CBE) this.selectedCuboid;
+        }
+        return null;
+    }
+
+    public void setSelectedCuboid(CuboidWrapper cube) {
+        this.selectedCuboid = cube;
+        if (this.selectedCuboid != null) {
+            this.gui.getSidebar().enable(this.getModel(), this.selectedCuboid);
         } else {
             this.gui.getSidebar().disable();
         }
@@ -49,5 +53,9 @@ public class Project<CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CB
 
     public boolean isSaved() {
         return this.saved;
+    }
+
+    public ModelType<?, ?> getModelType() {
+        return this.model.getType();
     }
 }

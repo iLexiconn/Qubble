@@ -11,6 +11,7 @@ import net.ilexiconn.llibrary.server.property.IFloatProperty;
 import net.ilexiconn.llibrary.server.property.IStringProperty;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
+import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 
@@ -81,7 +82,7 @@ public abstract class SidebarHandler<CBE extends CuboidWrapper<CBE>, MDL extends
         }
     }
 
-    public abstract void update(QubbleGUI gui, Project<CBE, MDL> project);
+    public abstract void update(QubbleGUI gui, Project project);
 
     protected abstract void initProperties(MDL model, CBE cuboid);
 
@@ -129,24 +130,28 @@ public abstract class SidebarHandler<CBE extends CuboidWrapper<CBE>, MDL extends
     protected void edit(Consumer<CBE> edit) {
         if (this.gui != null) {
             Project selectedProject = this.gui.getSelectedProject();
-            if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
-                MDL model = (MDL) selectedProject.getModel();
-                CBE selectedCuboid = (CBE) selectedProject.getSelectedCuboid();
-                edit.accept(selectedCuboid);
-                model.rebuildCuboid(selectedCuboid);
-                selectedProject.setSaved(false);
+            if (selectedProject != null) {
+                MDL model = selectedProject.getModel(this.getModelType());
+                CBE selectedCuboid = selectedProject.getSelectedCuboid(this.getModelType());
+                if (model != null && selectedCuboid != null) {
+                    edit.accept(selectedCuboid);
+                    model.rebuildCuboid(selectedCuboid);
+                    selectedProject.setSaved(false);
+                }
             }
         }
     }
 
     protected void editModel(Consumer<MDL> edit) {
         if (this.gui != null) {
-            Project<?, ?> selectedProject = this.gui.getSelectedProject();
+            Project selectedProject = this.gui.getSelectedProject();
             if (selectedProject != null) {
-                MDL model = (MDL) selectedProject.getModel();
-                edit.accept(model);
-                model.rebuildModel();
-                selectedProject.setSaved(false);
+                MDL model = selectedProject.getModel(this.getModelType());
+                if (model != null) {
+                    edit.accept(model);
+                    model.rebuildModel();
+                    selectedProject.setSaved(false);
+                }
             }
         }
     }
@@ -169,4 +174,6 @@ public abstract class SidebarHandler<CBE extends CuboidWrapper<CBE>, MDL extends
             input.setEditable(false);
         }
     }
+
+    public abstract ModelType<CBE, MDL> getModelType();
 }

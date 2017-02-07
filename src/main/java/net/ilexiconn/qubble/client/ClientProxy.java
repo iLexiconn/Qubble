@@ -16,6 +16,7 @@ import net.ilexiconn.qubble.client.world.DummyWorld;
 import net.ilexiconn.qubble.server.ServerProxy;
 import net.ilexiconn.qubble.server.model.importer.IModelImporter;
 import net.ilexiconn.qubble.server.model.importer.ModelImporters;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
@@ -237,14 +238,18 @@ public class ClientProxy extends ServerProxy {
         builder.registerTypeAdapter(Selector.class, new Selector.Deserializer());
         blockGson = builder.create();
         for (Map.Entry<IBlockState, ModelResourceLocation> entry : blockModels.entrySet()) {
-            String name = entry.getKey().getBlock().getLocalizedName();
-            if (!GAME_JSON_MODEL_LOCATIONS.containsKey(name)) {
-                if (!entry.getKey().isBlockNormalCube()) {
-                    ModelResourceLocation modelResource = entry.getValue();
-                    try {
-                        this.loadBlockModel(name, modelResource);
-                    } catch (Exception e) {
-                        System.err.println(e.toString());
+            IBlockState state = entry.getKey();
+            if (!state.isBlockNormalCube()) {
+                Block block = state.getBlock();
+                if (state == block.getDefaultState()) {
+                    String name = block.getLocalizedName();
+                    if (!GAME_JSON_MODEL_LOCATIONS.containsKey(name)) {
+                        ModelResourceLocation modelResource = entry.getValue();
+                        try {
+                            this.loadBlockModel(name, modelResource);
+                        } catch (Exception e) {
+                            System.err.println(e.toString());
+                        }
                     }
                 }
             }
@@ -420,8 +425,11 @@ public class ClientProxy extends ServerProxy {
         IResourceManager resourceManager = MINECRAFT.getResourceManager();
         IModelImporter<BlockModelContainer, BlockCuboidWrapper, BlockModelWrapper> importer = (IModelImporter<BlockModelContainer, BlockCuboidWrapper, BlockModelWrapper>) ModelImporters.BLOCK_JSON.getModelImporter();
         ModelBlockDefinition state = BlockStateLoader.load(new InputStreamReader(resourceManager.getResource(location).getInputStream()), blockGson);
+
         for (VariantList variantList : state.getMultipartVariants()) {
-            for (Variant variant : variantList.getVariantList()) {
+            List<Variant> variants = variantList.getVariantList();
+            if (!variants.isEmpty()) {
+                Variant variant = variants.get(0);
                 ResourceLocation resource = variant.getModelLocation();
                 ResourceLocation variantResource = new ResourceLocation(resource.getResourceDomain(), "models/" + resource.getResourcePath() + ".json");
                 ModelWrapper model = ClientProxy.parseJsonModel(blockGson, resourceManager, importer, name, variantResource);

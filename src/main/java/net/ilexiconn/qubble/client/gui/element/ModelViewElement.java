@@ -6,6 +6,7 @@ import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaFace;
 import net.ilexiconn.llibrary.client.util.ClientUtils;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
+import net.ilexiconn.qubble.client.gui.GUIHelper;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.toolbar.ToolbarElement;
@@ -29,6 +30,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
 import java.nio.FloatBuffer;
+import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class ModelViewElement extends Element<QubbleGUI> implements TextureDragAcceptor {
@@ -287,11 +289,9 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
     private void setupCamera(float scale, float partialTicks) {
         ScaledResolution resolution = this.gui.getResolution();
         int offsetScale = resolution.getScaleFactor() * 3;
-        for (Element element : this.gui.getPostOrderElements()) {
-            if (element instanceof ModelViewAdapter) {
-                ModelViewAdapter offset = (ModelViewAdapter) element;
-                GlStateManager.translate(offset.getOffsetX() / offsetScale, offset.getOffsetY() / offsetScale, offset.getOffsetZ() / offsetScale);
-            }
+        List<ModelViewAdapter> adapters = GUIHelper.INSTANCE.elements(this.gui, ModelViewAdapter.class);
+        for (ModelViewAdapter adapter : adapters) {
+            GlStateManager.translate(adapter.getOffsetX() / offsetScale, adapter.getOffsetY() / offsetScale, adapter.getOffsetZ() / offsetScale);
         }
         GlStateManager.disableTexture2D();
         GlStateManager.scale(scale, scale, scale);
@@ -361,7 +361,7 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
             Project selectedProject = this.gui.getSelectedProject();
             if (!this.dragged && selectedProject != null && this.isSelected(mouseX, mouseY)) {
                 CuboidWrapper selected = this.getSelected();
-                selectedProject.setSelectedCube(selected);
+                selectedProject.setSelectedCuboid(selected);
                 return selected != null;
             }
         }
@@ -406,6 +406,8 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
                     QubbleVanillaFace face = blockCuboid.getCuboid().getFace(facing);
                     face.setTexture(texture);
                 }
+                Project selectedProject = this.gui.getSelectedProject();
+                selectedProject.setSelectedCuboid(blockCuboid);
                 return true;
             }
         }

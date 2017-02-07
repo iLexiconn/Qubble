@@ -7,6 +7,7 @@ import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.property.DimensionProperty;
 import net.ilexiconn.qubble.client.gui.property.RotationProperty;
 import net.ilexiconn.qubble.client.gui.property.TransformProperty;
+import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 import net.minecraft.client.gui.GuiScreen;
@@ -74,9 +75,9 @@ public class DefaultModelSidebarHandler extends SidebarHandler<DefaultCuboidWrap
     }
 
     @Override
-    public void update(QubbleGUI gui, Project<DefaultCuboidWrapper, DefaultModelWrapper> project) {
-        if (project != null && project.getSelectedCuboid() != null) {
-            DefaultCuboidWrapper selectedCuboid = project.getSelectedCuboid();
+    public void update(QubbleGUI gui, Project project) {
+        if (project != null && project.getSelectedCuboid(ModelType.DEFAULT) != null) {
+            DefaultCuboidWrapper selectedCuboid = project.getSelectedCuboid(ModelType.DEFAULT);
             boolean hasParent = selectedCuboid.hasParent();
             this.scaleX.setEditable(!hasParent);
             this.scaleY.setEditable(!hasParent);
@@ -138,5 +139,10 @@ public class DefaultModelSidebarHandler extends SidebarHandler<DefaultCuboidWrap
 
     @Override
     protected void initElements(DefaultModelWrapper model, DefaultCuboidWrapper cuboid) {
+    }
+
+    @Override
+    public ModelType<DefaultCuboidWrapper, DefaultModelWrapper> getModelType() {
+        return ModelType.DEFAULT;
     }
 }

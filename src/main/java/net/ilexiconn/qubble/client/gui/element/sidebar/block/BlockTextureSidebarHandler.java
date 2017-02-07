@@ -9,6 +9,7 @@ import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarElement;
 import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarHandler;
 import net.ilexiconn.qubble.client.gui.property.FacingProperty;
 import net.ilexiconn.qubble.client.gui.property.TransformProperty;
+import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
 import net.minecraft.util.EnumFacing;
@@ -26,9 +27,9 @@ public class BlockTextureSidebarHandler extends SidebarHandler<BlockCuboidWrappe
 
     public BlockTextureSidebarHandler() {
         this.propertyFacing = new FacingProperty(value -> {
-            Project<?, ?> selectedProject = this.gui.getSelectedProject();
+            Project selectedProject = this.gui.getSelectedProject();
             if (selectedProject != null) {
-                BlockCuboidWrapper cuboid = (BlockCuboidWrapper) selectedProject.getSelectedCuboid();
+                BlockCuboidWrapper cuboid = selectedProject.getSelectedCuboid(ModelType.BLOCK);
                 if (cuboid != null) {
                     this.propertyMinU.set(cuboid.getMinU(value));
                     this.propertyMinV.set(cuboid.getMinV(value));
@@ -47,7 +48,7 @@ public class BlockTextureSidebarHandler extends SidebarHandler<BlockCuboidWrappe
     }
 
     @Override
-    public void update(QubbleGUI gui, Project<BlockCuboidWrapper, BlockModelWrapper> project) {
+    public void update(QubbleGUI gui, Project project) {
         /*this.texture.clearText();
         this.particleTexture.clearText();
         if (project != null) {
@@ -160,5 +161,10 @@ public class BlockTextureSidebarHandler extends SidebarHandler<BlockCuboidWrappe
 
     @Override
     protected void initElements(BlockModelWrapper model, BlockCuboidWrapper cuboid) {
+    }
+
+    @Override
+    public ModelType<BlockCuboidWrapper, BlockModelWrapper> getModelType() {
+        return ModelType.BLOCK;
     }
 }

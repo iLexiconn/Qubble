@@ -99,10 +99,11 @@ public class DefaultModelWrapper extends ModelWrapper<DefaultCuboidWrapper> {
     }
 
     @Override
-    public void deleteCuboid(DefaultCuboidWrapper cuboid) {
-        this.cuboids.remove(cuboid);
+    public boolean deleteCuboid(DefaultCuboidWrapper cuboid) {
+        boolean removed = this.cuboids.remove(cuboid);
         this.model.getCuboids().remove(cuboid.getCuboid());
         this.rebuildModel();
+        return removed;
     }
 
     @Override

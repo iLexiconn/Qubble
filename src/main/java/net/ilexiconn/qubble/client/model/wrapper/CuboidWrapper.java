@@ -85,4 +85,6 @@ public interface CuboidWrapper<CBE extends CuboidWrapper<CBE>> {
     boolean hasChild(CBE cuboid);
 
     ModelType getModelType();
+
+    void setAutoUV();
 }
