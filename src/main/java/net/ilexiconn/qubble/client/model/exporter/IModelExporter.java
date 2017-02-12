@@ -1,4 +1,4 @@
-package net.ilexiconn.qubble.server.model.exporter;
+package net.ilexiconn.qubble.client.model.exporter;
 
 import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;

@@ -2,7 +2,7 @@ package net.ilexiconn.qubble.client.model.wrapper;
 
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.qubble.client.model.ModelType;
-import net.ilexiconn.qubble.server.model.ModelHandler;
+import net.ilexiconn.qubble.client.model.ModelHandler;
 import net.minecraft.util.EnumFacing;
 
 import java.util.ArrayList;
@@ -248,6 +248,6 @@ public class DefaultCuboidWrapper implements CuboidWrapper<DefaultCuboidWrapper>
     }
 
     public boolean hasParent() {
-        return this.modelWrapper.getParent(this) != null;
+        return ModelHandler.INSTANCE.getParent(this.modelWrapper, this) != null;
     }
 }

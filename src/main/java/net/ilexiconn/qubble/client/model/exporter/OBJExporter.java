@@ -1,4 +1,4 @@
-package net.ilexiconn.qubble.server.model.exporter;
+package net.ilexiconn.qubble.client.model.exporter;
 
 import net.ilexiconn.llibrary.client.model.obj.Face;
 import net.ilexiconn.llibrary.client.model.obj.OBJModel;

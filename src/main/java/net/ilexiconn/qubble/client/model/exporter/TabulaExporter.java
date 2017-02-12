@@ -1,4 +1,4 @@
-package net.ilexiconn.qubble.server.model.exporter;
+package net.ilexiconn.qubble.client.model.exporter;
 
 import com.google.gson.Gson;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaCubeContainer;

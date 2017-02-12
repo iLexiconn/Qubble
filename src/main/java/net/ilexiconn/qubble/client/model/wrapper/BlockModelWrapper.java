@@ -1,14 +1,14 @@
 package net.ilexiconn.qubble.client.model.wrapper;
 
-import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaFace;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaModel;
+import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaTexture;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
-import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.model.ModelType;
-import net.ilexiconn.qubble.client.model.QubbleVanillaModelBase;
-import net.ilexiconn.qubble.client.model.QubbleVanillaModelRenderer;
+import net.ilexiconn.qubble.client.model.render.BlockRenderModel;
+import net.ilexiconn.qubble.client.model.render.QubbleRenderModel;
+import net.ilexiconn.qubble.client.model.ModelHandler;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -19,11 +19,12 @@ import java.util.Map;
 
 public class BlockModelWrapper extends ModelWrapper<BlockCuboidWrapper> {
     private QubbleVanillaModel model;
-    private QubbleVanillaModelBase renderModel;
+    private BlockRenderModel renderModel;
     private List<BlockCuboidWrapper> cuboids = new ArrayList<>();
 
     public BlockModelWrapper(QubbleVanillaModel model) {
         this.model = model;
+        this.rebuildModel();
         for (QubbleVanillaCuboid cuboid : model.getCuboids()) {
             this.cuboids.add(new BlockCuboidWrapper(this, cuboid));
         }
@@ -41,11 +42,7 @@ public class BlockModelWrapper extends ModelWrapper<BlockCuboidWrapper> {
 
     @Override
     public void rebuildModel() {
-        this.renderModel = new QubbleVanillaModelBase(this);
-    }
-
-    @Override
-    public void rebuildCuboid(BlockCuboidWrapper wrapper) {
+        this.renderModel = new BlockRenderModel(this);
     }
 
     @Override
@@ -65,7 +62,7 @@ public class BlockModelWrapper extends ModelWrapper<BlockCuboidWrapper> {
     }
 
     @Override
-    public void render(boolean clicking) {
+    public void render(boolean selection) {
         if (this.renderModel == null) {
             this.rebuildModel();
         }
@@ -74,58 +71,9 @@ public class BlockModelWrapper extends ModelWrapper<BlockCuboidWrapper> {
         GlStateManager.cullFace(GlStateManager.CullFace.BACK);
         GlStateManager.scale(1.0F, -1.0F, 1.0F);
         GlStateManager.translate(-8.0F * scale, -24.0F * scale, -8.0F * scale);
-        this.renderModel.render(scale, clicking);
+        this.renderModel.render(selection);
         GlStateManager.cullFace(GlStateManager.CullFace.FRONT);
         GlStateManager.popMatrix();
-    }
-
-    @Override
-    public void renderSelection(BlockCuboidWrapper selectedCuboid, Project project, boolean hovering) {
-        QubbleVanillaModelRenderer renderCuboid = this.renderModel.getCuboid(selectedCuboid);
-        if (renderCuboid != null) {
-            float scale = 0.0625F;
-            GlStateManager.cullFace(GlStateManager.CullFace.BACK);
-            GlStateManager.scale(1.0F, -1.0F, 1.0F);
-            GlStateManager.translate(-8.0F * scale, -24.0F * scale, -8.0F * scale);
-            GlStateManager.depthMask(false);
-            this.renderModel.renderSelectedOutline(renderCuboid, scale);
-            GlStateManager.depthMask(true);
-            GlStateManager.enableLighting();
-            GlStateManager.pushMatrix();
-            renderCuboid.renderSingle(scale, false);
-            GlStateManager.popMatrix();
-            if (!hovering) {
-                GlStateManager.pushMatrix();
-                GlStateManager.disableTexture2D();
-                int accent = LLibrary.CONFIG.getAccentColor();
-                GlStateManager.disableDepth();
-                GlStateManager.disableLighting();
-                float r = (float) (accent >> 16 & 0xFF) / 255.0F;
-                float g = (float) (accent >> 8 & 0xFF) / 255.0F;
-                float b = (float) (accent & 0xFF) / 255.0F;
-                GlStateManager.color(r, g, b, 1.0F);
-                float originX = (selectedCuboid.getOffsetX() - 0.5F) * scale;
-                float originY = (selectedCuboid.getOffsetY() - 0.5F) * scale;
-                float originZ = (selectedCuboid.getOffsetZ() - 0.5F) * scale;
-                GlStateManager.translate(originX, originY, originZ);
-                GlStateManager.scale(0.15F, 0.15F, 0.15F);
-                GlStateManager.translate(3.0F * scale, -18.0F * scale, 3.0F * scale);
-                ROTATION_POINT.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, scale);
-                GlStateManager.scale(0.8F, 0.8F, 0.8F);
-                GlStateManager.translate(0.0F, 0.33F, 0.0F);
-                GlStateManager.color(r * 0.6F, g * 0.6F, b * 0.6F, 1.0F);
-                ROTATION_POINT.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, scale);
-                GlStateManager.popMatrix();
-            }
-            GlStateManager.enableLighting();
-            GlStateManager.enableDepth();
-            GlStateManager.cullFace(GlStateManager.CullFace.FRONT);
-        }
-    }
-
-    @Override
-    public BlockCuboidWrapper getSelected(int selectionID) {
-        return this.renderModel.getCuboid(selectionID);
     }
 
     @Override
@@ -171,22 +119,43 @@ public class BlockModelWrapper extends ModelWrapper<BlockCuboidWrapper> {
     }
 
     @Override
+    public QubbleRenderModel<BlockCuboidWrapper, ?> getRenderModel() {
+        return this.renderModel;
+    }
+
+    @Override
     public void importTextures(Map<String, ModelTexture> textures) {
-        for (Map.Entry<String, String> entry : this.model.getTextures().entrySet()) {
+        for (Map.Entry<String, QubbleVanillaTexture> entry : this.model.getTextures().entrySet()) {
             String identifier = entry.getKey();
             ModelTexture modelTexture = textures.get(identifier);
             if (modelTexture != null) {
-                modelTexture.setName(entry.getValue());
+                modelTexture.setName(entry.getValue().getTexture());
                 super.setTexture(identifier, modelTexture);
             }
         }
     }
 
     @Override
+    public BlockCuboidWrapper createSide(BlockCuboidWrapper selectedCuboid, EnumFacing facing) {
+        BlockCuboidWrapper cuboid = selectedCuboid.copy(this);
+        ModelHandler.INSTANCE.applyTransformation(cuboid, ModelHandler.INSTANCE.getParentTransformation(this, selectedCuboid, true, false));
+        cuboid.setOffset(selectedCuboid.getOffsetX(), selectedCuboid.getOffsetY(), selectedCuboid.getOffsetZ());
+
+        float offsetX = cuboid.getDimensionX() * facing.getFrontOffsetX();
+        float offsetY = cuboid.getDimensionY() * facing.getFrontOffsetY();
+        float offsetZ = cuboid.getDimensionZ() * facing.getFrontOffsetZ();
+        cuboid.setPosition(cuboid.getPositionX() + offsetX, cuboid.getPositionY() + offsetY, cuboid.getPositionZ() + offsetZ);
+
+        this.addCuboid(cuboid);
+
+        return cuboid;
+    }
+
+    @Override
     public void setTexture(String name, ModelTexture texture) {
         super.setTexture(name, texture);
         if (texture != null) {
-            this.model.addTexture(name, texture.getName());
+            this.model.addTexture(name, ModelHandler.INSTANCE.createVanillaTexture(name, texture.getName()));
         } else {
             this.model.removeTexture(name);
             for (QubbleVanillaCuboid cuboid : this.model.getCuboids()) {
@@ -203,9 +172,9 @@ public class BlockModelWrapper extends ModelWrapper<BlockCuboidWrapper> {
 
     public void renameTexture(String name, String newName) {
         if (!name.equals(newName)) {
-            String value = this.model.getTextures().remove(name);
+            QubbleVanillaTexture value = this.model.getTextures().remove(name);
             if (value != null) {
-                this.model.addTexture(newName, value);
+                this.model.addTexture(newName, value.copy());
                 super.setTexture(newName, this.getTexture(name));
                 super.setTexture(name, null);
                 for (QubbleVanillaCuboid cuboid : this.model.getCuboids()) {

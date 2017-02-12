@@ -1,4 +1,4 @@
-package net.ilexiconn.qubble.client.model;
+package net.ilexiconn.qubble.client.model.container;
 
 import java.util.ArrayList;
 import java.util.HashMap;

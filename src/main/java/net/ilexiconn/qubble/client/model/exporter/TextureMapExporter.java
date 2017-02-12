@@ -1,4 +1,4 @@
-package net.ilexiconn.qubble.server.model.exporter;
+package net.ilexiconn.qubble.client.model.exporter;
 
 import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
@@ -25,19 +25,26 @@ public class TextureMapExporter implements IModelExporter<BufferedImage, Default
         model.unparent();
         BufferedImage texture = new BufferedImage(model.getTextureWidth(), model.getTextureHeight(), BufferedImage.TYPE_INT_ARGB);
         for (DefaultCuboidWrapper cube : model.getCuboids()) {
-            int textureX = (int) cube.getTextureX();
-            int textureY = (int) cube.getTextureY();
-            int dimensionX = (int) cube.getDimensionX();
-            int dimensionY = (int) cube.getDimensionY();
-            int dimensionZ = (int) cube.getDimensionZ();
-            this.fill(texture, textureX + dimensionZ, textureY, dimensionX, dimensionZ, 0xFF00FF00);
-            this.fill(texture, textureX + dimensionX + dimensionZ, textureY, dimensionX, dimensionZ, 0xFF00AA00);
-            this.fill(texture, textureX, textureY + dimensionZ, dimensionZ, dimensionY, 0xFFFF0000);
-            this.fill(texture, textureX + dimensionZ, textureY + dimensionZ, dimensionX, dimensionY, 0xFF0000FF);
-            this.fill(texture, textureX + dimensionX + dimensionZ, textureY + dimensionZ, dimensionZ, dimensionY, 0xFFAA0000);
-            this.fill(texture, textureX + dimensionX + dimensionZ + dimensionZ, textureY + dimensionZ, dimensionX, dimensionY, 0xFF0000AA);
+            this.drawCuboid(texture, cube);
         }
         return texture;
+    }
+
+    private void drawCuboid(BufferedImage texture, DefaultCuboidWrapper cuboid) {
+        int textureX = cuboid.getTextureX();
+        int textureY = cuboid.getTextureY();
+        int dimensionX = (int) cuboid.getDimensionX();
+        int dimensionY = (int) cuboid.getDimensionY();
+        int dimensionZ = (int) cuboid.getDimensionZ();
+        this.fill(texture, textureX + dimensionZ, textureY, dimensionX, dimensionZ, 0xFF00FF00);
+        this.fill(texture, textureX + dimensionX + dimensionZ, textureY, dimensionX, dimensionZ, 0xFF00AA00);
+        this.fill(texture, textureX, textureY + dimensionZ, dimensionZ, dimensionY, 0xFFFF0000);
+        this.fill(texture, textureX + dimensionZ, textureY + dimensionZ, dimensionX, dimensionY, 0xFF0000FF);
+        this.fill(texture, textureX + dimensionX + dimensionZ, textureY + dimensionZ, dimensionZ, dimensionY, 0xFFAA0000);
+        this.fill(texture, textureX + dimensionX + dimensionZ + dimensionZ, textureY + dimensionZ, dimensionX, dimensionY, 0xFF0000AA);
+        for (DefaultCuboidWrapper child : cuboid.getChildren()) {
+            this.drawCuboid(texture, child);
+        }
     }
 
     @Override

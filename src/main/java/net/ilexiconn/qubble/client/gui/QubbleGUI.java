@@ -12,8 +12,8 @@ import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarElement;
 import net.ilexiconn.qubble.client.gui.element.toolbar.ToolbarElement;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
-import net.ilexiconn.qubble.server.model.ModelHandler;
-import net.ilexiconn.qubble.server.model.importer.IModelImporter;
+import net.ilexiconn.qubble.client.model.ModelHandler;
+import net.ilexiconn.qubble.client.model.importer.IModelImporter;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraftforge.fml.relauncher.Side;
@@ -113,9 +113,7 @@ public class QubbleGUI extends ElementGUI {
     public void selectModel(int index) {
         this.selectedProject = Math.max(0, Math.min(this.openProjects.size() - 1, index));
         Project selectedProject = this.getSelectedProject();
-        if (this.sidebar != null) {
-            this.sidebar.initFields();
-        }
+        this.sidebar.initFields();
         if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
             ModelWrapper model = selectedProject.getModel();
             model.rebuildModel();

@@ -1,4 +1,4 @@
-package net.ilexiconn.qubble.server.model.exporter;
+package net.ilexiconn.qubble.client.model.exporter;
 
 public enum ModelExporters {
     JAVA(new JavaExporter()),

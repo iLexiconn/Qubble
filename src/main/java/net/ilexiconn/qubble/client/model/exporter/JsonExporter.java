@@ -1,11 +1,12 @@
-package net.ilexiconn.qubble.server.model.exporter;
+package net.ilexiconn.qubble.client.model.exporter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaFace;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaRotation;
-import net.ilexiconn.qubble.client.model.BlockModelContainer;
+import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaTexture;
+import net.ilexiconn.qubble.client.model.container.BlockModelContainer;
 import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Map;
 
 public class JsonExporter implements IModelExporter<BlockModelContainer, BlockCuboidWrapper, BlockModelWrapper> {
@@ -63,14 +65,68 @@ public class JsonExporter implements IModelExporter<BlockModelContainer, BlockCu
             blockModel.elements.add(element);
         }
 
-        for (Map.Entry<String, String> texture : model.getModel().getTextures().entrySet()) {
-            ResourceLocation resource = new ResourceLocation(texture.getValue());
-            blockModel.textures.put(texture.getKey(), new ResourceLocation(arguments[0], "blocks/" + resource.getResourcePath()).toString());
+        Map<String, QubbleVanillaTexture> textures = model.getModel().getTextures();
+        Map<QubbleVanillaTexture, ResourceLocation> textureLocations = new HashMap<>();
+
+        for (Map.Entry<String, QubbleVanillaTexture> entry : textures.entrySet()) {
+            QubbleVanillaTexture texture = entry.getValue();
+            ResourceLocation resource = new ResourceLocation(texture.getTexture());
+            ResourceLocation location = new ResourceLocation(arguments[0], "blocks/" + resource.getResourcePath());
+            blockModel.textures.put(entry.getKey(), location.toString());
+            textureLocations.put(texture, location);
+        }
+
+        for (Map.Entry<QubbleVanillaTexture, ResourceLocation> entry : textureLocations.entrySet()) {
+            QubbleVanillaTexture texture = entry.getKey();
+            if (texture.getBoolean("particle") && !blockModel.textures.containsKey("particle")) {
+                blockModel.textures.put("particle", entry.getValue().toString());
+                break;
+            }
+        }
+
+        if (blockModel.textures.size() > 0 && !blockModel.textures.containsKey("particle")) {
+            blockModel.textures.put("particle", this.getParticleTexture(arguments[0], model));
         }
 
         blockModel.ambientocclusion = model.hasAmbientOcclusion();
 
         return blockModel;
+    }
+
+    private String getParticleTexture(String domain, BlockModelWrapper model) {
+        Map<String, Integer> weights = new HashMap<>();
+
+        for (BlockCuboidWrapper wrapper : model.getCuboids()) {
+            QubbleVanillaCuboid cuboid = wrapper.getCuboid();
+            for (EnumFacing facing : EnumFacing.VALUES) {
+                QubbleVanillaFace face = cuboid.getFace(facing);
+                if (face != null) {
+                    String texture = face.getTexture();
+                    if (texture != null) {
+                        int weight = (int) ((face.getMaxU() - face.getMinU()) * (face.getMaxV() - face.getMinV()));
+                        int currentWeight = weights.getOrDefault(texture, 0);
+                        weights.put(texture, currentWeight + weight);
+                    }
+                }
+            }
+        }
+
+        int highestWeight = 0;
+        String particleTexture = null;
+        for (Map.Entry<String, Integer> entry : weights.entrySet()) {
+            int usages = entry.getValue();
+            if (usages > highestWeight) {
+                particleTexture = entry.getKey();
+                highestWeight = usages;
+            }
+        }
+
+        if (particleTexture != null) {
+            ResourceLocation resource = new ResourceLocation(particleTexture);
+            ResourceLocation location = new ResourceLocation(domain, "blocks/" + resource.getResourcePath());
+            return location.toString();
+        }
+        return null;
     }
 
     private BlockModelContainer.ElementFace createFace(QubbleVanillaFace face) {

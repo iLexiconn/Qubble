@@ -10,7 +10,7 @@ import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
-import net.ilexiconn.qubble.server.model.ModelHandler;
+import net.ilexiconn.qubble.client.model.ModelHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 

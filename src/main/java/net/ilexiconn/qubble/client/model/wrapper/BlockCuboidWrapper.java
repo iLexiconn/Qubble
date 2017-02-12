@@ -4,7 +4,7 @@ import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaFace;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaRotation;
 import net.ilexiconn.qubble.client.model.ModelType;
-import net.ilexiconn.qubble.server.model.ModelHandler;
+import net.ilexiconn.qubble.client.model.ModelHandler;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.MathHelper;
 

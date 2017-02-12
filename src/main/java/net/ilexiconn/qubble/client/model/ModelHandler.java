@@ -1,27 +1,29 @@
-package net.ilexiconn.qubble.server.model;
+package net.ilexiconn.qubble.client.model;
 
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaCuboid;
+import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaTexture;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.model.exporter.IModelExporter;
+import net.ilexiconn.qubble.client.model.exporter.ModelExporters;
+import net.ilexiconn.qubble.client.model.importer.IModelImporter;
+import net.ilexiconn.qubble.client.model.importer.ModelImporters;
 import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
-import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
-import net.ilexiconn.qubble.server.model.exporter.ModelExporters;
-import net.ilexiconn.qubble.server.model.importer.IModelImporter;
-import net.ilexiconn.qubble.server.model.importer.ModelImporters;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import javax.imageio.ImageIO;
+import javax.vecmath.Matrix4d;
+import javax.vecmath.Vector3d;
 import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -31,6 +33,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -260,6 +263,14 @@ public enum ModelHandler {
         return model.deleteCuboid(cuboid);
     }
 
+    public QubbleVanillaTexture createVanillaTexture(String name, String texture) {
+        QubbleVanillaTexture vanillaTexture = QubbleVanillaTexture.create(texture);
+        if (name.equals("particle")) {
+            vanillaTexture.setProperty("particle", "true");
+        }
+        return vanillaTexture;
+    }
+
     public QubbleCuboid copy(DefaultModelWrapper model, DefaultCuboidWrapper cuboid) {
         QubbleCuboid copy = QubbleCuboid.create(this.getCopyName(model, cuboid.getName()));
         copy.getChildren().addAll(cuboid.getChildren().stream().map((child) -> ModelHandler.INSTANCE.copy(model, child)).collect(Collectors.toList()));
@@ -310,5 +321,124 @@ public enum ModelHandler {
             }
         }
         return false;
+    }
+
+    public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> void maintainParentTransformation(MDL model, CBE parenting) {
+        this.applyTransformation(parenting, this.getParentTransformation(model, parenting, true, false));
+    }
+
+    public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> void inheritParentTransformation(MDL model, CBE parenting, CBE newParent) {
+        Matrix4d matrix = this.getParentTransformationMatrix(model, newParent, true, false);
+        matrix.invert();
+        matrix.mul(this.getParentTransformationMatrix(model, parenting, false, false));
+        float[][] parentTransformation = this.getParentTransformation(matrix);
+        this.applyTransformation(parenting, parentTransformation);
+    }
+
+    public <CBE extends CuboidWrapper<CBE>> void applyTransformation(CBE parenting, float[][] parentTransformation) {
+        parenting.setPosition(parentTransformation[0][0], parentTransformation[0][1], parentTransformation[0][2]);
+        parenting.setRotation(parentTransformation[1][0], parentTransformation[1][1], parentTransformation[1][2]);
+    }
+
+    public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> CBE getParent(MDL model, CBE cuboid) {
+        for (CBE currentCube : model.getCuboids()) {
+            CBE foundParent = this.getParent(currentCube, cuboid);
+            if (foundParent != null) {
+                return foundParent;
+            }
+        }
+        return null;
+    }
+
+    public <CBE extends CuboidWrapper<CBE>> CBE getParent(CBE parent, CBE cuboid) {
+        if (parent.getChildren().contains(cuboid)) {
+            return parent;
+        }
+        for (CBE child : parent.getChildren()) {
+            CBE foundParent = this.getParent(child, cuboid);
+            if (foundParent != null) {
+                return foundParent;
+            }
+        }
+        return null;
+    }
+
+    public <CBE extends CuboidWrapper<CBE>> boolean hasChild(CBE parent, CBE child) {
+        if (parent.getChildren().contains(child)) {
+            return true;
+        }
+        for (CBE c : parent.getChildren()) {
+            boolean hasChild = this.hasChild(c, child);
+            if (hasChild) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> List<CBE> getParents(MDL model, CBE cuboid, boolean ignoreSelf) {
+        CBE parent = cuboid;
+        List<CBE> parents = new ArrayList<>();
+        if (!ignoreSelf) {
+            parents.add(cuboid);
+        }
+        while ((parent = this.getParent(model, parent)) != null) {
+            parents.add(parent);
+        }
+        Collections.reverse(parents);
+        return parents;
+    }
+
+    public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> float[][] getParentTransformation(MDL model, CBE cuboid, boolean includeParents, boolean ignoreSelf) {
+        return this.getParentTransformation(this.getParentTransformationMatrix(model, cuboid, includeParents, ignoreSelf));
+    }
+
+    public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> Matrix4d getParentTransformationMatrix(MDL model, CBE cuboid, boolean includeParents, boolean ignoreSelf) {
+        List<CBE> parentCubes = new ArrayList<>();
+        if (includeParents) {
+            parentCubes = this.getParents(model, cuboid, ignoreSelf);
+        } else if (!ignoreSelf) {
+            parentCubes.add(cuboid);
+        }
+        Matrix4d matrix = new Matrix4d();
+        matrix.setIdentity();
+        Matrix4d transform = new Matrix4d();
+        for (CBE child : parentCubes) {
+            transform.setIdentity();
+            transform.setTranslation(new Vector3d(child.getPositionX(), child.getPositionY(), child.getPositionZ()));
+            matrix.mul(transform);
+            transform.rotZ(child.getRotationZ() / 180 * Math.PI);
+            matrix.mul(transform);
+            transform.rotY(child.getRotationY() / 180 * Math.PI);
+            matrix.mul(transform);
+            transform.rotX(child.getRotationX() / 180 * Math.PI);
+            matrix.mul(transform);
+        }
+        return matrix;
+    }
+
+    public float[][] getParentTransformation(Matrix4d matrix) {
+        double sinRotationAngleY, cosRotationAngleY, sinRotationAngleX, cosRotationAngleX, sinRotationAngleZ, cosRotationAngleZ;
+        sinRotationAngleY = -matrix.m20;
+        cosRotationAngleY = Math.sqrt(1 - sinRotationAngleY * sinRotationAngleY);
+        if (Math.abs(cosRotationAngleY) > 0.0001) {
+            sinRotationAngleX = matrix.m21 / cosRotationAngleY;
+            cosRotationAngleX = matrix.m22 / cosRotationAngleY;
+            sinRotationAngleZ = matrix.m10 / cosRotationAngleY;
+            cosRotationAngleZ = matrix.m00 / cosRotationAngleY;
+        } else {
+            sinRotationAngleX = -matrix.m12;
+            cosRotationAngleX = matrix.m11;
+            sinRotationAngleZ = 0;
+            cosRotationAngleZ = 1;
+        }
+        float rotationAngleX = (float) (this.epsilon((float) Math.atan2(sinRotationAngleX, cosRotationAngleX)) / Math.PI * 180);
+        float rotationAngleY = (float) (this.epsilon((float) Math.atan2(sinRotationAngleY, cosRotationAngleY)) / Math.PI * 180);
+        float rotationAngleZ = (float) (this.epsilon((float) Math.atan2(sinRotationAngleZ, cosRotationAngleZ)) / Math.PI * 180);
+        return new float[][] { { this.epsilon((float) matrix.m03), this.epsilon((float) matrix.m13), this.epsilon((float) matrix.m23) }, { rotationAngleX, rotationAngleY, rotationAngleZ } };
+    }
+
+    private float epsilon(float x) {
+        return x < 0 ? x > -0.0001F ? 0 : x : x < 0.0001F ? 0 : x;
     }
 }

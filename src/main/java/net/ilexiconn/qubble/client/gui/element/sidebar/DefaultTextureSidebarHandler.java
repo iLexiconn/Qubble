@@ -72,7 +72,7 @@ public class DefaultTextureSidebarHandler extends SidebarHandler<DefaultCuboidWr
                 DefaultModelWrapper model = selectedProject.getModel(this.getModelType());
                 DefaultCuboidWrapper selectedCuboid = selectedProject.getSelectedCuboid(this.getModelType());
                 selectedCuboid.setTextureMirrored(button.getColorScheme() != ColorSchemes.TOGGLE_OFF);
-                model.rebuildCuboid(selectedCuboid);
+                model.rebuildModel();
                 selectedProject.setSaved(false);
             }
             return true;

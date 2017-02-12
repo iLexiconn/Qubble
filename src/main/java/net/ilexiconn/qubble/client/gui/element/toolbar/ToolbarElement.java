@@ -26,11 +26,11 @@ import net.ilexiconn.qubble.client.gui.property.ColorProperty;
 import net.ilexiconn.qubble.client.model.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
-import net.ilexiconn.qubble.server.model.ModelHandler;
-import net.ilexiconn.qubble.server.model.exporter.IModelExporter;
-import net.ilexiconn.qubble.server.model.exporter.ModelExporters;
-import net.ilexiconn.qubble.server.model.importer.IModelImporter;
-import net.ilexiconn.qubble.server.model.importer.ModelImporters;
+import net.ilexiconn.qubble.client.model.ModelHandler;
+import net.ilexiconn.qubble.client.model.exporter.IModelExporter;
+import net.ilexiconn.qubble.client.model.exporter.ModelExporters;
+import net.ilexiconn.qubble.client.model.importer.IModelImporter;
+import net.ilexiconn.qubble.client.model.importer.ModelImporters;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Session;
@@ -287,7 +287,6 @@ public class ToolbarElement extends Element<QubbleGUI> {
             }
             try {
                 modelExporter.save(modelExporter.export(copy, arguments), new File(ClientProxy.QUBBLE_EXPORT_DIRECTORY, modelExporter.getFileName(arguments, fileName) + "." + modelExporter.getExtension()));
-                project.setSaved(true);
             } catch (IOException e) {
                 GUIHelper.INSTANCE.error(this.gui, 200, "Failed to export model!", e);
                 e.printStackTrace();

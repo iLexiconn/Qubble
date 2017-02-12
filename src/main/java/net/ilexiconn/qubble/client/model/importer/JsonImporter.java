@@ -1,4 +1,4 @@
-package net.ilexiconn.qubble.server.model.importer;
+package net.ilexiconn.qubble.client.model.importer;
 
 import com.google.gson.Gson;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaCuboid;
@@ -6,9 +6,10 @@ import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaFace;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaModel;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaRotation;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
-import net.ilexiconn.qubble.client.model.BlockModelContainer;
+import net.ilexiconn.qubble.client.model.container.BlockModelContainer;
 import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
+import net.ilexiconn.qubble.client.model.ModelHandler;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
@@ -87,7 +88,7 @@ public class JsonImporter implements IModelImporter<BlockModelContainer, BlockCu
             ModelTexture modelTexture = new ModelTexture(resource);
             modelTexture.setName(location.toString());
             textures.put(identifier, modelTexture);
-            qubbleModel.addTexture(identifier, location.toString());
+            qubbleModel.addTexture(identifier, ModelHandler.INSTANCE.createVanillaTexture(identifier, location.toString()));
         }
         BlockModelWrapper wrapper = new BlockModelWrapper(qubbleModel);
         wrapper.importTextures(textures);

@@ -1,4 +1,4 @@
-package net.ilexiconn.qubble.server.model.importer;
+package net.ilexiconn.qubble.client.model.importer;
 
 public enum ModelImporters {
     JAVASCRIPT(new JavaScriptImporter()),

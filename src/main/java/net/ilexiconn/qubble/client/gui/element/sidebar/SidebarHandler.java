@@ -135,7 +135,7 @@ public abstract class SidebarHandler<CBE extends CuboidWrapper<CBE>, MDL extends
                 CBE selectedCuboid = selectedProject.getSelectedCuboid(this.getModelType());
                 if (model != null && selectedCuboid != null) {
                     edit.accept(selectedCuboid);
-                    model.rebuildCuboid(selectedCuboid);
+                    model.rebuildModel();
                     selectedProject.setSaved(false);
                 }
             }

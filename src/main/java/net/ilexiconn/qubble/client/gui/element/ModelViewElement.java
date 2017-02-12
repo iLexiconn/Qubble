@@ -10,16 +10,20 @@ import net.ilexiconn.qubble.client.gui.GUIHelper;
 import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.toolbar.ToolbarElement;
+import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.model.Selection;
+import net.ilexiconn.qubble.client.model.render.QubbleRenderModel;
 import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
@@ -42,14 +46,20 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
     private float prevRotationPitch = this.rotationPitch;
     private float prevCameraOffsetX;
     private float prevCameraOffsetY;
+
     private float zoom = 1.0F;
     private float zoomVelocity;
+
     private float prevMouseX;
-
     private float prevMouseY;
-    private boolean dragging;
 
-    private boolean dragged;
+    private boolean dragging;
+    private EnumFacing draggingFace;
+
+    private float startMouseX;
+    private float startMouseY;
+
+    private boolean clicked;
 
     private float partialTicks;
 
@@ -78,7 +88,7 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
                 }
             }
             if (highlight) {
-                hovered = this.getSelected();
+                hovered = this.getSelection(this.gui.getSelectedProject().getModel()).getCuboid();
             }
         }
         GlStateManager.disableLighting();
@@ -153,7 +163,7 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
         GlStateManager.popMatrix();
     }
 
-    private void renderModel(float partialTicks, ScaledResolution scaledResolution, boolean clicking, CuboidWrapper hovered) {
+    private void renderModel(float partialTicks, ScaledResolution scaledResolution, boolean selection, CuboidWrapper hovered) {
         GlStateManager.pushMatrix();
         GlStateManager.enableCull();
         GlStateManager.cullFace(GlStateManager.CullFace.FRONT);
@@ -169,7 +179,7 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
         GlStateManager.enableBlend();
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.enableAlpha();
-        if (clicking) {
+        if (selection) {
             GlStateManager.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
         } else {
             int color = LLibrary.CONFIG.getTertiaryColor();
@@ -187,28 +197,16 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
             ModelWrapper wrapper = project.getModel();
             GlStateManager.translate(0.0F, -1.5F, 0.0F);
             CuboidWrapper selectedCuboid = project.getSelectedCuboid();
-            TextureManager textureManager = ClientProxy.MINECRAFT.getTextureManager();
+            QubbleRenderModel renderModel = wrapper.getRenderModel();
             boolean hasSelection = selectedCuboid != null;
-            if (!clicking) {
-                if (hasSelection) {
+            if (!selection) {
+                if (hasSelection || LLibrary.CONFIG.getColorMode().equals("light")) {
                     GlStateManager.color(0.7F, 0.7F, 0.7F, 1.0F);
                 }
-                if (wrapper.getBaseTexture() != null) {
-                    GlStateManager.enableTexture2D();
-                    textureManager.bindTexture(wrapper.getBaseTexture().getLocation());
-                }
-                if (LLibrary.CONFIG.getColorMode().equals("light")) {
-                    GlStateManager.color(0.6F, 0.6F, 0.6F, 1.0F);
-                }
             }
-            wrapper.render(clicking);
-            if (!clicking) {
-                if (wrapper.getOverlayTexture() != null) {
-                    GlStateManager.enableTexture2D();
-                    textureManager.bindTexture(wrapper.getOverlayTexture().getLocation());
-                    wrapper.render(false);
-                }
-                if (Qubble.CONFIG.showGrid && !ClientProxy.MINECRAFT.gameSettings.hideGUI) {
+            wrapper.render(selection);
+            if (!selection) {
+                if (Qubble.CONFIG.showGrid) {
                     GlStateManager.pushMatrix();
                     GlStateManager.disableTexture2D();
                     GlStateManager.disableLighting();
@@ -237,12 +235,12 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
                 }
                 if (hasSelection) {
                     GlStateManager.pushMatrix();
-                    wrapper.renderSelection(selectedCuboid, project, false);
+                    renderModel.renderSelection(selectedCuboid, false);
                     GlStateManager.popMatrix();
                 }
                 if (hovered != null) {
                     GlStateManager.pushMatrix();
-                    wrapper.renderSelection(hovered, project, true);
+                    wrapper.getRenderModel().renderSelection(hovered, true);
                     GlStateManager.popMatrix();
                 }
             }
@@ -307,31 +305,66 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
         this.prevMouseX = mouseX;
         this.prevMouseY = mouseY;
+        Project selectedProject = this.gui.getSelectedProject();
+        if (selectedProject != null && this.isSelected(mouseX, mouseY)) {
+            this.clicked = true;
+            ModelWrapper model = selectedProject.getModel();
+            Selection<?, ?> selected = this.getSelection(model);
+            CuboidWrapper selectedCuboid = selected.getCuboid();
+            if (GuiScreen.isCtrlKeyDown()) {
+                this.draggingFace = selected.getFacing();
+            }
+            if (GuiScreen.isAltKeyDown() && selectedCuboid != null) {
+                CuboidWrapper created = model.createSide(selectedCuboid, selected.getFacing());
+                selectedProject.setSelectedCuboid(created);
+                if (GuiScreen.isShiftKeyDown() && model.supportsParenting()) {
+                    model.reparent(created, selectedCuboid, true);
+                }
+                model.rebuildModel();
+                selectedProject.setSaved(false);
+                return true;
+            } else {
+                selectedProject.setSelectedCuboid(selectedCuboid);
+                if (selectedCuboid != null) {
+                    return true;
+                }
+            }
+        }
+        this.startMouseX = mouseX;
+        this.startMouseY = mouseY;
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseDragged(float mouseX, float mouseY, int button, long timeSinceClick) {
-        if (!this.gui.getModelTree().isParenting() && this.isSelected(mouseX, mouseY)) {
+        if (!this.gui.getModelTree().isParenting() && this.clicked) {
             if (!this.dragging) {
                 this.updatePrevious();
                 this.dragging = true;
             }
-            this.dragged = true;
             float xMovement = mouseX - this.prevMouseX;
             float yMovement = mouseY - this.prevMouseY;
             this.prevMouseX = mouseX;
             this.prevMouseY = mouseY;
-            if (button == 0) {
-                this.rotationYaw += xMovement / this.zoom;
-                if ((this.rotationPitch > -90.0F || yMovement < 0.0F) && (this.rotationPitch < 90.0F || yMovement > 0.0F)) {
-                    this.rotationPitch -= yMovement / this.zoom;
+            if (this.draggingFace != null) {
+                Project selectedProject = this.gui.getSelectedProject();
+                if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
+                    ModelWrapper model = selectedProject.getModel();
+                    CuboidWrapper selectedCuboid = selectedProject.getSelectedCuboid();
+                    selectedProject.setSaved(false);
                 }
-                return true;
-            } else if (button == 1) {
-                this.cameraOffsetX = this.cameraOffsetX + (xMovement / this.zoom) * 0.016F;
-                this.cameraOffsetY = this.cameraOffsetY + (yMovement / this.zoom) * 0.016F;
-                return true;
+            } else {
+                if (button == 0) {
+                    this.rotationYaw += xMovement / this.zoom;
+                    if ((this.rotationPitch > -90.0F || yMovement < 0.0F) && (this.rotationPitch < 90.0F || yMovement > 0.0F)) {
+                        this.rotationPitch -= yMovement / this.zoom;
+                    }
+                    return true;
+                } else if (button == 1) {
+                    this.cameraOffsetX = this.cameraOffsetX + (xMovement / this.zoom) * 0.016F;
+                    this.cameraOffsetY = this.cameraOffsetY + (yMovement / this.zoom) * 0.016F;
+                    return true;
+                }
             }
         }
         return false;
@@ -349,7 +382,30 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
     @Override
     public boolean mouseScrolled(float mouseX, float mouseY, int amount) {
         if (this.isSelected(mouseX, mouseY)) {
-            this.zoomVelocity += (amount / 120.0F) * 0.05F;
+            Project selectedProject = this.gui.getSelectedProject();
+            if (selectedProject != null && selectedProject.getSelectedCuboid() != null && this.draggingFace != null) {
+                CuboidWrapper selectedCuboid = selectedProject.getSelectedCuboid();
+                EnumFacing.Axis axis = this.draggingFace.getAxis();
+                EnumFacing.AxisDirection direction = this.draggingFace.getAxisDirection();
+                float offsetX = 0.0F;
+                float offsetY = 0.0F;
+                float offsetZ = 0.0F;
+                float offset = amount / 120.0F;
+                if (axis == EnumFacing.Axis.X) {
+                    offsetX = offset;
+                } else if (axis == EnumFacing.Axis.Y) {
+                    offsetY = offset;
+                } else if (axis == EnumFacing.Axis.Z) {
+                    offsetZ = offset;
+                }
+                selectedCuboid.setDimensions(selectedCuboid.getDimensionX() + offsetX, selectedCuboid.getDimensionY() + offsetY, selectedCuboid.getDimensionZ() + offsetZ);
+                if (direction == (selectedCuboid.getModelType().isInverted() ? EnumFacing.AxisDirection.NEGATIVE : EnumFacing.AxisDirection.POSITIVE)) {
+                    selectedCuboid.setPosition(selectedCuboid.getPositionX() - offsetX, selectedCuboid.getPositionY() - offsetY, selectedCuboid.getPositionZ() - offsetZ);
+                }
+                selectedProject.setSaved(false);
+            } else {
+                this.zoomVelocity += (amount / 120.0F) * 0.05F;
+            }
             return true;
         }
         return false;
@@ -357,20 +413,13 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
 
     @Override
     public boolean mouseReleased(float mouseX, float mouseY, int button) {
-        if (button == 0) {
-            Project selectedProject = this.gui.getSelectedProject();
-            if (!this.dragged && selectedProject != null && this.isSelected(mouseX, mouseY)) {
-                CuboidWrapper selected = this.getSelected();
-                selectedProject.setSelectedCuboid(selected);
-                return selected != null;
-            }
-        }
-        this.dragged = false;
         this.dragging = false;
+        this.draggingFace = null;
+        this.clicked = false;
         return false;
     }
 
-    public CuboidWrapper getSelected() {
+    public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> Selection<CBE, MDL> getSelection(MDL model) {
         ScaledResolution scaledResolution = new ScaledResolution(ClientProxy.MINECRAFT);
         this.renderModel(this.partialTicks, scaledResolution, true, null);
         FloatBuffer buffer = BufferUtils.createFloatBuffer(3);
@@ -379,7 +428,14 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
         int green = (int) (buffer.get(1) * 255.0F);
         int blue = (int) (buffer.get(2) * 255.0F);
         int selectionID = (red & 0xFF) << 16 | (green & 0xFF) << 8 | blue & 0xFF;
-        return this.gui.getSelectedProject().getModel().getSelected(selectionID);
+        CBE cuboid = model.getRenderModel().getSelectedCuboid(selectionID >>> 3);
+        if (cuboid != null) {
+            int facingIndex = selectionID & 7;
+            EnumFacing side = facingIndex >= 0 && facingIndex < EnumFacing.VALUES.length ? EnumFacing.VALUES[facingIndex] : EnumFacing.UP;
+            return new Selection<>(model, cuboid, side);
+        } else {
+            return new Selection<>(model, null, EnumFacing.UP);
+        }
     }
 
     @Override
@@ -399,15 +455,19 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
     @Override
     public boolean acceptTexture(String texture, float mouseX, float mouseY) {
         if (this.isSelected(mouseX, mouseY)) {
-            CuboidWrapper cuboid = this.getSelected();
-            if (cuboid instanceof BlockCuboidWrapper) {
-                BlockCuboidWrapper blockCuboid = (BlockCuboidWrapper) cuboid;
-                for (EnumFacing facing : EnumFacing.VALUES) {
-                    QubbleVanillaFace face = blockCuboid.getCuboid().getFace(facing);
-                    face.setTexture(texture);
+            Project selectedProject = this.gui.getSelectedProject();
+            BlockModelWrapper model = selectedProject.getModel(ModelType.BLOCK);
+            if (model != null) {
+                Selection<BlockCuboidWrapper, BlockModelWrapper> selected = this.getSelection(model);
+                BlockCuboidWrapper cuboid = selected.getCuboid();
+                if (cuboid != null) {
+                    EnumFacing[] facings = GuiScreen.isShiftKeyDown() ? new EnumFacing[] { selected.getFacing() } : EnumFacing.VALUES;
+                    for (EnumFacing facing : facings) {
+                        QubbleVanillaFace face = cuboid.getCuboid().getFace(facing);
+                        face.setTexture(texture);
+                    }
                 }
-                Project selectedProject = this.gui.getSelectedProject();
-                selectedProject.setSelectedCuboid(blockCuboid);
+                selectedProject.setSelectedCuboid(cuboid);
                 return true;
             }
         }

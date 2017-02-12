@@ -11,7 +11,7 @@ import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
-import net.ilexiconn.qubble.server.model.ModelHandler;
+import net.ilexiconn.qubble.client.model.ModelHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Keyboard;
@@ -257,8 +257,8 @@ public class ModelTreeElement extends Element<QubbleGUI> implements ModelViewAda
                 } else if (GuiScreen.isKeyComboCtrlC(key)) {
                     CuboidWrapper clipboard = selectedCuboid.copyRaw();
                     if (model.supportsParenting()) {
-                        float[][] transformation = model.getParentTransformation(selectedCuboid, true, false);
-                        model.applyTransformation(clipboard, transformation);
+                        float[][] transformation = ModelHandler.INSTANCE.getParentTransformation(model, selectedCuboid, true, false);
+                        ModelHandler.INSTANCE.applyTransformation(clipboard, transformation);
                     }
                     this.gui.setClipboard(clipboard);
                     return true;
@@ -288,7 +288,6 @@ public class ModelTreeElement extends Element<QubbleGUI> implements ModelViewAda
                 } else if (selectedCuboid != null) {
                     selectedCuboid.setAutoUV();
                     project.setSaved(false);
-                    model.rebuildCuboid(selectedCuboid);
                 }
             }
         }

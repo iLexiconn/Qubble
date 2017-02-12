@@ -19,7 +19,7 @@ public abstract class ModelType<CBE extends CuboidWrapper<CBE>, MDL extends Mode
     public static final List<String> NAMES = new ArrayList<>();
     public static final Map<Integer, ModelType<?, ?>> TYPES = new HashMap<>();
 
-    public static final ModelType<DefaultCuboidWrapper, DefaultModelWrapper> DEFAULT = new ModelType<DefaultCuboidWrapper, DefaultModelWrapper>(0, "Default", DefaultModelWrapper.class, DefaultCuboidWrapper.class) {
+    public static final ModelType<DefaultCuboidWrapper, DefaultModelWrapper> DEFAULT = new ModelType<DefaultCuboidWrapper, DefaultModelWrapper>(0, true, "Default", DefaultModelWrapper.class, DefaultCuboidWrapper.class) {
         @Override
         public DefaultModelWrapper deserialize(NBTTagCompound compound) {
             return new DefaultModelWrapper(QubbleModel.deserialize(compound));
@@ -30,7 +30,7 @@ public abstract class ModelType<CBE extends CuboidWrapper<CBE>, MDL extends Mode
             return new DefaultModelWrapper(QubbleModel.create(name, author, 64, 32));
         }
     };
-    public static final ModelType<BlockCuboidWrapper, BlockModelWrapper> BLOCK = new ModelType<BlockCuboidWrapper, BlockModelWrapper>(1, "Vanilla JSON", BlockModelWrapper.class, BlockCuboidWrapper.class) {
+    public static final ModelType<BlockCuboidWrapper, BlockModelWrapper> BLOCK = new ModelType<BlockCuboidWrapper, BlockModelWrapper>(1, false, "Vanilla JSON", BlockModelWrapper.class, BlockCuboidWrapper.class) {
         @Override
         public BlockModelWrapper deserialize(NBTTagCompound compound) {
             return new BlockModelWrapper(QubbleVanillaModel.deserialize(compound));
@@ -46,12 +46,14 @@ public abstract class ModelType<CBE extends CuboidWrapper<CBE>, MDL extends Mode
     private String name;
     private Class<MDL> model;
     private Class<CBE> cuboid;
+    private boolean inverted;
 
-    private ModelType(int id, String name, Class<MDL> model, Class<CBE> cuboid) {
+    private ModelType(int id, boolean inverted, String name, Class<MDL> model, Class<CBE> cuboid) {
         this.id = id;
         this.name = name;
         this.cuboid = cuboid;
         this.model = model;
+        this.inverted = inverted;
         NAMES.add(name);
         TYPES.put(id, this);
     }
@@ -74,5 +76,9 @@ public abstract class ModelType<CBE extends CuboidWrapper<CBE>, MDL extends Mode
 
     public int id() {
         return this.id;
+    }
+
+    public boolean isInverted() {
+        return this.inverted;
     }
 }

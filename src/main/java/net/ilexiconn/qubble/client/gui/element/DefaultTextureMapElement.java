@@ -110,7 +110,6 @@ public class DefaultTextureMapElement extends Element<QubbleGUI> {
                     int textureX = (int) ((mouseX - this.getPosX()) / scale) + this.dragOffsetX;
                     int textureY = (int) ((mouseY - this.getPosY()) / scale) + this.dragOffsetY;
                     selectedCube.setTexture(Math.max(0, Math.min(textureX, model.getTextureWidth() - (selectedCube.getDimensionX() * 2 + selectedCube.getDimensionZ() * 2))), Math.max(0, Math.min(textureY, model.getTextureHeight() - (selectedCube.getDimensionY() + selectedCube.getDimensionZ()))));
-                    model.rebuildCuboid(selectedCube);
                     this.gui.getSidebar().enable(model, selectedCube);
                     selectedProject.setSaved(false);
                 }

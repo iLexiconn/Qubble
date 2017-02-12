@@ -7,6 +7,7 @@ import net.ilexiconn.llibrary.client.gui.element.Element;
 import net.ilexiconn.llibrary.client.gui.element.ListElement;
 import net.ilexiconn.llibrary.client.gui.element.ScrollbarElement;
 import net.ilexiconn.llibrary.client.gui.element.WindowElement;
+import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaTexture;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.GUIHelper;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
@@ -124,8 +125,10 @@ public class BlockTextureBarElement extends Element<QubbleGUI> implements ModelV
                     fontRenderer.drawString("x", (int) close.getCenterX() - fontRenderer.getCharWidth('x') / 2, (int) close.getCenterY() - 6 + closeSize / 2 - fontRenderer.FONT_HEIGHT / 2, LLibrary.CONFIG.getTextColor(), false);
                 }
                 GlStateManager.enableTexture2D();
-                fontRenderer.drawString(fontRenderer.trimStringToWidth(entry.getKey(), TILE_SIZE), renderX, renderY + TILE_SIZE, LLibrary.CONFIG.getTextColor(), false);
-                if (entry.getKey().equals("particle")) {
+                String textureName = entry.getKey();
+                fontRenderer.drawString(fontRenderer.trimStringToWidth(textureName, TILE_SIZE), renderX, renderY + TILE_SIZE, LLibrary.CONFIG.getTextColor(), false);
+                QubbleVanillaTexture vanillaTexture = model.getModel().getTextures().get(textureName);
+                if (textureName.equals("particle") || vanillaTexture.getBoolean("particle")) {
                     ClientProxy.MINECRAFT.getTextureManager().bindTexture(QubbleIcons.PARTICLE);
                     this.drawTexturedRectangle(renderX + 2, renderY + 2, 16, 16, 0xA0000000);
                     this.drawTexturedRectangle(renderX + 1, renderY + 1, 16, 16, 0xFFFFFFFF);
