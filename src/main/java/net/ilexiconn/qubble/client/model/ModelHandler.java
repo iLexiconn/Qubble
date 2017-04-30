@@ -16,6 +16,7 @@ import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
+import net.ilexiconn.qubble.client.project.ModelType;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -302,6 +303,17 @@ public enum ModelHandler {
         return copy;
     }
 
+    public <CBE extends CuboidWrapper<CBE>> void apply(CuboidWrapper<CBE> cuboid, CuboidWrapper<CBE> apply) {
+        cuboid.setName(apply.getName());
+        cuboid.setPosition(apply.getPositionX(), apply.getPositionY(), apply.getPositionZ());
+        cuboid.setDimensions(apply.getDimensionX(), apply.getDimensionY(), apply.getDimensionZ());
+        cuboid.setTexture(apply.getTextureX(), apply.getTextureY());
+        cuboid.setTextureMirrored(apply.isTextureMirrored());
+        cuboid.setOffset(apply.getOffsetX(), apply.getOffsetY(), apply.getOffsetZ());
+        cuboid.setRotation(apply.getRotationX(), apply.getRotationY(), apply.getRotationZ());
+        apply.setScale(apply.getScaleX(), apply.getScaleY(), apply.getScaleZ());
+    }
+
     private boolean hasIdentifier(QubbleModel model, String identifier) {
         for (QubbleCuboid cuboid : model.getCuboids()) {
             if (this.hasIdentifier(cuboid, identifier)) {
@@ -440,5 +452,33 @@ public enum ModelHandler {
 
     private float epsilon(float x) {
         return x < 0 ? x > -0.0001F ? 0 : x : x < 0.0001F ? 0 : x;
+    }
+
+    public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> CBE getCuboid(MDL model, String name) {
+        List<CBE> cuboids = this.getAllCuboids(model);
+        for (CBE cuboid : cuboids) {
+            if (cuboid.getName().equals(name)) {
+                return cuboid;
+            }
+        }
+        return null;
+    }
+
+    public <CBE extends CuboidWrapper<CBE>, MDL extends ModelWrapper<CBE>> List<CBE> getAllCuboids(MDL model) {
+        List<CBE> cuboids = new ArrayList<>();
+        for (CBE cuboid : model.getCuboids()) {
+            cuboids.add(cuboid);
+            cuboids.addAll(this.getAllCuboids(cuboid));
+        }
+        return cuboids;
+    }
+
+    private <CBE extends CuboidWrapper<CBE>> List<CBE> getAllCuboids(CBE cuboid) {
+        List<CBE> cuboids = new ArrayList<>();
+        for (CBE child : cuboid.getChildren()) {
+            cuboids.add(child);
+            cuboids.addAll(this.getAllCuboids(child));
+        }
+        return cuboids;
     }
 }

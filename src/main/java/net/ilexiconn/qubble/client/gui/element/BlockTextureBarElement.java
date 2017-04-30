@@ -11,12 +11,14 @@ import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaTexture;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.GUIHelper;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
-import net.ilexiconn.qubble.client.gui.Project;
+import net.ilexiconn.qubble.client.project.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.QubbleIcons;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.project.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
+import net.ilexiconn.qubble.client.project.action.RenameTextureAction;
+import net.ilexiconn.qubble.client.project.action.SetTextureAction;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
@@ -59,9 +61,7 @@ public class BlockTextureBarElement extends Element<QubbleGUI> implements ModelV
                 if (selectedProject != null) {
                     String entry = list.getSelectedEntry();
                     ModelTexture texture = new ModelTexture(new File(ClientProxy.QUBBLE_TEXTURE_DIRECTORY, entry + ".png"), entry);
-                    BlockModelWrapper model = selectedProject.getModel(ModelType.BLOCK);
-                    model.setTexture(entry, texture);
-                    selectedProject.setSaved(false);
+                    this.gui.perform(new SetTextureAction(this.gui, entry, texture));
                     this.gui.removeElement(selectTextureWindow);
                 }
                 return true;
@@ -209,7 +209,6 @@ public class BlockTextureBarElement extends Element<QubbleGUI> implements ModelV
                 }
                 if (accepted) {
                     this.gui.playClickSound();
-                    selectedProject.setSaved(false);
                 }
             } else {
                 Tuple<String, Boolean> texture = this.clickedTexture;
@@ -219,8 +218,7 @@ public class BlockTextureBarElement extends Element<QubbleGUI> implements ModelV
                 } else {
                     GUIHelper.INSTANCE.input(this.gui, "Rename Texture", texture.getFirst(), response -> {
                         if (response != null && response.trim().length() > 0) {
-                            model.renameTexture(texture.getFirst(), response);
-                            selectedProject.setSaved(false);
+                            this.gui.perform(new RenameTextureAction(this.gui, texture.getFirst(), response));
                         }
                         return false;
                     });

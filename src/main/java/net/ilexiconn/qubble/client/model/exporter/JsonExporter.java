@@ -7,7 +7,7 @@ import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaFace;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaRotation;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaTexture;
 import net.ilexiconn.qubble.client.model.container.BlockModelContainer;
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.project.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
 import net.minecraft.util.EnumFacing;

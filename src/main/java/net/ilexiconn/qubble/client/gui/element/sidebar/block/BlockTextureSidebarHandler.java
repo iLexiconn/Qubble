@@ -1,16 +1,17 @@
 package net.ilexiconn.qubble.client.gui.element.sidebar.block;
 
-import net.ilexiconn.qubble.client.gui.Project;
+import net.ilexiconn.qubble.client.project.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarElement;
 import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarHandler;
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.project.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
 import net.minecraft.util.EnumFacing;
 
 public class BlockTextureSidebarHandler extends SidebarHandler<BlockCuboidWrapper, BlockModelWrapper> {
-    public BlockTextureSidebarHandler() {
+    @Override
+    public void createProperties(QubbleGUI gui, SidebarElement sidebar) {
     }
 
     @Override

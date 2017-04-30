@@ -1,6 +1,6 @@
 package net.ilexiconn.qubble.client.model.wrapper;
 
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.project.ModelType;
 import net.minecraft.util.EnumFacing;
 
 import java.util.List;
@@ -58,6 +58,8 @@ public interface CuboidWrapper<CBE extends CuboidWrapper<CBE>> {
 
     int getTextureY();
 
+    boolean isTextureMirrored();
+
     void setPosition(float x, float y, float z);
 
     void setOffset(float x, float y, float z);
@@ -77,6 +79,8 @@ public interface CuboidWrapper<CBE extends CuboidWrapper<CBE>> {
     void setMaxU(EnumFacing facing, float maxU);
 
     void setMaxV(EnumFacing facing, float maxV);
+
+    void setTextureMirrored(boolean mirrored);
 
     void addChild(CBE cuboid);
 

@@ -1,4 +1,4 @@
-package net.ilexiconn.qubble.client.model;
+package net.ilexiconn.qubble.client.project;
 
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaModel;

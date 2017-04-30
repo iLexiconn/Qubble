@@ -3,7 +3,7 @@ package net.ilexiconn.qubble.client.gui.element;
 import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.gui.element.Element;
 import net.ilexiconn.qubble.client.ClientProxy;
-import net.ilexiconn.qubble.client.gui.Project;
+import net.ilexiconn.qubble.client.project.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarElement;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
@@ -46,7 +46,7 @@ public class ProjectBarElement extends Element<QubbleGUI> {
             Project project = openProjects.get(projectIndex);
             ModelWrapper model = project.getModel();
             String name = model.getName();
-            if (!project.isSaved()) {
+            if (project.isModified()) {
                 name = "* " + name;
             }
             float projectWidth = fontRenderer.getStringWidth(name) + 15.0F;
@@ -79,7 +79,7 @@ public class ProjectBarElement extends Element<QubbleGUI> {
                     Project project = openProjects.get(projectIndex);
                     ModelWrapper model = project.getModel();
                     String name = model.getName();
-                    if (!project.isSaved()) {
+                    if (project.isModified()) {
                         name = "* " + name;
                     }
                     float projectWidth = fontRenderer.getStringWidth(name) + 15.0F;

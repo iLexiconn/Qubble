@@ -8,6 +8,7 @@ import net.ilexiconn.llibrary.client.gui.element.InputElement;
 import net.ilexiconn.llibrary.client.gui.element.LabelElement;
 import net.ilexiconn.llibrary.client.gui.element.ListElement;
 import net.ilexiconn.llibrary.client.gui.element.WindowElement;
+import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
 import net.minecraft.client.gui.FontRenderer;
 
@@ -30,7 +31,7 @@ public enum GUIHelper {
     }
 
     public <T extends IElementGUI> WindowElement<T> info(T gui, int width, String title, String message) {
-        FontRenderer fontRenderer = gui.getFontRenderer();
+        FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
         List<String> lines = this.splitLines(width, message, fontRenderer);
         int lineHeight = fontRenderer.FONT_HEIGHT + 2;
         int height = lines.size() * lineHeight + 29;

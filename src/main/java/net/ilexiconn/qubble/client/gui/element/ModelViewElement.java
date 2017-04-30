@@ -2,21 +2,23 @@ package net.ilexiconn.qubble.client.gui.element;
 
 import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.gui.element.Element;
-import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaFace;
 import net.ilexiconn.llibrary.client.util.ClientUtils;
 import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.GUIHelper;
-import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.toolbar.ToolbarElement;
-import net.ilexiconn.qubble.client.model.ModelType;
-import net.ilexiconn.qubble.client.model.Selection;
 import net.ilexiconn.qubble.client.model.render.QubbleRenderModel;
 import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
+import net.ilexiconn.qubble.client.project.ModelType;
+import net.ilexiconn.qubble.client.project.Project;
+import net.ilexiconn.qubble.client.project.Selection;
+import net.ilexiconn.qubble.client.project.action.CreateSideCuboid;
+import net.ilexiconn.qubble.client.project.action.CuboidUpdateAction;
+import net.ilexiconn.qubble.client.project.action.SetFaceTextureAction;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
@@ -315,13 +317,7 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
                 this.draggingFace = selected.getFacing();
             }
             if (GuiScreen.isAltKeyDown() && selectedCuboid != null) {
-                CuboidWrapper created = model.createSide(selectedCuboid, selected.getFacing());
-                selectedProject.setSelectedCuboid(created);
-                if (GuiScreen.isShiftKeyDown() && model.supportsParenting()) {
-                    model.reparent(created, selectedCuboid, true);
-                }
-                model.rebuildModel();
-                selectedProject.setSaved(false);
+                this.gui.perform(new CreateSideCuboid(this.gui, selectedCuboid, selected.getFacing(), GuiScreen.isShiftKeyDown()));
                 return true;
             } else {
                 selectedProject.setSelectedCuboid(selectedCuboid);
@@ -351,7 +347,6 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
                 if (selectedProject != null && selectedProject.getSelectedCuboid() != null) {
                     ModelWrapper model = selectedProject.getModel();
                     CuboidWrapper selectedCuboid = selectedProject.getSelectedCuboid();
-                    selectedProject.setSaved(false);
                 }
             } else {
                 if (button == 0) {
@@ -398,11 +393,12 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
                 } else if (axis == EnumFacing.Axis.Z) {
                     offsetZ = offset;
                 }
-                selectedCuboid.setDimensions(selectedCuboid.getDimensionX() + offsetX, selectedCuboid.getDimensionY() + offsetY, selectedCuboid.getDimensionZ() + offsetZ);
+                CuboidWrapper updated = selectedCuboid.copyRaw();
+                updated.setDimensions(selectedCuboid.getDimensionX() + offsetX, selectedCuboid.getDimensionY() + offsetY, selectedCuboid.getDimensionZ() + offsetZ);
                 if (direction == (selectedCuboid.getModelType().isInverted() ? EnumFacing.AxisDirection.NEGATIVE : EnumFacing.AxisDirection.POSITIVE)) {
-                    selectedCuboid.setPosition(selectedCuboid.getPositionX() - offsetX, selectedCuboid.getPositionY() - offsetY, selectedCuboid.getPositionZ() - offsetZ);
+                    updated.setPosition(selectedCuboid.getPositionX() - offsetX, selectedCuboid.getPositionY() - offsetY, selectedCuboid.getPositionZ() - offsetZ);
                 }
-                selectedProject.setSaved(false);
+                this.gui.perform(new CuboidUpdateAction(this.gui, updated));
             } else {
                 this.zoomVelocity += (amount / 120.0F) * 0.05F;
             }
@@ -439,7 +435,7 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
     }
 
     @Override
-    protected boolean isSelected(float mouseX, float mouseY) {
+    public boolean isSelected(float mouseX, float mouseY) {
         ToolbarElement toolbar = this.gui.getToolbar();
         ProjectBarElement projectBar = this.gui.getProjectBar();
         return this.gui.isElementOnTop(this) && mouseY >= toolbar.getPosY() + toolbar.getHeight() + (projectBar.isVisible() ? projectBar.getHeight() : 0);
@@ -461,11 +457,8 @@ public class ModelViewElement extends Element<QubbleGUI> implements TextureDragA
                 Selection<BlockCuboidWrapper, BlockModelWrapper> selected = this.getSelection(model);
                 BlockCuboidWrapper cuboid = selected.getCuboid();
                 if (cuboid != null) {
-                    EnumFacing[] facings = GuiScreen.isShiftKeyDown() ? new EnumFacing[] { selected.getFacing() } : EnumFacing.VALUES;
-                    for (EnumFacing facing : facings) {
-                        QubbleVanillaFace face = cuboid.getCuboid().getFace(facing);
-                        face.setTexture(texture);
-                    }
+                    EnumFacing[] sides = GuiScreen.isShiftKeyDown() ? new EnumFacing[] { selected.getFacing() } : EnumFacing.VALUES;
+                    this.gui.perform(new SetFaceTextureAction(this.gui, cuboid.getName(), texture, sides));
                 }
                 selectedProject.setSelectedCuboid(cuboid);
                 return true;

@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.client.model.wrapper;
 
 import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.project.ModelType;
 import net.ilexiconn.qubble.client.model.ModelHandler;
 import net.minecraft.util.EnumFacing;
 
@@ -228,10 +228,12 @@ public class DefaultCuboidWrapper implements CuboidWrapper<DefaultCuboidWrapper>
     public void setAutoUV() {
     }
 
+    @Override
     public void setTextureMirrored(boolean textureMirrored) {
         this.cuboid.setTextureMirrored(textureMirrored);
     }
 
+    @Override
     public boolean isTextureMirrored() {
         return this.cuboid.isTextureMirrored();
     }

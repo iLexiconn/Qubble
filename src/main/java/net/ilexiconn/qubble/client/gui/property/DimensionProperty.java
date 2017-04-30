@@ -1,23 +1,16 @@
 package net.ilexiconn.qubble.client.gui.property;
 
-import net.ilexiconn.llibrary.server.property.IFloatRangeProperty;
-import net.ilexiconn.llibrary.server.property.IStringProperty;
-import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarHandler;
+import net.ilexiconn.qubble.client.gui.QubbleGUI;
 
 import java.util.function.Consumer;
 
-public class DimensionProperty implements IFloatRangeProperty, IStringProperty {
+public class DimensionProperty extends ActionFloatProperty {
     private int value;
-    private SidebarHandler handler;
     private Consumer<Integer> submit;
 
-    public DimensionProperty(SidebarHandler handler, Consumer<Integer> submit) {
-        this.handler = handler;
+    public DimensionProperty(QubbleGUI gui, Consumer<Integer> submit) {
+        super(gui);
         this.submit = submit;
-    }
-
-    public DimensionProperty(Consumer<Integer> submit) {
-        this(null, submit);
     }
 
     @Override
@@ -31,17 +24,14 @@ public class DimensionProperty implements IFloatRangeProperty, IStringProperty {
     }
 
     @Override
-    public float getFloat() {
+    public float getAction() {
         return this.value;
     }
 
     @Override
-    public void setFloat(float value) {
+    public void setAction(float value) {
         this.value = (int) value;
         this.submit.accept(this.value);
-        if (this.handler != null) {
-            this.handler.updateSliders();
-        }
     }
 
     @Override
@@ -64,7 +54,8 @@ public class DimensionProperty implements IFloatRangeProperty, IStringProperty {
         }
     }
 
-    public void set(int value) {
-        this.value = value;
+    @Override
+    public void init(float value) {
+        this.value = (int) value;
     }
 }

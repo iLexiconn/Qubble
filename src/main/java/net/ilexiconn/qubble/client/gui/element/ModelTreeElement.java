@@ -6,12 +6,17 @@ import net.ilexiconn.llibrary.client.gui.element.Element;
 import net.ilexiconn.llibrary.client.gui.element.ScrollbarElement;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.GUIHelper;
-import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
+import net.ilexiconn.qubble.client.model.ModelHandler;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
-import net.ilexiconn.qubble.client.model.ModelHandler;
+import net.ilexiconn.qubble.client.project.Project;
+import net.ilexiconn.qubble.client.project.action.AutoUVCuboidAction;
+import net.ilexiconn.qubble.client.project.action.AutoUVModelAction;
+import net.ilexiconn.qubble.client.project.action.CreateCuboidAction;
+import net.ilexiconn.qubble.client.project.action.RemoveCuboidAction;
+import net.ilexiconn.qubble.client.project.action.ReparentCuboidAction;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Keyboard;
@@ -37,29 +42,18 @@ public class ModelTreeElement extends Element<QubbleGUI> implements ModelViewAda
     public void init() {
         this.gui.addElement(this.scroller = new ScrollbarElement<>(this, () -> this.getWidth() - 8.0F, () -> 2.0F, () -> (float) this.getHeight(), 12, () -> this.entryCount));
         this.gui.addElement(new ButtonElement<>(this.gui, "+", this.getPosX(), this.getPosY() + this.getHeight(), 16, 16, (button) -> {
-            this.createCube();
+            ModelWrapper model = this.gui.getSelectedProject().getModel();
+            String name = ModelHandler.INSTANCE.getCopyName(model, "Cuboid");
+            this.gui.perform(new CreateCuboidAction(this.gui, name));
             return true;
         }).withColorScheme(ColorSchemes.DEFAULT));
         this.gui.addElement(new ButtonElement<>(this.gui, "-", this.getPosX() + 16, this.getPosY() + this.getHeight(), 16, 16, (button) -> {
             Project project = this.gui.getSelectedProject();
-            if (project != null) {
-                this.removeSelectedCuboid();
+            if (project != null && project.getSelectedCuboid() != null) {
+                this.gui.perform(new RemoveCuboidAction(this.gui, project.getSelectedCuboid().getName()));
             }
             return true;
         }).withColorScheme(ColorSchemes.DEFAULT));
-    }
-
-    private boolean createCube() {
-        if (this.gui.getSelectedProject() != null && this.gui.getSelectedProject().getModel() != null) {
-            ModelWrapper model = this.gui.getSelectedProject().getModel();
-            String name = ModelHandler.INSTANCE.getCopyName(model, "Cuboid");
-            CuboidWrapper cuboid = model.createCuboid(name);
-            this.gui.getSelectedProject().setSaved(false);
-            this.gui.getSelectedProject().setSelectedCuboid(cuboid);
-            this.gui.getSidebar().selectName();
-            return true;
-        }
-        return false;
     }
 
     @Override
@@ -149,17 +143,17 @@ public class ModelTreeElement extends Element<QubbleGUI> implements ModelViewAda
         if (this.parenting != null) {
             Project project = this.gui.getSelectedProject();
             if (project != null && project.getModel() != null) {
-                ModelWrapper model = project.getModel();
-                if (model.supportsParenting()) {
-                    if (model.reparent(this.parenting, this.getSelectedCube(mouseX, mouseY), GuiScreen.isShiftKeyDown())) {
-                        project.setSaved(false);
-                        model.rebuildModel();
-                    }
-                }
+                CuboidWrapper newParent = this.getSelectedCube(mouseX, mouseY);
+                this.gui.perform(new ReparentCuboidAction(this.gui, this.parenting, newParent, GuiScreen.isShiftKeyDown()));
             }
             this.parenting = null;
         }
         return false;
+    }
+
+    @Override
+    public boolean isSelected(float mouseX, float mouseY) {
+        return super.isSelected(mouseX, mouseY);
     }
 
     private CuboidWrapper mouseDetectionCubeEntry(CuboidWrapper<?> cube, int xOffset, float mouseX, float mouseY) {
@@ -187,31 +181,33 @@ public class ModelTreeElement extends Element<QubbleGUI> implements ModelViewAda
         return null;
     }
 
-    private void drawCubeEntry(CuboidWrapper<?> cube, int xOffset) {
+    private void drawCubeEntry(CuboidWrapper<?> cuboid, int xOffset) {
         FontRenderer fontRenderer = ClientProxy.MINECRAFT.fontRendererObj;
-        String name = cube.getName();
+        String name = cuboid.getName();
         float entryX = this.getPosX() + xOffset;
         float entryY = this.getPosY() + this.cubeY * 12.0F + 2.0F - this.scroller.getScrollOffset();
-        if (!cube.equals(this.parenting)) {
-            fontRenderer.drawString(name, entryX + 10, entryY, this.gui.getSelectedProject().getSelectedCuboid() == cube ? LLibrary.CONFIG.getAccentColor() : LLibrary.CONFIG.getTextColor(), false);
+        if (!cuboid.equals(this.parenting)) {
+            fontRenderer.drawString(name, entryX + 10, entryY, this.gui.getSelectedProject().getSelectedCuboid() == cuboid ? LLibrary.CONFIG.getAccentColor() : LLibrary.CONFIG.getTextColor(), false);
         }
         this.cubeY++;
-        boolean expanded = this.isExpanded(cube);
+        boolean expanded = this.isExpanded(cuboid);
         int prevCubeY = this.cubeY;
         int size = 0;
         if (expanded) {
             int i = 0;
-            for (CuboidWrapper child : cube.getChildren()) {
-                if (i == cube.getChildren().size() - 1) {
-                    size = (this.cubeY + 1) - prevCubeY;
+            for (CuboidWrapper child : cuboid.getChildren()) {
+                if (child != null) {
+                    if (i == cuboid.getChildren().size() - 1) {
+                        size = (this.cubeY + 1) - prevCubeY;
+                    }
+                    this.drawCubeEntry(child, xOffset + 6);
                 }
-                this.drawCubeEntry(child, xOffset + 6);
                 i++;
             }
         }
         int outlineColor = 0xFF9E9E9E;
         this.drawRectangle(entryX - 5, entryY + 3.5, 11, 0.75, outlineColor);
-        if (cube.getChildren().size() > 0) {
+        if (cuboid.getChildren().size() > 0) {
             if (expanded) {
                 this.drawRectangle(entryX + 1, entryY + 3.5, 0.75, size * 12.0F, outlineColor);
             }
@@ -248,61 +244,20 @@ public class ModelTreeElement extends Element<QubbleGUI> implements ModelViewAda
     public boolean keyPressed(char character, int key) {
         Project project = this.gui.getSelectedProject();
         if (project != null) {
-            ModelWrapper model = project.getModel();
             CuboidWrapper selectedCuboid = project.getSelectedCuboid();
-            if (selectedCuboid != null) {
-                if (key == Keyboard.KEY_DELETE || key == Keyboard.KEY_BACK) {
-                    this.removeSelectedCuboid();
-                    return true;
-                } else if (GuiScreen.isKeyComboCtrlC(key)) {
-                    CuboidWrapper clipboard = selectedCuboid.copyRaw();
-                    if (model.supportsParenting()) {
-                        float[][] transformation = ModelHandler.INSTANCE.getParentTransformation(model, selectedCuboid, true, false);
-                        ModelHandler.INSTANCE.applyTransformation(clipboard, transformation);
-                    }
-                    this.gui.setClipboard(clipboard);
-                    return true;
-                }
-            }
-            if (GuiScreen.isKeyComboCtrlV(key)) {
-                CuboidWrapper clipboard = this.gui.getClipboard();
-                if (clipboard != null && clipboard.getModelType() == project.getModelType()) {
-                    CuboidWrapper copy = clipboard.copy(model);
-                    model.addCuboid(copy);
-                    project.setSelectedCuboid(copy);
-                }
-                return true;
-            }
             if (GuiScreen.isCtrlKeyDown() && key == Keyboard.KEY_F) {
                 if (GuiScreen.isShiftKeyDown()) {
                     GUIHelper.INSTANCE.confirmation(this.gui, "Are you sure you'd like to set all cuboid UVs to their defaults?", 150, accepted -> {
                         if (accepted) {
-                            List<CuboidWrapper> cuboids = model.getCuboids();
-                            for (CuboidWrapper cuboid : cuboids) {
-                                cuboid.setAutoUV();
-                            }
-                            project.setSaved(false);
-                            model.rebuildModel();
+                            this.gui.perform(new AutoUVModelAction(this.gui));
                         }
                     });
                 } else if (selectedCuboid != null) {
-                    selectedCuboid.setAutoUV();
-                    project.setSaved(false);
+                    this.gui.perform(new AutoUVCuboidAction(this.gui, selectedCuboid));
                 }
             }
         }
         return false;
-    }
-
-    private void removeSelectedCuboid() {
-        Project project = this.gui.getSelectedProject();
-        ModelWrapper model = project.getModel();
-        CuboidWrapper cuboid = project.getSelectedCuboid();
-        if (ModelHandler.INSTANCE.removeCuboid(model, cuboid)) {
-            project.setSelectedCuboid(null);
-            project.setSaved(false);
-            this.gui.getSidebar().disable();
-        }
     }
 
     public boolean isParenting() {

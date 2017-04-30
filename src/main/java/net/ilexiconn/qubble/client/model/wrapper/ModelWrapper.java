@@ -1,7 +1,7 @@
 package net.ilexiconn.qubble.client.model.wrapper;
 
 import net.ilexiconn.qubble.client.gui.ModelTexture;
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.project.ModelType;
 import net.ilexiconn.qubble.client.model.render.QubbleRenderModel;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;

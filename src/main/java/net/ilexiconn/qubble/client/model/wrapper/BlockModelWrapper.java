@@ -5,7 +5,7 @@ import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaFace;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaModel;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaTexture;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.project.ModelType;
 import net.ilexiconn.qubble.client.model.render.BlockRenderModel;
 import net.ilexiconn.qubble.client.model.render.QubbleRenderModel;
 import net.ilexiconn.qubble.client.model.ModelHandler;

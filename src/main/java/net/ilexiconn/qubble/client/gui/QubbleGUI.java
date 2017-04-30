@@ -10,10 +10,13 @@ import net.ilexiconn.qubble.client.gui.element.ProjectBarElement;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
 import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarElement;
 import net.ilexiconn.qubble.client.gui.element.toolbar.ToolbarElement;
-import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
-import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 import net.ilexiconn.qubble.client.model.ModelHandler;
 import net.ilexiconn.qubble.client.model.importer.IModelImporter;
+import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
+import net.ilexiconn.qubble.client.project.Project;
+import net.ilexiconn.qubble.client.project.action.ActionHandler;
+import net.ilexiconn.qubble.client.project.action.EditAction;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraftforge.fml.relauncher.Side;
@@ -48,6 +51,8 @@ public class QubbleGUI extends ElementGUI {
 
     private CuboidWrapper<?> clipboard;
 
+    private ActionHandler actionHandler = new ActionHandler(this);
+
     public QubbleGUI(GuiScreen parent) {
         this.parent = parent;
     }
@@ -63,6 +68,7 @@ public class QubbleGUI extends ElementGUI {
         this.addElement(this.sidebar = new SidebarElement(this));
         this.addElement(this.toolbar = new ToolbarElement(this));
         this.addElement(this.projectBar = new ProjectBarElement(this));
+
         this.initialized = true;
     }
 
@@ -82,7 +88,7 @@ public class QubbleGUI extends ElementGUI {
     }
 
     @Override
-    public void drawScreen(float v, float v1, float v2) {
+    public void drawScreen(float mouseX, float mouseY, float partialTicks) {
         this.resolution = new ScaledResolution(this.mc);
     }
 
@@ -102,6 +108,7 @@ public class QubbleGUI extends ElementGUI {
         ModelWrapper model = ModelHandler.INSTANCE.loadModel(name, importer);
         if (model != null) {
             this.selectModel(model);
+            this.getSelectedProject().clearHistory();
         }
     }
 
@@ -127,7 +134,7 @@ public class QubbleGUI extends ElementGUI {
     public void closeModel(int index) {
         if (!this.openProjects.isEmpty()) {
             Project project = this.openProjects.get(index);
-            if (project != null && !project.isSaved()) {
+            if (project != null && project.isModified()) {
                 WindowElement<QubbleGUI> window = new WindowElement<>(this, "Project not saved!", 200, 54);
                 new LabelElement<>(this, "You have unsaved changes to this", 3.0F, 16.0F).withParent(window);
                 new LabelElement<>(this, "project. Would you like to save now?", 3.0F, 26.0F).withParent(window);
@@ -138,7 +145,7 @@ public class QubbleGUI extends ElementGUI {
                 }).withParent(window).withColorScheme(ColorSchemes.WINDOW);
                 new ButtonElement<>(this, "Discard", 101.0F, 37.0F, 97, 15, (button) -> {
                     this.removeElement(window);
-                    project.setSaved(true);
+                    project.clearHistory();
                     this.closeModel(index);
                     return true;
                 }).withParent(window).withColorScheme(ColorSchemes.WINDOW);
@@ -216,9 +223,12 @@ public class QubbleGUI extends ElementGUI {
                     }
                 });
                 return;
+            } else {
+                this.actionHandler.onKeyTyped(keyCode, this.getPreciseMouseX(), this.getPreciseMouseY());
             }
             super.keyTyped(typedChar, keyCode);
         } catch (Exception e) {
+            GUIHelper.INSTANCE.error(this, 200, "Key press threw an exception!", e);
             e.printStackTrace();
         }
     }
@@ -236,7 +246,7 @@ public class QubbleGUI extends ElementGUI {
     public void close(Consumer<Boolean> callback) {
         int unsaved = 0;
         for (Project project : this.openProjects) {
-            if (!project.isSaved()) {
+            if (project.isModified()) {
                 unsaved++;
             }
         }
@@ -266,6 +276,18 @@ public class QubbleGUI extends ElementGUI {
 
     public CuboidWrapper<?> getClipboard() {
         return this.clipboard;
+    }
+
+    public void perform(EditAction action) {
+        Project selectedProject = this.getSelectedProject();
+        if (selectedProject != null) {
+            try {
+                selectedProject.perform(action);
+            } catch (Exception e) {
+                GUIHelper.INSTANCE.error(this, 200, "Action threw exception!", e);
+                e.printStackTrace();
+            }
+        }
     }
 
     public static List<String> getFiles(File directory, String extension) {

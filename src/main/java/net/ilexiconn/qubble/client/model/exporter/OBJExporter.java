@@ -5,7 +5,7 @@ import net.ilexiconn.llibrary.client.model.obj.OBJModel;
 import net.ilexiconn.llibrary.client.model.obj.Shape;
 import net.ilexiconn.llibrary.client.model.obj.TextureCoords;
 import net.ilexiconn.llibrary.client.model.obj.Vertex;
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.project.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
 import org.lwjgl.util.vector.Vector3f;

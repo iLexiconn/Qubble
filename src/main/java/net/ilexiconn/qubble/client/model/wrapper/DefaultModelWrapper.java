@@ -4,7 +4,7 @@ import net.ilexiconn.llibrary.client.model.qubble.QubbleCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.QubbleModel;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.project.ModelType;
 import net.ilexiconn.qubble.client.model.render.DefaultRenderModel;
 import net.ilexiconn.qubble.client.model.render.QubbleRenderModel;
 import net.ilexiconn.qubble.client.model.ModelHandler;

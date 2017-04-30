@@ -5,12 +5,14 @@ import net.ilexiconn.llibrary.client.gui.element.Element;
 import net.ilexiconn.llibrary.client.gui.element.InputElement;
 import net.ilexiconn.llibrary.client.gui.element.InputElementBase;
 import net.ilexiconn.llibrary.client.gui.element.LabelElement;
-import net.ilexiconn.qubble.client.gui.Project;
+import net.ilexiconn.qubble.client.gui.GUIHelper;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.model.ModelHandler;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
-import net.ilexiconn.qubble.client.model.ModelHandler;
+import net.ilexiconn.qubble.client.project.ModelType;
+import net.ilexiconn.qubble.client.project.Project;
+import net.ilexiconn.qubble.client.project.action.RenameCuboidAction;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -74,9 +76,13 @@ public class SidebarElement extends Element<QubbleGUI> {
                 if (selectedCuboid != null) {
                     ModelWrapper<?> model = selectedProject.getModel();
                     if (!ModelHandler.INSTANCE.hasDuplicateName(model, inputElement.getText())) {
-                        selectedCuboid.setName(inputElement.getText());
+                        try {
+                            selectedProject.perform(new RenameCuboidAction(this.gui, selectedCuboid.getName(), inputElement.getText()));
+                        } catch (Exception e) {
+                            GUIHelper.INSTANCE.error(this.gui, 200, "Failed to rename cuboid!", e);
+                            e.printStackTrace();
+                        }
                         model.rebuildModel();
-                        selectedProject.setSaved(false);
                     } else {
                         inputElement.clearText();
                         inputElement.writeText(selectedCuboid.getName());
@@ -95,5 +101,9 @@ public class SidebarElement extends Element<QubbleGUI> {
         if (this.nameInput != null && this.nameInput.isEnabled()) {
             this.nameInput.select();
         }
+    }
+
+    public SidebarHandler getHandler() {
+        return this.sidebarHandler;
     }
 }

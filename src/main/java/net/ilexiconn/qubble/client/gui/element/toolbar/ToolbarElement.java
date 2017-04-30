@@ -18,19 +18,20 @@ import net.ilexiconn.qubble.Qubble;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.GUIHelper;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
-import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.color.ColorSchemes;
 import net.ilexiconn.qubble.client.gui.property.CheckboxProperty;
 import net.ilexiconn.qubble.client.gui.property.ColorProperty;
-import net.ilexiconn.qubble.client.model.ModelType;
-import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
-import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
 import net.ilexiconn.qubble.client.model.ModelHandler;
 import net.ilexiconn.qubble.client.model.exporter.IModelExporter;
 import net.ilexiconn.qubble.client.model.exporter.ModelExporters;
 import net.ilexiconn.qubble.client.model.importer.IModelImporter;
 import net.ilexiconn.qubble.client.model.importer.ModelImporters;
+import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
+import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
+import net.ilexiconn.qubble.client.project.ModelType;
+import net.ilexiconn.qubble.client.project.Project;
+import net.ilexiconn.qubble.client.project.action.SetTextureAction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Session;
@@ -114,7 +115,6 @@ public class ToolbarElement extends Element<QubbleGUI> {
                     }
                 }
                 this.gui.selectModel(type.create(name, author));
-                this.gui.getSelectedProject().setSaved(false);
                 this.gui.removeElement(newWindow);
             }
             return true;
@@ -180,8 +180,8 @@ public class ToolbarElement extends Element<QubbleGUI> {
             ResourceLocation texture = ClientProxy.GAME_TEXTURES.get(list.getSelectedEntry());
             if (texture != null) {
                 Project selectedProject = this.gui.getSelectedProject();
-                selectedProject.getModel(model.getType()).setBaseTexture(new ModelTexture(texture));
-                selectedProject.setSaved(true);
+                this.gui.perform(new SetTextureAction(this.gui, ModelTexture.BASE, new ModelTexture(texture)));
+                selectedProject.clearHistory();
             }
             this.gui.removeElement(openWindow);
             return true;
@@ -225,7 +225,7 @@ public class ToolbarElement extends Element<QubbleGUI> {
         saveWindow.addElement(new ButtonElement<>(this.gui, "Save", 2, 50, 47, 12, (v) -> {
             try {
                 ModelHandler.INSTANCE.saveModel(selectedModel, fileName.getText());
-                project.setSaved(true);
+                project.clearHistory();
                 callback.accept(true);
             } catch (IOException e) {
                 GUIHelper.INSTANCE.error(this.gui, 200, "Failed to save model!", e);

@@ -7,13 +7,15 @@ import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaFace;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.GUIHelper;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
-import net.ilexiconn.qubble.client.gui.Project;
+import net.ilexiconn.qubble.client.project.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.gui.element.TextureDragAcceptor;
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.project.ModelType;
 import net.ilexiconn.qubble.client.model.wrapper.BlockCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.BlockModelWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
+import net.ilexiconn.qubble.client.project.action.SetFaceEnabledAction;
+import net.ilexiconn.qubble.client.project.action.SetFaceTextureAction;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
@@ -130,19 +132,14 @@ public class BlockFaceElement extends Element<QubbleGUI> implements TextureDragA
                 GUIHelper.INSTANCE.selection(this.gui, "Select Texture", textures, selection -> {
                     BlockCuboidWrapper cuboidWrapper = project.getSelectedCuboid(ModelType.BLOCK);
                     if (cuboidWrapper != null) {
-                        QubbleVanillaCuboid cuboid = cuboidWrapper.getCuboid();
-                        QubbleVanillaFace face = cuboid.getFace(this.facing);
-                        face.setTexture(selection);
-                        project.setSaved(false);
-                        model.rebuildModel();
+                        this.gui.perform(new SetFaceTextureAction(this.gui, cuboidWrapper.getName(), selection, this.facing));
                     }
                 });
                 return true;
             } else if (this.isSelected(close, mouseX, mouseY)) {
                 BlockCuboidWrapper cuboid = this.gui.getSelectedProject().getSelectedCuboid(ModelType.BLOCK);
                 QubbleVanillaFace face = cuboid.getCuboid().getFace(this.facing);
-                face.setEnabled(!face.isEnabled());
-                project.setSaved(false);
+                this.gui.perform(new SetFaceEnabledAction(this.gui, cuboid, this.facing, !face.isEnabled()));
                 this.gui.playClickSound();
                 return true;
             }
@@ -167,10 +164,9 @@ public class BlockFaceElement extends Element<QubbleGUI> implements TextureDragA
     public boolean acceptTexture(String texture, float mouseX, float mouseY) {
         if (this.isSelected(mouseX, mouseY)) {
             Project project = this.gui.getSelectedProject();
-            if (project != null && project.getSelectedCuboid(ModelType.BLOCK) != null) {
-                BlockCuboidWrapper cuboid = project.getSelectedCuboid(ModelType.BLOCK);
-                QubbleVanillaFace face = cuboid.getCuboid().getFace(this.facing);
-                face.setTexture(texture);
+            BlockCuboidWrapper cuboid = project.getSelectedCuboid(ModelType.BLOCK);
+            if (cuboid != null) {
+                this.gui.perform(new SetFaceTextureAction(this.gui, project.getSelectedCuboid().getName(), texture, this.facing));
                 return true;
             }
         }

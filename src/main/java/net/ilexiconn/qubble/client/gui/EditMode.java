@@ -9,7 +9,8 @@ import net.ilexiconn.qubble.client.gui.element.sidebar.DefaultTextureSidebarHand
 import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarHandler;
 import net.ilexiconn.qubble.client.gui.element.sidebar.block.BlockModelSidebarHandler;
 import net.ilexiconn.qubble.client.gui.element.sidebar.block.BlockTextureSidebarHandler;
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.project.ModelType;
+import net.ilexiconn.qubble.client.project.Project;
 
 import java.util.function.Function;
 

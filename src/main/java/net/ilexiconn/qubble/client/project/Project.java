@@ -1,19 +1,22 @@
-package net.ilexiconn.qubble.client.gui;
+package net.ilexiconn.qubble.client.project;
 
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.gui.QubbleGUI;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
+import net.ilexiconn.qubble.client.project.action.ActionHistory;
+import net.ilexiconn.qubble.client.project.action.EditAction;
 
 public class Project {
     private QubbleGUI gui;
     private ModelWrapper model;
     private CuboidWrapper selectedCuboid;
-    private boolean saved;
+    private ActionHistory history = new ActionHistory(128);
+    private ActionHistory undoHistory = new ActionHistory(128);
+    private int actionIndex = 1;
 
     public Project(QubbleGUI gui, ModelWrapper model) {
         this.gui = gui;
         this.model = model;
-        this.saved = true;
     }
 
     public ModelWrapper<?> getModel() {
@@ -47,15 +50,42 @@ public class Project {
         }
     }
 
-    public void setSaved(boolean saved) {
-        this.saved = saved;
+    public boolean isModified() {
+        return this.actionIndex != 0;
     }
 
-    public boolean isSaved() {
-        return this.saved;
+    public void perform(EditAction action) throws Exception {
+        this.history.push(action);
+        this.undoHistory.clear();
+        this.actionIndex++;
+        action.perform();
+    }
+
+    public void undo() throws Exception {
+        EditAction action = this.history.pop();
+        if (action != null) {
+            action.undo();
+            this.undoHistory.push(action);
+            this.actionIndex--;
+        }
+    }
+
+    public void redo() throws Exception {
+        EditAction action = this.undoHistory.pop();
+        if (action != null) {
+            this.history.push(action);
+            action.perform();
+            this.actionIndex++;
+        }
     }
 
     public ModelType<?, ?> getModelType() {
         return this.model.getType();
+    }
+
+    public void clearHistory() {
+        this.actionIndex = 0;
+        this.undoHistory.clear();
+        this.history.clear();
     }
 }

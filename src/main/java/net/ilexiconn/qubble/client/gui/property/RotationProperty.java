@@ -1,24 +1,17 @@
 package net.ilexiconn.qubble.client.gui.property;
 
-import net.ilexiconn.llibrary.server.property.IFloatRangeProperty;
-import net.ilexiconn.llibrary.server.property.IStringProperty;
 import net.ilexiconn.qubble.Qubble;
-import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarHandler;
+import net.ilexiconn.qubble.client.gui.QubbleGUI;
 
 import java.util.function.Function;
 
-public class RotationProperty implements IFloatRangeProperty, IStringProperty {
+public class RotationProperty extends ActionFloatProperty {
     private float value;
-    private SidebarHandler handler;
     private Function<Float, Float> submit;
 
-    public RotationProperty(SidebarHandler handler, Function<Float, Float> submit) {
-        this.handler = handler;
+    public RotationProperty(QubbleGUI gui, Function<Float, Float> submit) {
+        super(gui);
         this.submit = submit;
-    }
-
-    public RotationProperty(Function<Float, Float> submit) {
-        this(null, submit);
     }
 
     @Override
@@ -32,14 +25,13 @@ public class RotationProperty implements IFloatRangeProperty, IStringProperty {
     }
 
     @Override
-    public float getFloat() {
+    public float getAction() {
         return this.value;
     }
 
     @Override
-    public void setFloat(float value) {
+    public void setAction(float value) {
         this.value = this.submit.apply(Float.parseFloat(Qubble.DEFAULT_FORMAT.format(value)));
-        this.handler.updateSliders();
     }
 
     @Override
@@ -62,7 +54,8 @@ public class RotationProperty implements IFloatRangeProperty, IStringProperty {
         }
     }
 
-    public void set(float value) {
+    @Override
+    public void init(float value) {
         this.value = value;
     }
 }

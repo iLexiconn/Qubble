@@ -7,13 +7,14 @@ import net.ilexiconn.llibrary.client.gui.element.InputElementBase;
 import net.ilexiconn.llibrary.client.gui.element.PropertyInputElement;
 import net.ilexiconn.llibrary.client.gui.element.SliderElement;
 import net.ilexiconn.llibrary.server.property.IBooleanProperty;
-import net.ilexiconn.llibrary.server.property.IFloatProperty;
 import net.ilexiconn.llibrary.server.property.IStringProperty;
-import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.gui.property.ActionFloatProperty;
+import net.ilexiconn.qubble.client.gui.property.ActionObjectProperty;
 import net.ilexiconn.qubble.client.model.wrapper.CuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.ModelWrapper;
+import net.ilexiconn.qubble.client.project.ModelType;
+import net.ilexiconn.qubble.client.project.Project;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +25,7 @@ public abstract class SidebarHandler<CBE extends CuboidWrapper<CBE>, MDL extends
     protected QubbleGUI gui;
 
     private final List<IBooleanProperty> booleanProperties = new ArrayList<>();
-    private final List<IFloatProperty> floatProperties = new ArrayList<>();
+    private final List<ActionFloatProperty> floatProperties = new ArrayList<>();
     private final List<IStringProperty> stringProperties = new ArrayList<>();
     private final List<SliderElement<QubbleGUI, ?>> sliders = new ArrayList<>();
     private final List<CheckboxElement<QubbleGUI>> checkboxes = new ArrayList<>();
@@ -35,6 +36,7 @@ public abstract class SidebarHandler<CBE extends CuboidWrapper<CBE>, MDL extends
     public void create(QubbleGUI gui, SidebarElement sidebar) {
         this.gui = gui;
 
+        this.createProperties(gui, sidebar);
         this.createElements(gui, sidebar);
         for (SliderElement<QubbleGUI, ?> element : this.sliders) {
             element.withParent(sidebar);
@@ -53,6 +55,8 @@ public abstract class SidebarHandler<CBE extends CuboidWrapper<CBE>, MDL extends
         }
     }
 
+    public abstract void createProperties(QubbleGUI gui, SidebarElement sidebar);
+
     public void enable(QubbleGUI gui, MDL model, CBE cuboid) {
         this.gui = gui;
 
@@ -63,14 +67,22 @@ public abstract class SidebarHandler<CBE extends CuboidWrapper<CBE>, MDL extends
     }
 
     public void disable() {
-        for (IFloatProperty property : this.floatProperties) {
-            property.setFloat(0.0F);
+        for (ActionFloatProperty property : this.floatProperties) {
+            property.init(0.0F);
         }
         for (IBooleanProperty property : this.booleanProperties) {
-            property.setBoolean(false);
+            if (property instanceof ActionObjectProperty) {
+                ((ActionObjectProperty) property).init(false);
+            } else {
+                property.setBoolean(false);
+            }
         }
         for (IStringProperty property : this.stringProperties) {
-            property.setString("");
+            if (property instanceof ActionObjectProperty) {
+                ((ActionObjectProperty) property).init("");
+            } else {
+                property.setString("");
+            }
         }
         this.setEnabled(false);
         this.updateSliders();
@@ -90,7 +102,7 @@ public abstract class SidebarHandler<CBE extends CuboidWrapper<CBE>, MDL extends
 
     protected abstract void initElements(MDL model, CBE cuboid);
 
-    protected void addFloat(IFloatProperty... properties) {
+    protected void addFloat(ActionFloatProperty... properties) {
         Collections.addAll(this.floatProperties, properties);
     }
 
@@ -136,10 +148,10 @@ public abstract class SidebarHandler<CBE extends CuboidWrapper<CBE>, MDL extends
                 if (model != null && selectedCuboid != null) {
                     edit.accept(selectedCuboid);
                     model.rebuildModel();
-                    selectedProject.setSaved(false);
                 }
             }
         }
+        this.updateSliders();
     }
 
     protected void editModel(Consumer<MDL> edit) {
@@ -150,10 +162,10 @@ public abstract class SidebarHandler<CBE extends CuboidWrapper<CBE>, MDL extends
                 if (model != null) {
                     edit.accept(model);
                     model.rebuildModel();
-                    selectedProject.setSaved(false);
                 }
             }
         }
+        this.updateSliders();
     }
 
     private void setEnabled(boolean enabled) {

@@ -4,11 +4,13 @@ import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.gui.element.Element;
 import net.ilexiconn.qubble.client.ClientProxy;
 import net.ilexiconn.qubble.client.gui.ModelTexture;
-import net.ilexiconn.qubble.client.gui.Project;
 import net.ilexiconn.qubble.client.gui.QubbleGUI;
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.gui.element.sidebar.DefaultTextureSidebarHandler;
+import net.ilexiconn.qubble.client.gui.element.sidebar.SidebarHandler;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
+import net.ilexiconn.qubble.client.project.ModelType;
+import net.ilexiconn.qubble.client.project.Project;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
@@ -109,9 +111,14 @@ public class DefaultTextureMapElement extends Element<QubbleGUI> {
                     float scale = this.getScale(model);
                     int textureX = (int) ((mouseX - this.getPosX()) / scale) + this.dragOffsetX;
                     int textureY = (int) ((mouseY - this.getPosY()) / scale) + this.dragOffsetY;
-                    selectedCube.setTexture(Math.max(0, Math.min(textureX, model.getTextureWidth() - (selectedCube.getDimensionX() * 2 + selectedCube.getDimensionZ() * 2))), Math.max(0, Math.min(textureY, model.getTextureHeight() - (selectedCube.getDimensionY() + selectedCube.getDimensionZ()))));
-                    this.gui.getSidebar().enable(model, selectedCube);
-                    selectedProject.setSaved(false);
+                    SidebarHandler handler = this.gui.getSidebar().getHandler();
+                    if (handler instanceof DefaultTextureSidebarHandler) {
+                        DefaultTextureSidebarHandler textureHandler = (DefaultTextureSidebarHandler) handler;
+                        textureHandler.propertyTextureX.setFloat(textureX);
+                        textureHandler.propertyTextureY.setFloat(textureY);
+                    } else {
+                        this.gui.getSidebar().enable(model, selectedCube);
+                    }
                 }
                 return true;
             }

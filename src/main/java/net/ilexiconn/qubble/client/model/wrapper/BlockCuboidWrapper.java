@@ -3,7 +3,7 @@ package net.ilexiconn.qubble.client.model.wrapper;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaCuboid;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaFace;
 import net.ilexiconn.llibrary.client.model.qubble.vanilla.QubbleVanillaRotation;
-import net.ilexiconn.qubble.client.model.ModelType;
+import net.ilexiconn.qubble.client.project.ModelType;
 import net.ilexiconn.qubble.client.model.ModelHandler;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.MathHelper;
@@ -176,6 +176,11 @@ public class BlockCuboidWrapper implements CuboidWrapper<BlockCuboidWrapper> {
     }
 
     @Override
+    public boolean isTextureMirrored() {
+        return false;
+    }
+
+    @Override
     public void setPosition(float x, float y, float z) {
         float dimensionX = this.getDimensionX();
         float dimensionY = this.getDimensionY();
@@ -268,6 +273,10 @@ public class BlockCuboidWrapper implements CuboidWrapper<BlockCuboidWrapper> {
     @Override
     public void setMaxV(EnumFacing facing, float maxV) {
         this.cuboid.getFace(facing).setMaxV(MathHelper.clamp(maxV, 0.0F, 16.0F));
+    }
+
+    @Override
+    public void setTextureMirrored(boolean mirrored) {
     }
 
     @Override
