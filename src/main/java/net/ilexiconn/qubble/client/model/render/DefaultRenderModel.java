@@ -1,9 +1,9 @@
 package net.ilexiconn.qubble.client.model.render;
 
 import net.ilexiconn.llibrary.LLibrary;
+import net.ilexiconn.qubble.client.model.ModelHandler;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultCuboidWrapper;
 import net.ilexiconn.qubble.client.model.wrapper.DefaultModelWrapper;
-import net.ilexiconn.qubble.client.model.ModelHandler;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.EnumFacing;
 
@@ -125,7 +125,7 @@ public class DefaultRenderModel extends QubbleRenderModel<DefaultCuboidWrapper, 
             float scaleX = cuboid.getScaleX();
             float scaleY = cuboid.getScaleY();
             float scaleZ = cuboid.getScaleZ();
-            GlStateManager.translate((-0.5F * scale) / scaleX, (-0.5F * scale) / scaleY, (0.5F * scale) / scaleZ);
+            GlStateManager.translate((-0.5F * scale) / scaleX, (-0.5F * scale) / scaleY, (-0.5F * scale) / scaleZ);
             GlStateManager.scale(0.15F, 0.15F, 0.15F);
             GlStateManager.translate((3.0F * scale) / scaleX, (-18.0F * scale) / scaleY, (3.0F * scale) / scaleZ);
             GlStateManager.pushMatrix();

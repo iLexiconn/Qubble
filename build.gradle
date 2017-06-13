@@ -20,21 +20,21 @@ archivesBaseName = "qubble"
 sourceCompatibility = targetCompatibility = "1.8"
 
 minecraft {
-    version = "1.10.2-12.18.2.2099"
+    version = "1.11.2-13.20.0.2282"
     runDir = "minecraft"
-    mappings = "stable_29"
+    mappings = "snapshot_20161220"
 }
 
 repositories {
-	mavenCentral()
-	maven {
-		name = "mcmoddev"
-		url = "http://maven.mcmoddev.com"
-	}
+    mavenCentral()
+    maven {
+        name = "mcmoddev"
+        url = "http://maven.mcmoddev.com"
+    }
 }
 
 dependencies {
-    //compile "net.ilexiconn:llibrary:$llibrary_version-1.10.2:dev"
+    compile "net.ilexiconn:llibrary:$llibrary_version-1.11.2:dev"
 }
 
 processResources {
@@ -42,49 +42,49 @@ processResources {
     inputs.property "mcversion", project.minecraft.version
     inputs.property "llibrary_version", llibrary_version
 
-    from (sourceSets.main.resources.srcDirs) {
+    from(sourceSets.main.resources.srcDirs) {
         include "mcmod.info"
         expand "version": project.version, "mcversion": project.minecraft.version, "llibrary_version": llibrary_version
     }
-        
-    from (sourceSets.main.resources.srcDirs) {
+
+    from(sourceSets.main.resources.srcDirs) {
         exclude "mcmod.info"
     }
 }
 
 String getModFile() {
-    String path = "";
+    String path = ""
     FileTree tree = fileTree(dir: 'src/main/java')
     tree.include '**/*.java'
-    tree.visit {element ->
+    tree.visit { element ->
         if (element.file.isFile()) {
             element.file.eachLine { String s ->
-                s = s.trim();
+                s = s.trim()
                 if (s.startsWith("@Mod")) {
                     path = "src/main/java/$element.relativePath"
                 }
             }
         }
     }
-    return path;
+    return path
 }
 
 String getVersion(String type, String mod_file) {
-    String major = "0";
-    String revision = "0";
-    String patch = "0";
-    String prefix = "public static final String $type = \"";
+    String major = "0"
+    String revision = "0"
+    String patch = "0"
+    String prefix = "public static final String $type = \""
     File file = file(mod_file)
     file.eachLine { String s ->
-        s = s.trim();
+        s = s.trim()
         if (s.startsWith(prefix)) {
-            s = s.substring(prefix.length(), s.length() - 2);
-            String[] pts = s.split("\\.");
+            s = s.substring(prefix.length(), s.length() - 2)
+            String[] pts = s.split("\\.")
 
-            major = pts[0];
-            revision = pts[1];
-            patch = pts[2];
+            major = pts[0]
+            revision = pts[1]
+            patch = pts[2]
         }
     }
-    return "$major.$revision.$patch";
+    return "$major.$revision.$patch"
 }

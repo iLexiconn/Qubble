@@ -36,6 +36,9 @@ public class ActionHandler {
                         GUIHelper.INSTANCE.error(this.gui, 200, "Failed to redo action", e);
                         e.printStackTrace();
                     }
+                } else if (key == Keyboard.KEY_N) {
+                    String name = ModelHandler.INSTANCE.getCopyName(model, "Cuboid");
+                    this.gui.perform(new CreateCuboidAction(this.gui, name));
                 } else if (GuiScreen.isKeyComboCtrlC(key)) {
                     CuboidWrapper clipboard = selectedCuboid.copyRaw();
                     if (model.supportsParenting()) {

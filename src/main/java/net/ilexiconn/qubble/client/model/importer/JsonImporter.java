@@ -35,7 +35,10 @@ public class JsonImporter implements IModelImporter<BlockModelContainer, BlockCu
         int partIndex = 0;
         QubbleVanillaModel qubbleModel = QubbleVanillaModel.create(fileName, "Unknown");
         for (BlockModelContainer.Element element : model.elements) {
-            String name = element.name == null ? "Part " + ++partIndex : element.name;
+            String name = element.name;
+            if (element.name == null) {
+                name = element.__comment == null ? "Part " + ++partIndex : element.__comment;
+            }
             QubbleVanillaCuboid cuboid = QubbleVanillaCuboid.create(name, null, element.from[0], element.from[1], element.from[2], element.to[0], element.to[1], element.to[2]);
             if (element.rotation != null) {
                 BlockModelContainer.ElementRotation elementRotation = element.rotation;

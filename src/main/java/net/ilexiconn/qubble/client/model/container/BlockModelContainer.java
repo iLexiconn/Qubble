@@ -1,5 +1,7 @@
 package net.ilexiconn.qubble.client.model.container;
 
+import net.minecraft.util.math.MathHelper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +16,7 @@ public class BlockModelContainer {
 
     public static class Element {
         public String name;
+        public String __comment;
         public float[] from = new float[3];
         public float[] to = new float[3];
         public ElementRotation rotation;
@@ -48,23 +51,15 @@ public class BlockModelContainer {
         public String texture;
         public float[] uv;
         public String cullface;
-        private Integer rotation;
-        private Integer tintindex;
+        public int tintindex;
+        private int rotation;
 
         public int getRotation() {
-            return this.rotation != null ? this.rotation : 0;
+            return MathHelper.clamp(this.rotation / 90 * 90, 0, 270);
         }
 
-        public int getTintIndex() {
-            return this.tintindex != null ? this.tintindex : 0;
-        }
-
-        public void setRotation(Integer rotation) {
-            this.rotation = rotation;
-        }
-
-        public void setTintIndex(Integer tintindex) {
-            this.tintindex = tintindex;
+        public void setRotation(int rotation) {
+            this.rotation = MathHelper.clamp(rotation / 90 * 90, 0, 270);
         }
     }
 

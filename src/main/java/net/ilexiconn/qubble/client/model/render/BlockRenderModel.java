@@ -67,7 +67,6 @@ public class BlockRenderModel extends QubbleRenderModel<BlockCuboidWrapper, Bloc
                 this.drawBlockFace(facing, fromX, fromY, fromZ, toX, toY, toZ, minU, minV, maxU, maxV);
             }
         }
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     @Override
