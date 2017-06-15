@@ -42,7 +42,7 @@ public class TabulaExporter implements IModelExporter<TabulaModelContainer, Defa
             if (identifier == null) {
                 identifier = this.generateIdentifier(cube.getName(), null);
             }
-            TabulaCubeContainer tabulaCube = new TabulaCubeContainer(cube.getName(), identifier, null, dimensions, position, offset, rotation, scale, textureOffset, cube.isTextureMirrored(), cube.getOpacity(), 0.0, false);
+            TabulaCubeContainer tabulaCube = new TabulaCubeContainer(cube.getName(), identifier, null, dimensions, position, offset, rotation, scale, textureOffset, cube.isTextureMirrored(), 100.0F, 0.0, false);
             tabulaCube.getChildren().addAll(this.convertChildren(cube, tabulaCube));
             tabulaCubes.add(tabulaCube);
         }
@@ -62,7 +62,7 @@ public class TabulaExporter implements IModelExporter<TabulaModelContainer, Defa
             if (identifier == null) {
                 identifier = this.generateIdentifier(child.getName(), parent.getName());
             }
-            TabulaCubeContainer tabulaChild = new TabulaCubeContainer(child.getName(), identifier, tabulaParent.getIdentifier(), dimensions, position, offset, rotation, scale, textureOffset, child.isTextureMirrored(), child.getOpacity(), 0.0, false);
+            TabulaCubeContainer tabulaChild = new TabulaCubeContainer(child.getName(), identifier, tabulaParent.getIdentifier(), dimensions, position, offset, rotation, scale, textureOffset, child.isTextureMirrored(), 100.0F, 0.0, false);
             tabulaChild.getChildren().addAll(this.convertChildren(child, tabulaChild));
             children.add(tabulaChild);
         }

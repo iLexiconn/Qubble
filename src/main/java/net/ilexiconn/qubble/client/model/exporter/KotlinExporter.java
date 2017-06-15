@@ -95,7 +95,6 @@ public class KotlinExporter implements IModelExporter<List<String>, DefaultCuboi
         for (DefaultCuboidWrapper cube : cubes) {
             String field = this.getFieldName(cube);
             boolean scale = cube.getRotationX() != 0.0F || cube.getRotationY() != 0.0F || cube.getRotationZ() != 0.0F;
-            boolean blend = cube.getOpacity() != 100.0F;
             if (scale) {
                 list.add("        GlStateManager.pushMatrix()");
                 list.add("        GlStateManager.translate(this." + field + ".offsetX, this." + field + ".offsetY, this." + field + ".offsetZ)");
@@ -104,15 +103,7 @@ public class KotlinExporter implements IModelExporter<List<String>, DefaultCuboi
                 list.add("        GlStateManager.translate(-this." + field + ".offsetX, -this." + field + ".offsetY, -this." + field + ".offsetZ)");
                 list.add("        GlStateManager.translate(-this." + field + ".rotationPointX * scale, -this." + field + ".rotationPointY * scale, -this." + field + ".rotationPointZ * scale)");
             }
-            if (blend) {
-                list.add("        GlStateManager.enableBlend()");
-                list.add("        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)");
-                list.add("        GlStateManager.color(1.0F, 1.0F, 1.0F, " + (cube.getOpacity() / 100.0F) + "F)");
-            }
             list.add("        this." + field + ".render(scale)");
-            if (blend) {
-                list.add("        GlStateManager.disableBlend()");
-            }
             if (scale) {
                 list.add("        GlStateManager.popMatrix()");
             }
