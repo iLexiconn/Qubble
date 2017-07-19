@@ -48,7 +48,7 @@ public class KotlinExporter implements IModelExporter<List<String>, DefaultCuboi
         this.addCubeDeclarations(model.getCuboids(), null, list);
         list.add("    }");
         list.add("");
-        list.add("    override fun render(entity: Entity, limbSwing: Float, limbSwingAmount: Float, ageInTick: Float, rotationYaw: Float, rotationPitch: Float, scale: Float) {");
+        list.add("    override fun render(entity: Entity?, limbSwing: Float, limbSwingAmount: Float, ageInTick: Float, rotationYaw: Float, rotationPitch: Float, scale: Float) {");
         this.addRenderCalls(model.getCuboids(), list);
         list.add("    }");
         list.add("");
@@ -74,7 +74,7 @@ public class KotlinExporter implements IModelExporter<List<String>, DefaultCuboi
     public void addCubeDeclarations(List<DefaultCuboidWrapper> cubes, DefaultCuboidWrapper parent, List<String> list) {
         for (DefaultCuboidWrapper cube : cubes) {
             String field = this.getFieldName(cube);
-            list.add("        this." + field + " = new ModelRenderer(this, " + cube.getTextureX() + ", " + cube.getTextureY() + ").apply {");
+            list.add("        this." + field + " = ModelRenderer(this, " + cube.getTextureX() + ", " + cube.getTextureY() + ").apply {");
             list.add("            setRotationPoint(" + cube.getPositionX() + "F, " + cube.getPositionY() + "F, " + cube.getPositionZ() + "F)");
             list.add("            addBox(" + cube.getOffsetX() + "F, " + cube.getOffsetY() + "F, " + cube.getOffsetZ() + "F, " + cube.getDimensionX() + ", " + cube.getDimensionY() + ", " + cube.getDimensionZ() + ")");
             if (cube.isTextureMirrored()) {
